@@ -6,9 +6,7 @@ id (PK)
 page_name
 page_code  - uk
 route_path - uk
-page_type
-status
-is_deleted
+isActive
 created_at
 updated_at
 

@@ -1,0 +1,12 @@
+package dynamicUi.demo.service;
+
+import dynamicUi.demo.entity.UIPage;
+import java.util.List;
+
+public interface UIPageService {
+    UIPage createPage(UIPage uiPage);
+    UIPage getPageByCode(String pageCode);
+    List<UIPage> getAllPages();
+    UIPage updatePage(String pageCode, UIPage uiPage);
+    void deletePage(String pageCode);
+}
