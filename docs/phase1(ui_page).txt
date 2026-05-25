@@ -1,0 +1,21 @@
+--DB 
+	
+ui_page
+---------
+id (PK)
+page_name
+page_code  - uk
+route_path - uk
+page_type
+status
+is_deleted
+created_at
+updated_at
+
+
+--Backend
+
+Two modules:
+
+Admin APIs
+Runtime APIs
