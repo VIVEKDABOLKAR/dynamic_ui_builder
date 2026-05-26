@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getUiPageByCode } from '../../api/uiPageApi'
+import DynamicPageRenderEngine from '../../components/dynamicPageRender/DynamicPageRenderEngine'
 
 export default function DynamicPageRendering() {
     //can use * in path insted of location 
@@ -54,9 +55,11 @@ export default function DynamicPageRendering() {
       //render json
       <div> Render json to UI </div>
 
+        {pageJson && 
       <div className="border-1 border-white/10">
             <DynamicPageRenderEngine jsonSchema={pageJson?.jsonSchema} />
       </div>
+        }
     </main>
   )
 }

@@ -13,29 +13,33 @@ import lombok.*;
 public class UIPageJson {
         private static final String DEFAULT_JSON_SCHEMA = """
                         {
-                            "page": {
-                                "id": 1,
-                                "pageCode": "home",
-                                "pageName": "Home Page"
-                            },
-                            "components": [
-                                {
-                                    "id": 1,
-                                    "type": "button",
-                                    "properties": {
-                                        "text": "Click Me",
-                                        "color": "blue"
-                                    }
-                                },
-                                {
-                                    "id": 2,
-                                    "type": "input",
-                                    "properties": {
-                                        "placeholder": "Enter text",
-                                        "width": 200
-                                    }
-                                }
-                            ]
+                              "page": {
+                                  "id": 1,
+                                  "pageCode": "home",
+                                  "pageName": "Home Page"
+                              },
+                              "components": [
+                                  {
+                                      "id": 1,
+                                      "name": "testButton",
+                                      "type": "button",
+                                      "sequence": 1,
+                                      "properties": {
+                                          "text": "Click Me",
+                                          "color": "blue"
+                                      }
+                                  },
+                                  {
+                                      "id": 2,
+                                      "name": "testInput",
+                                      "type": "input",
+                                      "sequence": 2,
+                                      "properties": {
+                                          "placeholder": "Enter text",
+                                          "width": 200
+                                      }
+                                  }
+                              ]
                         }
                         """;
 

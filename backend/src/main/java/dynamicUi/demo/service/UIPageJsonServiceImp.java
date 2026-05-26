@@ -19,7 +19,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
     public UIPageJson getByPageCode(String pageCode) {
         return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
             .orElseGet(() -> {
-                UIPageJson j = new UIPageJson();
+                UIPageJson j = UIPageJson.builder().id(-1L).build();
                 UIPage p = new UIPage();
                 p.setPageCode(pageCode);
                 j.setUiPage(p);
