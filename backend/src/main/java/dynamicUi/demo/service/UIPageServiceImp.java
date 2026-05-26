@@ -1,17 +1,23 @@
 package dynamicUi.demo.service;
 
-import dynamicUi.demo.entity.UIPage;
-import org.springframework.stereotype.Service;
-import dynamicUi.demo.repoistory.UIPageRepository;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import dynamicUi.demo.entity.UIPage;
+import dynamicUi.demo.entity.UIPageJson;
+import dynamicUi.demo.repoistory.UIPageJsonRepository;
+import dynamicUi.demo.repoistory.UIPageRepository;
 
 @Service
 public class UIPageServiceImp implements UIPageService {
 
     private final UIPageRepository uiPageRepository;
+    private final UIPageJsonRepository uiPageJsonRepository;
 
-    public UIPageServiceImp(UIPageRepository uiPageRepository) {
+    public UIPageServiceImp(UIPageRepository uiPageRepository, UIPageJsonRepository uiPageJsonRepository) {
         this.uiPageRepository = uiPageRepository;
+        this.uiPageJsonRepository = uiPageJsonRepository;
     }
 
     @Override
@@ -19,7 +25,11 @@ public class UIPageServiceImp implements UIPageService {
         if (uiPageRepository.existsByPageCode(uiPage.getPageCode())) {
             throw new RuntimeException("Page code already exists");
         }
-        return uiPageRepository.save(uiPage);
+        UIPage uiPageSaved = uiPageRepository.save(uiPage);
+        UIPageJson uiPageJson = new UIPageJson();
+        uiPageJson.setUiPage(uiPageSaved);
+        uiPageJsonRepository.save(uiPageJson);
+        return uiPageSaved;
     }
 
     @Override

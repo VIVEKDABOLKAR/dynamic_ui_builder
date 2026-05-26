@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import dynamicUi.demo.service.UIPageService;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/pages")
+@RequestMapping("/api/admin/pages")
 public class UIPageController {
 
     private final UIPageService uiPageService;
