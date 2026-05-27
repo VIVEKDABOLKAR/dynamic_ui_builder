@@ -1,7 +1,9 @@
 import React from 'react'
 import { convertToFormilySchema } from './JsonConvert.ts';
+import { form } from './formily/createForm.ts';
 
-
+import { FormProvider } from '@formily/react'
+import { SchemaField } from './formily/SchemaField.tsx';
 
 /**
  * this is the core engine to render dynamic page based on json schema
@@ -25,11 +27,11 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
         <>
             <div>DynamicPageRenderEngine</div>
 
-            {/* <div>
+            <div className='bg-white'>
                 <FormProvider form={form}>
                     <SchemaField schema={formilySchema} />
                 </FormProvider>
-            </div> */}
+            </div>
 
         </>
     )

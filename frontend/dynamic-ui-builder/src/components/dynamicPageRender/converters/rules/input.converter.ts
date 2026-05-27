@@ -11,7 +11,7 @@ export function convertInput(
         type: "string",
         title: prop.label,
         "x-component": "Input",
-        "x-decorator": "FormItem",
+        "x-decorator": "form",
 
         "x-component-props": {
             placeholder: prop.placeholder,

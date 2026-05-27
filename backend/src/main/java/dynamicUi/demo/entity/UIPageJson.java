@@ -35,6 +35,7 @@ public class UIPageJson {
                                       "type": "input",
                                       "sequence": 2,
                                       "properties": {
+                                          "label": "input field",
                                           "placeholder": "Enter text",
                                           "width": 200
                                       }
