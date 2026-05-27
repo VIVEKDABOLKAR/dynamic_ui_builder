@@ -11,8 +11,10 @@ export function convertButton(
     type: "void",
     "x-component": "CustomButton",
     "x-component-props": {
+      componentId: component.id,
       text: p.text,
-      variant: p.variant
+      variant: p.variant,
+      style: p.style || {}
     },
     "x-index": component.sequence
   };

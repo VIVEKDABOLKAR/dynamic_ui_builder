@@ -31,6 +31,7 @@ export function convertCard(
     "x-component": "Card",
 
     "x-component-props": {
+      componentId: component.id,
       title: p.title,
       description: p.description,
       width: p.width,

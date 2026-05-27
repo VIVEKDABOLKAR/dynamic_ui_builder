@@ -7,6 +7,7 @@ import { Textarea } from './muiComponents/Textarea'
 import { Card } from './muiComponents/Card'
 import { Select } from './muiComponents/Select'
 import { Checkbox } from './muiComponents/Checkbox'
+import { Radio } from './muiComponents/Radio'
 
 export const SchemaField = createSchemaField({
   components: {
@@ -17,6 +18,7 @@ export const SchemaField = createSchemaField({
     Card,
     Select,
     Checkbox,
+    Radio,
   },    
   
-})
+})  

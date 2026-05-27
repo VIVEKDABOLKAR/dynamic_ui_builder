@@ -17,9 +17,11 @@ export function convertSelect(
     "x-component": "Select",
 
     "x-component-props": {
+      componentId: component.id,
       placeholder: p.placeholder,
       style: {
-        width: p.width
+        width: p.width || "100%",
+        ...(p.style || {})
       }
     },
 

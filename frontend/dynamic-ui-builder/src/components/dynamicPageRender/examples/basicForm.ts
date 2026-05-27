@@ -138,9 +138,24 @@ export const basicFormSchema: DynamicPageSchema = {
         },
         {
           id: 33,
+          name: "gender",
+          type: "radio",
+          sequence: 3,
+          properties: {
+            label: "gender",
+            placeholder: "Select gender",
+            options: [
+              { label: "Male", value: "male" },
+              { label: "Women", value: "women" },
+            ],
+            width: "100%",
+          },
+        },
+        {
+          id: 34,
           name: "isActive",
           type: "checkbox",
-          sequence: 3,
+          sequence: 4,
           properties: {
             label: "Active employee",
             defaultValue: true,

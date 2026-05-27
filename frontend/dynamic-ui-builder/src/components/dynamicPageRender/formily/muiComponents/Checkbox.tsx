@@ -1,4 +1,5 @@
 import React from "react";
+import { Box } from "@mui/material";
 
 import {
   Checkbox as MuiCheckbox,
@@ -13,24 +14,31 @@ import {
 const BaseCheckbox = ({
   label,
   checked,
-  onChange
+  onChange,
+  style
 }: any) => {
 
   return (
-
-    <FormControlLabel
-
-      control={
-        <MuiCheckbox
-          checked={!!checked}
-          onChange={(e) => {
-            onChange?.(e.target.checked);
-          }}
-        />
-      }
-
-      label={label}
-    />
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        mb: 2,
+        ...style,
+      }}
+    >
+      <FormControlLabel
+        control={
+          <MuiCheckbox
+            checked={!!checked}
+            onChange={(e) => {
+              onChange?.(e.target.checked);
+            }}
+          />
+        }
+        label={label}
+      />
+    </Box>
   );
 };
 

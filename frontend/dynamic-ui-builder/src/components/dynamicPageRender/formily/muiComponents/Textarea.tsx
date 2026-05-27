@@ -12,8 +12,9 @@ const MuiTextarea = ({
   onInput,
   label,
   required,
-  height = 10,
+  height,
   width = "100%",
+  style,
   ...props
 }: any) => {
   return (
@@ -26,6 +27,9 @@ const MuiTextarea = ({
       onChange={(e) => onInput(e.target.value)}
       sx={{
         width,
+        mb: 2,
+        ...(height ? { minHeight: height } : {}),
+        ...style,
       }}
       {...props}
     />
@@ -36,5 +40,6 @@ export const Textarea = connect(
   MuiTextarea,
   mapProps({
     value: "value",
+    title: "label"
   })
 );

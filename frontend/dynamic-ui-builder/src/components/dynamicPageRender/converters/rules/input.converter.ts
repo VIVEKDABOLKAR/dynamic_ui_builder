@@ -14,10 +14,10 @@ export function convertInput(
         "x-decorator": "form",
 
         "x-component-props": {
+            componentId: comp.id,
             placeholder: prop.placeholder,
-            style: {
-                width: prop.width
-            }
+            width: prop.width || "100%",
+            style: prop.style || {}
         },
 
         "x-visible": prop.visible ?? true,

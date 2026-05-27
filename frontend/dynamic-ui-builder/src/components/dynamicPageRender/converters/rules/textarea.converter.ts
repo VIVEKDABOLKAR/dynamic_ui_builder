@@ -19,17 +19,16 @@ export function convertTextarea(
     "x-component": "Textarea",
 
     "x-component-props": {
+      componentId: component.id,
 
       placeholder: p.placeholder,
 
       multiline: true,
 
       minRows: p.rows || 4,
-
-      style: {
-        width: p.width || "100%",
-        height: p.height
-      }
+      width: p.width || "100%",
+      height: p.height,
+      style: p.style || {}
     },
 
     "x-index": component.sequence

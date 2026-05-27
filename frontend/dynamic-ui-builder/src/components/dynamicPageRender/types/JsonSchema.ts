@@ -14,7 +14,8 @@ export type ComponentType =
   | "card"
   | "divider"
   | "table"
-  | "custom";
+  | "custom"
+  | "radio";
 
 export type MappingType =
   | "STATIC"

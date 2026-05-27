@@ -1,6 +1,6 @@
 import { ComponentSchema } from "../../types/JsonSchema";
 
-export function convertCheckbox(
+export function convertRadio(
   component: ComponentSchema
 ): any {
 
@@ -8,17 +8,22 @@ export function convertCheckbox(
 
   return {
 
-    type: "boolean",
+    type: "string",
 
     title: p.label,
 
-    default: p.defaultValue || false,
+    default: p.defaultValue,
 
-    "x-component": "Checkbox",
+    enum: p.options || [],
+
+    "x-component": "Radio",
 
     "x-component-props": {
       componentId: component.id,
-      style: p.style || {}
+      style: {
+        width: p.width || "100%",
+        ...(p.style || {})
+      }
     },
 
     "x-index": component.sequence

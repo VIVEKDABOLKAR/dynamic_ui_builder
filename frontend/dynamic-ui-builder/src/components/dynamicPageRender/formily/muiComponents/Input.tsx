@@ -13,6 +13,7 @@ const MuiInput = ({
   label,
   required,
   width = "100%",
+  style,
   ...props
 }: any) => {
   return (
@@ -24,6 +25,8 @@ const MuiInput = ({
       onChange={(e) => onInput(e.target.value)}
       sx={{
         width,
+        mb: 2,
+        ...style,
       }}
       {...props}
     />
@@ -34,5 +37,6 @@ export const Input = connect(
   MuiInput,
   mapProps({
     value: "value",
+    title: "label",
   })
 );

@@ -5,6 +5,7 @@ import { convertCard } from "./rules/card.converter";
 import { convertCheckbox } from "./rules/checkbox.converter";
 import { convertHeading } from "./rules/heading.converter";
 import { convertInput } from "./rules/input.converter";
+import { convertRadio } from "./rules/radio.converter";
 import { convertSelect } from "./rules/select.converter";
 import { convertTextarea } from "./rules/textarea.converter";
 
@@ -34,6 +35,9 @@ export function convertComponetToField(
 
         case "checkbox":
             return convertCheckbox(component);
+
+        case "radio":
+            return convertRadio(component);
 
         default:
             console.warn(`Unsupported type: ${component.type}`);

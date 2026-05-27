@@ -1,74 +1,81 @@
 import React from "react";
 
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select as MuiSelect
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select as MuiSelect
 } from "@mui/material";
 
 import {
-  connect,
-  mapProps
+    connect,
+    mapProps
 } from "@formily/react";
 
 const BaseSelect = ({
-  label,
-  options = [],
-  value,
-  onChange,
-  placeholder,
-  style
+    label,
+    options = [],
+    value,
+    onChange,
+    placeholder,
+    style
 }: any) => {
 
-  return (
-    <FormControl
-      fullWidth
-      sx={style}
-    >
-      <InputLabel>
-        {label}
-      </InputLabel>
+    return (
+        <FormControl
+            fullWidth
+            sx={{
+                mb: 2,
+                ...style,
+            }}
+        >
+            <InputLabel>
+                {label}
+            </InputLabel>
 
-      <MuiSelect
-        value={value || ""}
-        label={label}
-        onChange={onChange}
-      >
+            <MuiSelect
+                value={value || ""}
+                label={label}
+                onChange={ (event) => {
+                    onChange?.(event.target.value);
+                }}
+            >
 
-        {options.map((item: any) => (
+                {options.map((item: any) => (
 
-          <MenuItem
-            key={item.value}
-            value={item.value}
-          >
-            {item.label}
-          </MenuItem>
+                    <MenuItem
+                        key={item.value}
+                        value={item.value}
+                    >
+                        {item.label}
+                    </MenuItem>
 
-        ))}
+                ))}
 
-      </MuiSelect>
+            </MuiSelect>
 
-    </FormControl>
-  );
+        </FormControl>
+    );
 };
 
 export const Select = connect(
-  BaseSelect,
+    BaseSelect,
 
-  mapProps(
-    {
-      dataSource: "options"
-    },
+    mapProps(
+        {
+            dataSource: "options",
+            value: "value",
+        },
+    
 
-    (props, field) => {
+        (props, field) => {
 
-      return {
+            return {
 
-        ...props,
+                ...props,
 
-        label: field.title
-      };
-    }
-  )
+                label: field.title
+            };
+        }
+    )
 );
