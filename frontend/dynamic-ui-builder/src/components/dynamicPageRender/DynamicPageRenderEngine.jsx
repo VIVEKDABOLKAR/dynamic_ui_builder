@@ -25,9 +25,9 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
     // const form = createForm();
     return (
         <>
-            <div>DynamicPageRenderEngine</div>
+            <div>DynamicPageRenderEngine:- {jsonSchema.pageName}</div>
 
-            <div className='bg-white'>
+            <div className='bg-white text-black'>
                 <FormProvider form={form}>
                     <SchemaField schema={formilySchema} />
                 </FormProvider>

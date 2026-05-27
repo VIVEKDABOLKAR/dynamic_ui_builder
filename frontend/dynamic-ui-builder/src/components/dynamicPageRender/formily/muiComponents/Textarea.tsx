@@ -7,17 +7,19 @@ import {
   mapProps
 } from "@formily/react";
 
-const MuiInput = ({
+const MuiTextarea = ({
   value,
   onInput,
   label,
   required,
+  height = 10,
   width = "100%",
   ...props
 }: any) => {
   return (
     <TextField
-      fullWidth
+      multiline
+      rows={4}
       value={value || ""}
       label={label}
       required={required}
@@ -30,8 +32,8 @@ const MuiInput = ({
   );
 };
 
-export const Input = connect(
-  MuiInput,
+export const Textarea = connect(
+  MuiTextarea,
   mapProps({
     value: "value",
   })

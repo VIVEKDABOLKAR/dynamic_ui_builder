@@ -8,6 +8,7 @@ export function convertToFormilySchema(jsonSchema: DynamicPageSchema | string) {
 
     const res = convertPageToFormily(normalizePageSchema(jsonSchema));
 
+    console.log(res)
     return res;
 }
 

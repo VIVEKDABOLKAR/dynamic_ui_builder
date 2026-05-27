@@ -11,6 +11,7 @@ export type ComponentType =
   | "select"
   | "checkbox"
   | "button"
+  | "card"
   | "divider"
   | "table"
   | "custom";
@@ -56,6 +57,7 @@ export interface ComponentSchema {
   type: ComponentType;
   sequence: number;               // render order
   properties: ComponentProperties;
+  children?: ComponentSchema[];
   mapping?: MappingSchema;
   lookup?: LookupSchema;
 }

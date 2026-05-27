@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getUiPageByCode } from '../../api/uiPageApi'
 import DynamicPageRenderEngine from '../../components/dynamicPageRender/DynamicPageRenderEngine'
+import { basicFormSchema } from '../../components/dynamicPageRender/examples/basicForm'
 
 export default function DynamicPageRendering() {
-    //can use * in path insted of location 
+  //can use * in path insted of location 
   const location = useLocation()
   const [pageJson, setPageJson] = useState(null)
 
@@ -40,26 +41,28 @@ export default function DynamicPageRendering() {
   const message = parsedSchema?.children?.[0]?.value || 'Hello world'
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">
-      <section className="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center">
+    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100 flex flex-row">
+      <section className="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center basis-1/2">
         <div className="w-full rounded-3xl border border-white/10 bg-white/5 p-8 text-center shadow-2xl shadow-slate-950/40 backdrop-blur">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300">Page Code: {pageCode}</p>
           <h1 className="mt-4 text-4xl font-semibold text-white">{title}</h1>
           <p className="mt-4 text-lg text-slate-300">{message}</p>
           <pre className="mt-6 overflow-auto rounded-2xl bg-slate-900/80 p-4 text-left text-xs text-slate-300">
-{JSON.stringify(pageJson?.jsonSchema ? parsedSchema : { title, message }, null, 2)}
+            {/* {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : { title, message }, null, 2)} */}
+            {JSON.stringify(basicFormSchema, null, 2)}
           </pre>
         </div>
       </section>
 
-      //render json
-      <div> Render json to UI </div>
 
-        {pageJson && 
-      <div className="border-1 border-white/10">
-            <DynamicPageRenderEngine jsonSchema={pageJson?.jsonSchema} />
-      </div>
-        }
+
+
+      {pageJson &&
+        <div className="border-1 border-white/10 basis-1/2">
+          <div> Render json to UI </div>
+          <DynamicPageRenderEngine jsonSchema={basicFormSchema} />
+        </div>
+      }
     </main>
   )
 }

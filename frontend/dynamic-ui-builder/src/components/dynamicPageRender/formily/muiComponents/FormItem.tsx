@@ -2,7 +2,7 @@ import FormControl from '@mui/material/FormControl'
 import FormHelperText from '@mui/material/FormHelperText'
 import InputLabel from '@mui/material/InputLabel'
 
-export const FormItem = (props) => {
+export const FormItem = (props: any) => {
   return (
     <FormControl fullWidth margin="normal">
       {props.label && (
