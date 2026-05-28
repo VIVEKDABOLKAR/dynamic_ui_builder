@@ -107,6 +107,14 @@ export const pageForm: DynamicPageSchema = {
               borderRadius: "8px",
             },
           },
+          action: [{
+            event: "onClick",
+            type: "SUBMIT_FORM",
+            api: {
+              url: "/api/admin/pages",
+              method: "POST"  
+            },
+          }]
         },
       ],
     },

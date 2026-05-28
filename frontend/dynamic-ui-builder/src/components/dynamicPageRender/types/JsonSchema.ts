@@ -63,9 +63,28 @@ export interface ComponentSchema {
   children?: ComponentSchema[];
   mapping?: MappingSchema;
   lookup?: LookupSchema;
+  action?: ActionSchema[];
   // layout?: LayoutSchema;
 }
 
+
+// ============================================
+// ACTION PROPERTIES
+// components specfice action array for functionlity
+// ============================================
+export interface ActionSchema {
+  event: string;
+  type?: ActionType;
+  api?: {
+    url: string;
+    method?: "GET" | "POST" | "PUT";
+    headers?: Record<string, string>;
+  }
+  value?: string;
+}
+
+export type ActionType =
+| "SUBMIT_FORM";
 
 // ============================================
 // COMPONENT PROPERTIES
