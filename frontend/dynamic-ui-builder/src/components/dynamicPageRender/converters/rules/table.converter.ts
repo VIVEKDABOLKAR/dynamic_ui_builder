@@ -12,6 +12,8 @@ export function convertTable(
 
     "x-component": "DataTable",
 
+    "x-mapping": component.mapping || undefined,
+
     "x-component-props": {
 
       title: p.title,

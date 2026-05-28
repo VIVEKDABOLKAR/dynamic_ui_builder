@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { createComponent, getComponentsByPage } from '../../../../api/componentApi'
+import { createComponent, deleteComponent, getComponentsByPage, updateComponent } from '../../../../api/componentApi'
 
 const AVAILABLE_COMPONENTS = [
   { type: 'input', label: 'Text Field', icon: '🔤' },
@@ -17,7 +17,9 @@ export default function ManagePageComponents() {
   const { pageCode } = useParams()
   const navigate = useNavigate()
   const [components, setComponents] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [editingComponentId, setEditingComponentId] = useState(null)
   const [selectedComponent, setSelectedComponent] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [formData, setFormData] = useState({
@@ -33,6 +35,86 @@ export default function ManagePageComponents() {
   })
   const [lookupValues, setLookupValues] = useState([])
   const [newLookupValue, setNewLookupValue] = useState('')
+
+  const loadComponents = async () => {
+    setIsLoading(true)
+    try {
+      const data = await getComponentsByPage(pageCode)
+      const list = Array.isArray(data) ? data : []
+      setComponents(list)
+      setFormData((prev) => ({
+        ...prev,
+        sequenceNo: list.length + 1,
+      }))
+    } catch (error) {
+      console.error('Failed to load page components', error)
+      setComponents([])
+      setFormData((prev) => ({
+        ...prev,
+        sequenceNo: 1,
+      }))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const resetForm = () => {
+    setEditingComponentId(null)
+    setSelectedComponent(null)
+    setFormData((prev) => ({
+      ...prev,
+      componentName: '',
+      componentType: AVAILABLE_COMPONENTS[0].type,
+      labelName: '',
+      placeholder: '',
+      width: '',
+      isRequired: false,
+      isVisible: true,
+      isDisabled: false,
+    }))
+    setLookupValues([])
+    setNewLookupValue('')
+  }
+
+  const handleEditRow = (row) => {
+    let parsedProperties = {}
+    try {
+      parsedProperties = row?.properties ? JSON.parse(row.properties) : {}
+    } catch (error) {
+      parsedProperties = {}
+    }
+
+    setEditingComponentId(row.id)
+    setSelectedComponent(row.componentType)
+    setFormData((prev) => ({
+      ...prev,
+      componentName: row.componentName || '',
+      componentType: row.componentType || AVAILABLE_COMPONENTS[0].type,
+      labelName: row.labelName || parsedProperties.label || '',
+      placeholder: row.placeholder || parsedProperties.placeholder || '',
+      width: parsedProperties.width || '',
+      sequenceNo: row.sequenceNo || 1,
+      isRequired: !!row.isRequired,
+      isVisible: row.isVisible ?? true,
+      isDisabled: row.isDisabled ?? false,
+    }))
+    setLookupValues(Array.isArray(row.lookupValues) ? row.lookupValues : [])
+  }
+
+  const handleDeleteRow = async (id) => {
+    const confirmed = window.confirm('Delete this component?')
+    if (!confirmed) return
+
+    try {
+      await deleteComponent(id)
+      await loadComponents()
+      if (editingComponentId === id) {
+        resetForm()
+      }
+    } catch (error) {
+      console.error('Failed to delete component', error)
+    }
+  }
 
   const columnDefs = [
     { field: 'id', hide: true },
@@ -57,30 +139,41 @@ export default function ManagePageComponents() {
       minWidth: 110,
       valueFormatter: (params) => (params.value ? 'Yes' : 'No'),
     },
+    {
+      headerName: 'Action',
+      field: 'actions',
+      pinned: 'right',
+      lockPinned: true,
+      lockPosition: true,
+      suppressMovable: true,
+      sortable: false,
+      filter: false,
+      minWidth: 190,
+      maxWidth: 220,
+      cellRenderer: (params) => (
+        <div className="flex h-full items-center gap-2 py-1">
+          <button
+            type="button"
+            onClick={() => handleEditRow(params.data)}
+            className="rounded-md bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-200"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDeleteRow(params.data.id)}
+            className="rounded-md bg-red-100 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-200"
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
   ]
 
   useEffect(() => {
-    const fetchComponents = async () => {
-      try {
-        const data = await getComponentsByPage(pageCode)
-        const list = Array.isArray(data) ? data : []
-        setComponents(list)
-        setFormData((prev) => ({
-          ...prev,
-          sequenceNo: list.length + 1,
-        }))
-      } catch (error) {
-        console.error('Failed to load page components', error)
-        setComponents([])
-        setFormData((prev) => ({
-          ...prev,
-          sequenceNo: 1,
-        }))
-      }
-    }
-
     if (pageCode) {
-      fetchComponents()
+      loadComponents()
     }
   }, [pageCode])
 
@@ -175,19 +268,14 @@ export default function ManagePageComponents() {
         }))
       }
 
-      await createComponent(payload)
-      const updated = await getComponentsByPage(pageCode)
-      const list = Array.isArray(updated) ? updated : []
-      setComponents(list)
-      setFormData((prev) => ({
-        ...prev,
-        componentName: '',
-        labelName: '',
-        placeholder: '',
-        sequenceNo: list.length + 1,
-      }))
-      setLookupValues([])
-      setNewLookupValue('')
+      if (editingComponentId) {
+        await updateComponent(editingComponentId, payload)
+      } else {
+        await createComponent(payload)
+      }
+
+      await loadComponents()
+      resetForm()
       navigate(`./`)
     } catch (error) {
       console.error('Failed to create component', error)
@@ -405,8 +493,17 @@ export default function ManagePageComponents() {
                 disabled={saving || (formData.componentType === 'select' || formData.componentType === 'radio') && lookupValues.length === 0}
                 className="inline-flex items-center justify-center rounded-full bg-cyan-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {saving ? 'Adding...' : 'Add Component'}
+                {saving ? (editingComponentId ? 'Updating...' : 'Adding...') : (editingComponentId ? 'Update Component' : 'Add Component')}
               </button>
+              {editingComponentId ? (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="inline-flex items-center justify-center rounded-full bg-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-300"
+                >
+                  Cancel Edit
+                </button>
+              ) : null}
             </form>
           </div>
 
@@ -419,7 +516,19 @@ export default function ManagePageComponents() {
             </div>
             <div className="overflow-hidden rounded-2xl border border-slate-200">
               <div className="h-[360px] w-full">
-                <AgGridReact rowData={components} columnDefs={columnDefs} />
+                {isLoading ? (
+                  <div className="flex h-full items-center justify-center gap-3 text-sm text-slate-500">
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
+                    Loading components...
+                  </div>
+                ) : components.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-slate-500">
+                    <p className="font-semibold text-slate-700">No components yet</p>
+                    <p>Add your first component using the form above.</p>
+                  </div>
+                ) : (
+                  <AgGridReact rowData={components} columnDefs={columnDefs} />
+                )}
               </div>
             </div>
           </div>

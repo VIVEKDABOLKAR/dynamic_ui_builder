@@ -2,11 +2,11 @@ import { convertPageToFormily } from "./converters/pageToFormily";
 import { DynamicPageSchema } from "./types/JsonSchema";
 
 //this will provied function to convert our define json scheama into formily json schema
-export async function convertToFormilySchema(jsonSchema: DynamicPageSchema | string) {
+export function convertToFormilySchema(jsonSchema: DynamicPageSchema | string) {
     //convert jsonSchema string into json object
 
 
-    const res = await convertPageToFormily(normalizePageSchema(jsonSchema));
+    const res = convertPageToFormily(normalizePageSchema(jsonSchema));
 
     console.log(res)
     return res;

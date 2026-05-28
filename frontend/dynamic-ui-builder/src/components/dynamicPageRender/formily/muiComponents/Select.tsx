@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
     FormControl,
@@ -12,14 +12,57 @@ import {
     mapProps
 } from "@formily/react";
 
+import { resolveApiLookup } from "../../../dataMappingEngine/rule/api.resolver";
+
 const BaseSelect = ({
     label,
     options = [],
     value,
     onChange,
     placeholder,
-    style
+    style,
+    lookup
 }: any) => {
+    const [runtimeOptions, setRuntimeOptions] = useState(options);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadOptions = async () => {
+            if (!lookup) {
+                if (mounted) setRuntimeOptions(options || []);
+                return;
+            }
+
+            try {
+                const response = await resolveApiLookup(lookup);
+                if (!mounted) return;
+
+                const labelKey = lookup.labelKey || "displayValue";
+                const valueKey = lookup.valueKey || "lookupValue";
+
+                const mapped = Array.isArray(response)
+                    ? response.map((item: any) => ({
+                        label: item?.[labelKey] ?? item?.label ?? String(item),
+                        value: item?.[valueKey] ?? item?.value ?? item?.id ?? item,
+                    }))
+                    : [];
+
+                setRuntimeOptions(mapped);
+            } catch (error) {
+                console.error("Failed to load select lookup options", error);
+                if (mounted) setRuntimeOptions(options || []);
+            }
+        };
+
+        loadOptions();
+
+        return () => {
+            mounted = false;
+        };
+    }, [lookup, options]);
+
+    const menuItems = useMemo(() => runtimeOptions || [], [runtimeOptions]);
 
     return (
         <FormControl
@@ -41,7 +84,7 @@ const BaseSelect = ({
                 }}
             >
 
-                {options.map((item: any) => (
+                {menuItems.map((item: any) => (
 
                     <MenuItem
                         key={item.value}

@@ -56,6 +56,7 @@ public class UiComponentServiceImp implements UiComponentService {
                 .isRequired(dto.getIsRequired())
                 .isVisible(dto.getIsVisible())
                 .isDisabled(dto.getIsDisabled())
+                .isActive(Boolean.TRUE.equals(dto.getIsActive()) || dto.getIsActive() == null)
                 .build();
 
         UIComponent saved = uiComponentRepository.save(component);
@@ -81,7 +82,7 @@ public class UiComponentServiceImp implements UiComponentService {
     public List<UIComponentDTO> getComponentsByPage(String pageCode) {
 
         List<UIComponent> components =
-                uiComponentRepository.findByUiPage_PageCodeOrderBySequenceNo(pageCode);
+            uiComponentRepository.findByUiPage_PageCodeAndIsActiveTrueOrderBySequenceNo(pageCode);
 
         return components.stream()
                 .map(this::mapToDto)
@@ -112,6 +113,7 @@ public class UiComponentServiceImp implements UiComponentService {
         component.setIsRequired(dto.getIsRequired());
         component.setIsVisible(dto.getIsVisible());
         component.setIsDisabled(dto.getIsDisabled());
+        component.setIsActive(dto.getIsActive() == null ? component.getIsActive() : dto.getIsActive());
         // lookup master id removed from DTO; relation handled via UILookupMaster association
 
         UIComponent updated = uiComponentRepository.save(component);
@@ -141,10 +143,11 @@ public class UiComponentServiceImp implements UiComponentService {
         UIComponent component = uiComponentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Component not found"));
 
-        // NEW: Get page code before deleting
+        // Soft delete: mark inactive instead of hard delete.
         String pageCode = component.getUiPage().getPageCode();
-
-        uiComponentRepository.deleteById(id);
+        component.setIsActive(false);
+        component.setIsVisible(false);
+        uiComponentRepository.save(component);
 
         // NEW: Remove from JSON schema
         uiPageJsonService.removeComponentFromJson(pageCode, id);
@@ -164,6 +167,7 @@ public class UiComponentServiceImp implements UiComponentService {
                 .isRequired(component.getIsRequired())
                 .isVisible(component.getIsVisible())
                 .isDisabled(component.getIsDisabled())
+                .isActive(component.getIsActive())
                 
                 .lookupValues(component.getUiLookupMaster() != null
                     ? uiLookupRepository.findByUiLookupMaster_Id(component.getUiLookupMaster().getId()).stream()

@@ -47,11 +47,7 @@ export const Card = ({
           </Typography>
         )}
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap={2}
-        >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {children}
         </Box>
       </CardContent>

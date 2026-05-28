@@ -33,6 +33,8 @@ public class UIComponentDTO {
     private Boolean isVisible;
 
     private Boolean isDisabled;
+
+    private Boolean isActive;
     private List<UILookupDTO> lookupValues;
 
 

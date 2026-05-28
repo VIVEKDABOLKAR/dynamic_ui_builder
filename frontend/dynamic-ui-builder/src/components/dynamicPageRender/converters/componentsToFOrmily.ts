@@ -13,7 +13,7 @@ import { convertTextarea } from "./rules/textarea.converter";
 
 export function convertComponetToField(
     component: ComponentSchema
-): FormilyFieldSchema | Promise<FormilyFieldSchema> | null {
+): FormilyFieldSchema | null {
 
     switch (component.type) {
         case "input":

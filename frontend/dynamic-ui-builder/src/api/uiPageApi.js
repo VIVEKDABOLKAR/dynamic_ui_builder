@@ -1,10 +1,6 @@
-import axios from 'axios'
-
-const uiClient = axios.create({
-  baseURL: 'http://localhost:8080/api/ui/pages',
-})
+import apiClient from './apiClient'
 
 export const getUiPageByCode = async (pageCode) => {
-  const response = await uiClient.get(`/${pageCode}`)
+  const response = await apiClient.get(`/api/ui/pages/${pageCode}`)
   return response.data
 }

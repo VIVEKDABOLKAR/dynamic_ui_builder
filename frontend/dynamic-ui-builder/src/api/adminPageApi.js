@@ -19,3 +19,8 @@ export const updatePage = async (pageCode, payload) => {
   const response = await adminClient.put(`/pages/${pageCode}`, payload)
   return response.data
 }
+
+export const deletePage = async (pageCode) => {
+  const response = await adminClient.delete(`/pages/${pageCode}`)
+  return response.data
+}

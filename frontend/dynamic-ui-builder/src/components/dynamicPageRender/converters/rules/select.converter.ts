@@ -1,18 +1,11 @@
-import { resolveApiLookup } from "../../../dataMappingEngine/rule/api.resolver";
 import { ComponentSchema } from "../../types/JsonSchema";
+import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 
-export async function convertSelect(
+export function convertSelect(
   component: ComponentSchema
-) {
+): FormilyFieldSchema {
 
   const p = component.properties || {};
-
-  const lookupResponse = await resolveApiLookup(component.lookup);
-
-  const options = (lookupResponse || []).map((item: any) => ({
-    label: item.displayValue,
-    value: item.lookupValue
-  }));
 
   return {
 
@@ -20,13 +13,20 @@ export async function convertSelect(
 
     title: p.label,
 
-    enum: options,
+    enum: p.options || [],
 
     "x-component": "Select",
+
+    "x-lookup": component.lookup || undefined,
+
+    "x-mapping": component.mapping || undefined,
 
     "x-component-props": {
       componentId: component.id,
       placeholder: p.placeholder,
+      lookup: component.lookup || null,
+      mapping: component.mapping || null,
+      options: p.options || [],
       style: {
         width: p.width || "100%",
         ...(p.style || {})

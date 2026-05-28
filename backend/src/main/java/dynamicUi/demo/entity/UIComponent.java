@@ -51,6 +51,9 @@ public class UIComponent {
     @Column(name = "is_disabled")
     private Boolean isDisabled;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @ManyToOne
     @JoinColumn(name = "lookup_master_id")
     private UILookupMaster uiLookupMaster;
@@ -63,6 +66,9 @@ public class UIComponent {
 
     @PrePersist
     public void prePersist() {
+        if (isActive == null) {
+            isActive = true;
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

@@ -2,10 +2,11 @@ package dynamicUi.demo.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.stereotype.Service;
 
 import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIPageJson;
@@ -90,7 +91,7 @@ public class UIPageServiceImp implements UIPageService {
 
     @Override
     public List<UIPage> getAllPages() {
-        return uiPageRepository.findAll();
+        return uiPageRepository.findByIsActiveTrue();
     }
 
     @Override

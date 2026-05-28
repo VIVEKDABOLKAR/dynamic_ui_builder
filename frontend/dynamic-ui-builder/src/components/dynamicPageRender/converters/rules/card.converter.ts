@@ -4,9 +4,9 @@ import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertComponetToField } from "../componentsToFOrmily";
 
 
-export async function convertCard(
+export function convertCard(
   component: ComponentSchema
-): Promise<FormilyFieldSchema> {
+): FormilyFieldSchema {
 
   const p = component.properties || {};
 
@@ -18,7 +18,7 @@ export async function convertCard(
 
   for (const child of children) {
 
-    const converted = await convertComponetToField(child);
+    const converted = convertComponetToField(child);
 
     if (!converted) continue;
 
@@ -32,7 +32,7 @@ export async function convertCard(
 
     "x-component-props": {
       componentId: component.id,
-      title: p.title,
+      title: p.title || p.label,
       description: p.description,
       width: p.width,
       style: p.style,

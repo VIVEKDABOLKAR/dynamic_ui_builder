@@ -19,20 +19,7 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
     const [formilySchema, setFormilySchema] = useState(null)
 
     useEffect(() => {
-        let mounted = true;
-
-        const loadSchema = async () => {
-            const res = await convertToFormilySchema(jsonSchema)
-            if (mounted) {
-                setFormilySchema(res)
-            }
-        }
-
-        loadSchema();
-
-        return () => {
-            mounted = false;
-        };
+        setFormilySchema(convertToFormilySchema(jsonSchema))
     }, [jsonSchema])
 
     if (!formilySchema) {

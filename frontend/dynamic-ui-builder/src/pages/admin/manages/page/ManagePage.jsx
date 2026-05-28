@@ -1,10 +1,36 @@
 import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Link } from 'react-router-dom'
-import { getAllPages } from '../../../../api/adminPageApi'
+import { deletePage, getAllPages } from '../../../../api/adminPageApi'
 
 export default function ManagePage() {
     const [rowData, setRowData] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+
+    const loadPages = async () => {
+        setIsLoading(true)
+        try {
+            const res = await getAllPages()
+            setRowData(Array.isArray(res) ? res : [])
+        } catch (error) {
+            console.error('Failed to load pages', error)
+            setRowData([])
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleDelete = async (pageCode) => {
+        const confirmed = window.confirm('Delete this page?')
+        if (!confirmed) return
+
+        try {
+            await deletePage(pageCode)
+            await loadPages()
+        } catch (error) {
+            console.error('Failed to delete page', error)
+        }
+    }
 
     const columnDefs = [
         { field: 'id', minWidth: 90 },
@@ -23,45 +49,42 @@ export default function ManagePage() {
         },
         {
             headerName: 'Action',
-            minWidth: 140,
+            minWidth: 320,
+            maxWidth: 380,
+            pinned: 'right',
+            lockPinned: true,
+            lockPosition: true,
+            suppressMovable: true,
             sortable: false,
             filter: false,
             cellRenderer: (params) => (
-                <Link
-                    to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
-                    className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
-                >
-                    Edit
-                </Link>
-            ),
-        },
-        {
-            headerName: 'Add Component',
-            minWidth: 180,
-            sortable: false,
-            filter: false,
-            cellRenderer: (params) => (
-                <Link
-                    to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
-                    className="rounded-full bg-cyan-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-cyan-400"
-                >
-                    Add Component
-                </Link>
+                <div className="flex h-full items-center gap-2 py-1">
+                    <Link
+                        to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
+                        className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-700"
+                    >
+                        Edit
+                    </Link>
+                    <button
+                        type="button"
+                        onClick={() => handleDelete(params.data.pageCode)}
+                        className="rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-red-400"
+                    >
+                        Delete
+                    </button>
+                    <Link
+                        to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
+                        className="rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-400"
+                    >
+                        Add Component
+                    </Link>
+                </div>
             ),
         },
     ]
 
     useEffect(() => {
-        const fetchPages = async () => {
-            try {
-                const res = await getAllPages()
-                setRowData(Array.isArray(res) ? res : [])
-            } catch (error) {
-                console.error('Failed to load pages', error)
-            }
-        }
-
-        fetchPages()
+        loadPages()
     }, [])
 
     return (
@@ -91,7 +114,19 @@ export default function ManagePage() {
 
                 <div className="overflow-auto">
                     <div className="h-[350px] ">
-                        <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+                        {isLoading ? (
+                            <div className="flex h-full items-center justify-center gap-3 text-sm text-slate-500">
+                                <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
+                                Loading pages...
+                            </div>
+                        ) : rowData.length === 0 ? (
+                            <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-slate-500">
+                                <p className="font-semibold text-slate-700">No pages yet</p>
+                                <p>Create a new page to get started.</p>
+                            </div>
+                        ) : (
+                            <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+                        )}
                     </div>
                 </div>
             </div>

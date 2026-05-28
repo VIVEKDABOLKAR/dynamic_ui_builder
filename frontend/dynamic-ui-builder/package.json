@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@alifd/next": "^1.27.34",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@formily/core": "^2.3.7",

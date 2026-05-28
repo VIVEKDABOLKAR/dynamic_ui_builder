@@ -17,14 +17,17 @@ export function convertInput(
             componentId: comp.id,
             placeholder: prop.placeholder,
             width: prop.width || "100%",
-            style: prop.style || {}
+            style: prop.style || {},
+            mapping: comp.mapping || null,
+            lookup: comp.lookup || null
         },
 
         "x-visible": prop.visible ?? true,
         "x-disabled": prop.disabled ?? false,
         "x-index": comp.sequence,
 
-        "x-mapping": comp.mapping,
+        "x-mapping": comp.mapping || undefined,
+        "x-lookup": comp.lookup || undefined,
 
         ...(prop.required && {
             "x-validator": [

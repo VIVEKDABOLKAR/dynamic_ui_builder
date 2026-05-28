@@ -5,9 +5,9 @@ import { convertComponetToField } from "./componentsToFOrmily";
 
 
 
-export async function convertPageToFormily(
+export function convertPageToFormily(
     page: DynamicPageSchema | null
-): Promise<FormilyPageSchema> {
+): FormilyPageSchema {
    
 
     // safety check
@@ -27,7 +27,7 @@ export async function convertPageToFormily(
     );
 
     for (const comp of sorted) {
-        const field = await convertComponetToField(comp);
+        const field = convertComponetToField(comp);
 
         if (field) {
             properties[comp.name] = field;
