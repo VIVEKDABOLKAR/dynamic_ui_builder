@@ -178,5 +178,20 @@ export const basicFormSchema: DynamicPageSchema = {
         },
       },
     },
+    {
+      "id": 50,
+      "name": "pagesTable",
+      "type": "table",
+      "sequence": 5,
+      "mapping": {
+        "type": "API",
+        "source": "PAGE_LIST_API",
+        "expression": "status = 'ACTIVE'"
+      },
+      "properties": {
+        "title": "Pages List",
+        "height": 400
+      }
+    }
   ],
 };

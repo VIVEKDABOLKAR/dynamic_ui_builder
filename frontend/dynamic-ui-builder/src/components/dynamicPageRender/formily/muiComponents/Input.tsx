@@ -4,7 +4,9 @@ import TextField from "@mui/material/TextField";
 
 import {
   connect,
-  mapProps
+  mapProps,
+  useField,
+  useFieldSchema
 } from "@formily/react";
 
 const MuiInput = ({
@@ -16,6 +18,11 @@ const MuiInput = ({
   style,
   ...props
 }: any) => {
+  const field = useField();
+  const fieldSchema = useFieldSchema();
+  
+  const mapping = fieldSchema["x-mapping"];
+
   return (
     <TextField
       fullWidth
@@ -38,5 +45,10 @@ export const Input = connect(
   mapProps({
     value: "value",
     title: "label",
-  })
+  }),
+  (props, field) => {
+    return {
+      ...props,
+    }
+  }
 );

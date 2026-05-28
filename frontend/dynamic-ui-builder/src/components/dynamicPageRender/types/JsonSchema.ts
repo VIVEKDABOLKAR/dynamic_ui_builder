@@ -22,7 +22,9 @@ export type MappingType =
   | "API"
   | "FIELD"
   | "FORMULA"
-  | "LOOKUP";
+  | "LOOKUP"
+  | "DATABASE"
+  | "ENTITY";
 
 
 // ============================================
@@ -61,6 +63,7 @@ export interface ComponentSchema {
   children?: ComponentSchema[];
   mapping?: MappingSchema;
   lookup?: LookupSchema;
+  // layout?: LayoutSchema;
 }
 
 
@@ -109,7 +112,7 @@ export interface SelectOption {
 export interface MappingSchema {
   type: MappingType;
 
-  source?: string;
+  source: string;
   target?: string;
 
   expression?: string;

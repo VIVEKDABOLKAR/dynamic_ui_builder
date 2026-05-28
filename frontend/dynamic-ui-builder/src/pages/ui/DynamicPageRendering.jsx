@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { getUiPageByCode } from '../../api/uiPageApi'
 import DynamicPageRenderEngine from '../../components/dynamicPageRender/DynamicPageRenderEngine'
 import { basicFormSchema } from '../../components/dynamicPageRender/examples/basicForm'
+import { pageForm } from '../../components/dynamicPageRender/examples/pageForm'
 
 export default function DynamicPageRendering() {
   //can use * in path insted of location 
@@ -49,7 +50,7 @@ export default function DynamicPageRendering() {
           <p className="mt-4 text-lg text-slate-300">{message}</p>
           <pre className="mt-6 overflow-auto rounded-2xl bg-slate-900/80 p-4 text-left text-xs text-slate-300">
             {/* {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : { title, message }, null, 2)} */}
-            {JSON.stringify(basicFormSchema, null, 2)}
+            {JSON.stringify(pageForm, null, 2)}
           </pre>
         </div>
       </section>
@@ -60,7 +61,7 @@ export default function DynamicPageRendering() {
       {pageJson &&
         <div className="border-1 border-white/10 basis-1/2">
           <div> Render json to UI </div>
-          <DynamicPageRenderEngine jsonSchema={basicFormSchema} />
+          <DynamicPageRenderEngine jsonSchema={pageForm} />
         </div>
       }
     </main>

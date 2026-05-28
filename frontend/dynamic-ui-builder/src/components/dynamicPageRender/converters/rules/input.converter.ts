@@ -24,6 +24,8 @@ export function convertInput(
         "x-disabled": prop.disabled ?? false,
         "x-index": comp.sequence,
 
+        "x-mapping": comp.mapping,
+
         ...(prop.required && {
             "x-validator": [
                 {

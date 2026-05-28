@@ -7,6 +7,7 @@ import { convertHeading } from "./rules/heading.converter";
 import { convertInput } from "./rules/input.converter";
 import { convertRadio } from "./rules/radio.converter";
 import { convertSelect } from "./rules/select.converter";
+import { convertTable } from "./rules/table.converter";
 import { convertTextarea } from "./rules/textarea.converter";
 
 
@@ -38,6 +39,9 @@ export function convertComponetToField(
 
         case "radio":
             return convertRadio(component);
+
+        case "table":
+            return convertTable(component);
 
         default:
             console.warn(`Unsupported type: ${component.type}`);
