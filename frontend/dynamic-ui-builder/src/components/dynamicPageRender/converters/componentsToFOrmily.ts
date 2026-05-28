@@ -32,7 +32,11 @@ export function convertComponetToField(
             return convertTextarea(component);
 
         case "select":
-            return convertSelect(component);
+            let response;
+            convertSelect(component).then((res) => {
+                response = res;
+            });
+            return response || null;
 
         case "checkbox":
             return convertCheckbox(component);

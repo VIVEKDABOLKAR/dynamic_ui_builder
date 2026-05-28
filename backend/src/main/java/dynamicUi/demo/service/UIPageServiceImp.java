@@ -2,6 +2,9 @@ package dynamicUi.demo.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 
 import dynamicUi.demo.entity.UIPage;
@@ -19,16 +22,63 @@ public class UIPageServiceImp implements UIPageService {
         this.uiPageRepository = uiPageRepository;
         this.uiPageJsonRepository = uiPageJsonRepository;
     }
-
     @Override
     public UIPage createPage(UIPage uiPage) {
+
         if (uiPageRepository.existsByPageCode(uiPage.getPageCode())) {
             throw new RuntimeException("Page code already exists");
         }
+
+        // STEP 1 - SAVE PAGE
+
         UIPage uiPageSaved = uiPageRepository.save(uiPage);
+
+        // STEP 2 - CREATE JSON ROOT
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ObjectNode rootNode = objectMapper.createObjectNode();
+
+        // STEP 3 - PAGE OBJECT
+
+        ObjectNode pageNode = objectMapper.createObjectNode();
+
+        pageNode.put(
+                "pageCode",
+                uiPageSaved.getPageCode()
+        );
+
+        pageNode.put(
+                "pageName",
+                uiPageSaved.getPageName()
+        );
+
+        // IMPORTANT LINE YOU MISSED
+
+        rootNode.set("page", pageNode);
+
+        // STEP 4 - EMPTY COMPONENT ARRAY
+
+        ArrayNode componentsArray =
+                objectMapper.createArrayNode();
+
+        rootNode.set(
+                "components",
+                componentsArray
+        );
+
+        // STEP 5 - SAVE JSON
+
         UIPageJson uiPageJson = new UIPageJson();
+
         uiPageJson.setUiPage(uiPageSaved);
+
+        uiPageJson.setJsonSchema(
+                rootNode.toPrettyString()
+        );
+
         uiPageJsonRepository.save(uiPageJson);
+
         return uiPageSaved;
     }
 

@@ -54,5 +54,5 @@ public class UIPageJson {
 
     @Lob
     @Column(name = "json_schema", nullable = false, columnDefinition = "LONGTEXT")
-    private String jsonSchema = DEFAULT_JSON_SCHEMA;
+    private String jsonSchema = "";
 }

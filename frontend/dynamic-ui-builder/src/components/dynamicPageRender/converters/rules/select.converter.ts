@@ -1,10 +1,18 @@
+import { resolveApiLookup } from "../../../dataMappingEngine/rule/api.resolver";
 import { ComponentSchema } from "../../types/JsonSchema";
 
-export function convertSelect(
+export async function convertSelect(
   component: ComponentSchema
-): any {
+) {
 
   const p = component.properties || {};
+
+  const lookupResponse = await resolveApiLookup(component.lookup);
+
+  const options = (lookupResponse || []).map((item: any) => ({
+    label: item.displayValue,
+    value: item.lookupValue
+  }));
 
   return {
 
@@ -12,7 +20,7 @@ export function convertSelect(
 
     title: p.label,
 
-    enum: p.options || [],
+    enum: options,
 
     "x-component": "Select",
 

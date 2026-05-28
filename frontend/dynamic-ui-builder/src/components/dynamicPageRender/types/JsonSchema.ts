@@ -138,7 +138,7 @@ export interface MappingSchema {
 // ============================================
 
 export interface LookupSchema {
-  apiUrl?: string;
+  apiUrl: string;
   method?: "GET" | "POST";
 
   labelKey?: string;

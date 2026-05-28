@@ -5,6 +5,7 @@ import Landing from './pages/landing/Landing'
 import AdminLayout from './pages/admin/Admin_Layout'
 import ManagePage from './pages/admin/manages/page/ManagePage'
 import AddNewPage from './pages/admin/manages/page/AddNewPage'
+import ManagePageComponents from './pages/admin/manages/page/ManagePageComponents'
 import DynamicPageRendering from './pages/ui/DynamicPageRendering'
 
 export default function App() {
@@ -22,11 +23,11 @@ export default function App() {
         />
         <Route path='manage_page' element={<ManagePage />} />
         <Route path='manage_page/add' element={<AddNewPage />} />
+        <Route path='manage_page/:pageCode/edit' element={<AddNewPage />} />
+        <Route path='manage_page/:pageCode/components' element={<ManagePageComponents />} />
       </Route>
 
-      <Route path='/ui/*' element={<DynamicPageRendering />}>
-
-      </Route>
+      <Route path='/ui/*' element={<DynamicPageRendering />} />
       {/* <Route path='*' element={<Navigate to='/' replace />} /> */}
     </Routes>
   )

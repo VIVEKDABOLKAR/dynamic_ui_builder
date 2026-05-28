@@ -27,13 +27,26 @@ export default function ManagePage() {
             sortable: false,
             filter: false,
             cellRenderer: (params) => (
-                <button
-                    type="button"
-                    onClick={() => console.log('Edit page:', params.data)}
+                <Link
+                    to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
                     className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
                 >
                     Edit
-                </button>
+                </Link>
+            ),
+        },
+        {
+            headerName: 'Add Component',
+            minWidth: 180,
+            sortable: false,
+            filter: false,
+            cellRenderer: (params) => (
+                <Link
+                    to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
+                    className="rounded-full bg-cyan-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-cyan-400"
+                >
+                    Add Component
+                </Link>
             ),
         },
     ]
