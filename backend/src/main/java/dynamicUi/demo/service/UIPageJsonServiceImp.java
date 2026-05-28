@@ -150,16 +150,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         }
 
         String properties = component.getProperties();
-        if (properties != null && !properties.isBlank()) {
-            try {
-                JsonNode parsedProperties = OBJECT_MAPPER.readTree(properties);
-                if (parsedProperties.isObject()) {
-                    parsedProperties.fields().forEachRemaining(entry -> propertiesNode.set(entry.getKey(), entry.getValue()));
-                }
-            } catch (JsonProcessingException e) {
-                // ignore invalid properties JSON and keep base properties
-            }
-        }
+
 
         if ("button".equalsIgnoreCase(component.getComponentType())) {
             if (!propertiesNode.has("text") && component.getLabelName() != null) {
@@ -167,15 +158,12 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
             }
         }
 
-        if (lookups != null && !lookups.isEmpty() && ("select".equalsIgnoreCase(component.getComponentType()) || "radio".equalsIgnoreCase(component.getComponentType()))) {
-            ArrayNode optionsArray = OBJECT_MAPPER.createArrayNode();
-            for (UILookup lookup : lookups) {
-                ObjectNode option = OBJECT_MAPPER.createObjectNode();
-                option.put("label", lookup.getDisplayValue());
-                option.put("value", lookup.getLookupValue());
-                optionsArray.add(option);
-            }
-            propertiesNode.set("options", optionsArray);
+        if (("select".equalsIgnoreCase(component.getComponentType()) || "radio".equalsIgnoreCase(component.getComponentType()))) {
+            // Store only lookup schema; frontend will fetch labels/values dynamically from the API at render time
+            ObjectNode lookupNode = OBJECT_MAPPER.createObjectNode();
+            lookupNode.put("apiUrl", "/api/ui/lookups/component/" + component.getId());
+            lookupNode.put("method", "GET");
+            componentNode.set("lookup", lookupNode);
         }
 
         componentNode.set("properties", propertiesNode);
