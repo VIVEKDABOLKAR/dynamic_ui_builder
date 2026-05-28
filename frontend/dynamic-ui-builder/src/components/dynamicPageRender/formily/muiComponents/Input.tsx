@@ -46,9 +46,5 @@ export const Input = connect(
     value: "value",
     title: "label",
   }),
-  (props, field) => {
-    return {
-      ...props,
-    }
-  }
+  
 );

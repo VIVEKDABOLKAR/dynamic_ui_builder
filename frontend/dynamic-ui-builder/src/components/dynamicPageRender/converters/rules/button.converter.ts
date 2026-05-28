@@ -14,7 +14,8 @@ export function convertButton(
       componentId: component.id,
       text: p.text,
       variant: p.variant,
-      style: p.style || {}
+      style: p.style || {},
+      action: component.action || []
     },
     "x-index": component.sequence
   };

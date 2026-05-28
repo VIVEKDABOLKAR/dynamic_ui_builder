@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { convertToFormilySchema } from './JsonConvert.ts';
 import { form } from './formily/createForm.ts';
 
@@ -16,13 +16,29 @@ import { SchemaField } from './formily/SchemaField.tsx';
  * @returns 
  */
 export default function DynamicPageRenderEngine({ jsonSchema }) {
+    const [formilySchema, setFormilySchema] = useState(null)
 
-    //get formily schema from json schema
-    const formilySchema = convertToFormilySchema(jsonSchema)
+    useEffect(() => {
+        let mounted = true;
 
-    console.log(formilySchema)
+        const loadSchema = async () => {
+            const res = await convertToFormilySchema(jsonSchema)
+            if (mounted) {
+                setFormilySchema(res)
+            }
+        }
 
-    // const form = createForm();
+        loadSchema();
+
+        return () => {
+            mounted = false;
+        };
+    }, [jsonSchema])
+
+    if (!formilySchema) {
+        return <div>Loading...</div>
+    }
+
     return (
         <>
             <div>DynamicPageRenderEngine:- {jsonSchema.pageName}</div>

@@ -25,7 +25,6 @@ export function convertTextarea(
 
       multiline: true,
 
-      minRows: p.rows || 4,
       width: p.width || "100%",
       height: p.height,
       style: p.style || {}

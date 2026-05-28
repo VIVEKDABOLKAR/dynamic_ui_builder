@@ -56,13 +56,11 @@ export async function resolveApiLookup(
   try {
 
     let registeryEntry = (API_REGISTRY as any)[lookup.apiUrl];
-    if (!registeryEntry || !registeryEntry.url) {
-        registeryEntry = `http://localhost:8080${lookup.apiUrl}`; // treat source as URL if not found in registry
-    }
+    const url = registeryEntry?.url || `http://localhost:8080${lookup.apiUrl}`;
 
     const response = await axios({
       method: (registeryEntry?.method || "GET").toUpperCase(),
-      url: registeryEntry,
+      url,
       headers: {},
       params: {},
     });
