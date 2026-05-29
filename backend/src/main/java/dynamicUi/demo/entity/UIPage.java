@@ -30,6 +30,7 @@ public class UIPage {
     @Column(name = "is_active")
     private Boolean isActive;
 
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

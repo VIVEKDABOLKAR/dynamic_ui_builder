@@ -1,8 +1,9 @@
 import { ComponentSchema } from "../../types/JsonSchema";
+import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 
 export function convertRadio(
   component: ComponentSchema
-): any {
+): FormilyFieldSchema {
 
   const p = component.properties || {};
 
@@ -18,8 +19,15 @@ export function convertRadio(
 
     "x-component": "Radio",
 
+    "x-lookup": component.lookup || undefined,
+
+    "x-mapping": component.mapping || undefined,
+
     "x-component-props": {
       componentId: component.id,
+      lookup: component.lookup || null,
+      mapping: component.mapping || null,
+      options: p.options || [],
       style: {
         width: p.width || "100%",
         ...(p.style || {})

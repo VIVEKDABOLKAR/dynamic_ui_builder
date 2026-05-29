@@ -1,9 +1,13 @@
 package dynamicUi.demo.controller;
 
 import dynamicUi.demo.dto.UIComponentDTO;
+import dynamicUi.demo.dto.UIEntityMappingDTO;
 import dynamicUi.demo.service.UiComponentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -12,6 +16,7 @@ import java.util.List;
 public class UiComponentController {
 
     private final UiComponentService uiComponentService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public UiComponentController(UiComponentService uiComponentService) {
         this.uiComponentService = uiComponentService;
@@ -19,9 +24,29 @@ public class UiComponentController {
 
     @PostMapping
     public UIComponentDTO createComponent(
-            @RequestBody UIComponentDTO dto
+            @RequestBody Map<String, Object> requestBody
     ) {
-        return uiComponentService.createComponent(dto);
+        Object componentValue = requestBody.containsKey("component") ? requestBody.get("component") : requestBody;
+        Object mappingValue = requestBody.containsKey("mappingValues")
+            ? requestBody.get("mappingValues")
+            : componentValue instanceof Map<?, ?> componentMap && componentMap.containsKey("mappingValues")
+            ? componentMap.get("mappingValues")
+            : null;
+
+        Map<String, Object> normalizedComponentMap = componentValue instanceof Map<?, ?> componentMap
+            ? objectMapper.convertValue(componentMap, Map.class)
+            : new LinkedHashMap<>();
+
+        if (!normalizedComponentMap.containsKey("lookupValues") && requestBody.containsKey("lookupValues")) {
+            normalizedComponentMap.put("lookupValues", requestBody.get("lookupValues"));
+        }
+
+        UIComponentDTO componentDTO = objectMapper.convertValue(normalizedComponentMap, UIComponentDTO.class);
+        UIEntityMappingDTO mappingDTO = mappingValue != null
+            ? objectMapper.convertValue(mappingValue, UIEntityMappingDTO.class)
+                : null;
+
+        return uiComponentService.createComponent(componentDTO, mappingDTO);
     }
 
     @GetMapping("/page/{pageCode}")

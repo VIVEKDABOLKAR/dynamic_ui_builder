@@ -1,15 +1,10 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.dto.UIComponentDTO;
+import dynamicUi.demo.dto.UIEntityMappingDTO;
 import dynamicUi.demo.dto.UILookupDTO;
-import dynamicUi.demo.entity.UIComponent;
-import dynamicUi.demo.entity.UILookup;
-import dynamicUi.demo.entity.UILookupMaster;
-import dynamicUi.demo.entity.UIPage;
-import dynamicUi.demo.repoistory.UiComponentRepository;
-import dynamicUi.demo.repoistory.UILookupMasterRepository;
-import dynamicUi.demo.repoistory.UILookupRepository;
-import dynamicUi.demo.repoistory.UIPageRepository;
+import dynamicUi.demo.entity.*;
+import dynamicUi.demo.repoistory.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,23 +19,25 @@ public class UiComponentServiceImp implements UiComponentService {
     private final UILookupRepository uiLookupRepository;
     private final UILookupMasterRepository uiLookupMasterRepository;
     private final UIPageJsonService uiPageJsonService;
+    private  final UIEntityMappingRepository uiEntityMappingRepository;
 
     public UiComponentServiceImp(
             UiComponentRepository uiComponentRepository,
             UIPageRepository uiPageRepository,
             UILookupRepository uiLookupRepository,
             UILookupMasterRepository uiLookupMasterRepository,
-            UIPageJsonService uiPageJsonService
+            UIPageJsonService uiPageJsonService, UIEntityMappingRepository uiEntityMappingRepository
     ) {
         this.uiComponentRepository = uiComponentRepository;
         this.uiPageRepository = uiPageRepository;
         this.uiLookupRepository = uiLookupRepository;
         this.uiLookupMasterRepository = uiLookupMasterRepository;
         this.uiPageJsonService = uiPageJsonService;
+        this.uiEntityMappingRepository = uiEntityMappingRepository;
     }
 
     @Override
-    public UIComponentDTO createComponent(UIComponentDTO dto) {
+    public UIComponentDTO createComponent(UIComponentDTO dto, UIEntityMappingDTO mappingDTO) {
 
         UIPage uiPage = uiPageRepository.findByPageCode(dto.getPageCode())
                 .orElseThrow(() -> new RuntimeException("Page not found"));
@@ -72,6 +69,22 @@ public class UiComponentServiceImp implements UiComponentService {
             : List.of();
         uiPageJsonService.addComponentToJson(dto.getPageCode(), saved, lookups);
 
+        // SAVE COLUMN MAPPING
+        // SAVE ENTITY MAPPING
+        if (mappingDTO != null) {
+
+            UIEntityMapping mapping = UIEntityMapping.builder()
+                    .uiComponent(saved)
+                    .tableName(mappingDTO.getTableName())
+                    .columnName(mappingDTO.getColumnName())
+                    .attributeName(mappingDTO.getAttributeName())
+                    .displayName(mappingDTO.getDisplayName())
+                    .isRequired(mappingDTO.getIsRequired())
+                    .isFilterable(mappingDTO.getIsFilterable())
+                    .build();
+
+            uiEntityMappingRepository.save(mapping);
+        }
 
         dto.setId(saved.getId());
 

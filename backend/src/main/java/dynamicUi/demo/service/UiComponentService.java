@@ -2,12 +2,13 @@ package dynamicUi.demo.service;
 
 
 import dynamicUi.demo.dto.UIComponentDTO;
+import dynamicUi.demo.dto.UIEntityMappingDTO;
 
 import java.util.List;
 
 public interface UiComponentService {
 
-    UIComponentDTO createComponent(UIComponentDTO dto);
+    UIComponentDTO createComponent(UIComponentDTO componentDTO, UIEntityMappingDTO mappingDTO);
 
     List<UIComponentDTO> getComponentsByPage(String pageCode);
 
