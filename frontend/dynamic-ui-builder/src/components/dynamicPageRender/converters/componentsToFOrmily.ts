@@ -5,6 +5,7 @@ import { convertCard } from "./rules/card.converter";
 import { convertCheckbox } from "./rules/checkbox.converter";
 import { convertHeading } from "./rules/heading.converter";
 import { convertInput } from "./rules/input.converter";
+import { convertLayout } from "./rules/layout.converter";
 import { convertRadio } from "./rules/radio.converter";
 import { convertSelect } from "./rules/select.converter";
 import { convertTable } from "./rules/table.converter";
@@ -24,6 +25,9 @@ export function convertComponetToField(
 
         case "heading":
             return convertHeading(component);
+
+        case "layout":
+            return convertLayout(component);
 
         case "card":
             return convertCard(component);

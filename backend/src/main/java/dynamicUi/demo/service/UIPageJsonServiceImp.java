@@ -1,27 +1,36 @@
 package dynamicUi.demo.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.stereotype.Service;
+
 import dynamicUi.demo.entity.UIComponent;
-import dynamicUi.demo.entity.UILookup;
 import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIPageJson;
 import dynamicUi.demo.repoistory.UIPageJsonRepository;
-
-import java.util.List;
+import dynamicUi.demo.repoistory.UiComponentRepository;
 
 @Service
 public class UIPageJsonServiceImp implements UIPageJsonService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final UIPageJsonRepository uiPageJsonRepository;
+    private final UiComponentRepository uiComponentRepository;
 
-    public UIPageJsonServiceImp(UIPageJsonRepository uiPageJsonRepository) {
+    public UIPageJsonServiceImp(
+            UIPageJsonRepository uiPageJsonRepository,
+            UiComponentRepository uiComponentRepository
+    ) {
         this.uiPageJsonRepository = uiPageJsonRepository;
+        this.uiComponentRepository = uiComponentRepository;
     }
 
     @Override
@@ -37,50 +46,34 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
     }
 
     @Override
-    public void addComponentToJson(String pageCode, UIComponent component, List<UILookup> lookups) {
-        // loads existing page JSON or creates empty JSON
-        ObjectNode root = parseOrCreateRoot(pageCode, component.getUiPage() != null ? component.getUiPage().getPageName() : null);
-        ArrayNode componentsArray = root.withArray("components");
-        componentsArray.add(toComponentNode(component, lookups));
-        savePageJson(pageCode, root, component.getUiPage());
-    }
-
-    @Override
-    public void updateComponentInJson(String pageCode, UIComponent component, List<UILookup> lookups) {
-        ObjectNode root = parseOrCreateRoot(pageCode, component.getUiPage() != null ? component.getUiPage().getPageName() : null);
-        ArrayNode componentsArray = root.withArray("components");
-
-        boolean updated = false;
-        for (int i = 0; i < componentsArray.size(); i++) {
-            JsonNode node = componentsArray.get(i);
-            if (node.has("id") && node.get("id").asLong() == component.getId()) {
-                componentsArray.set(i, toComponentNode(component, lookups));
-                updated = true;
-                break;
-            }
-        }
-
-        if (!updated) {
-            componentsArray.add(toComponentNode(component, lookups));
-        }
-
-        savePageJson(pageCode, root, component.getUiPage());
-    }
-
-    @Override
-    public void removeComponentFromJson(String pageCode, Long componentId) {
+    public void syncPageJson(String pageCode) {
         ObjectNode root = parseOrCreateRoot(pageCode, null);
-        ArrayNode componentsArray = root.withArray("components");
-        ArrayNode filtered = OBJECT_MAPPER.createArrayNode();
+        List<UIComponent> components = uiComponentRepository.findByUiPage_PageCodeAndIsActiveTrueOrderBySequenceNo(pageCode);
 
-        for (JsonNode node : componentsArray) {
-            if (node.has("id") && node.get("id").asLong() == componentId) {
+        Map<Long, ObjectNode> nodeById = new HashMap<>();
+        ArrayNode rootComponents = OBJECT_MAPPER.createArrayNode();
+
+        for (UIComponent component : components) {
+            nodeById.put(component.getId(), toComponentNode(component));
+        }
+
+        for (UIComponent component : components) {
+            ObjectNode node = nodeById.get(component.getId());
+            Long parentId = component.getParentComponentId();
+
+            if (parentId == null || !nodeById.containsKey(parentId)) {
+                rootComponents.add(node);
                 continue;
             }
-            filtered.add(node);
+
+            ObjectNode parentNode = nodeById.get(parentId);
+            ArrayNode children = parentNode.has("children") && parentNode.get("children").isArray()
+                    ? (ArrayNode) parentNode.get("children")
+                    : parentNode.putArray("children");
+            children.add(node);
         }
 
-        root.set("components", filtered);
+        root.set("components", rootComponents);
         savePageJson(pageCode, root, null);
     }
 
@@ -125,7 +118,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         }
     }
 
-    private ObjectNode toComponentNode(UIComponent component, List<UILookup> lookups) {
+    private ObjectNode toComponentNode(UIComponent component) {
         ObjectNode componentNode = OBJECT_MAPPER.createObjectNode();
         componentNode.put("id", component.getId());
         componentNode.put("name", component.getComponentName());
@@ -148,9 +141,6 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         if (component.getIsRequired() != null) {
             propertiesNode.put("required", component.getIsRequired());
         }
-
-        String properties = component.getProperties();
-
 
         if ("button".equalsIgnoreCase(component.getComponentType())) {
             if (!propertiesNode.has("text") && component.getLabelName() != null) {

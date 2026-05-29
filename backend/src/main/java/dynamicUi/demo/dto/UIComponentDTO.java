@@ -35,6 +35,9 @@ public class UIComponentDTO {
     private Boolean isDisabled;
 
     private Boolean isActive;
+
+    private Long parentComponentId;
+
     private List<UILookupDTO> lookupValues;
 
 

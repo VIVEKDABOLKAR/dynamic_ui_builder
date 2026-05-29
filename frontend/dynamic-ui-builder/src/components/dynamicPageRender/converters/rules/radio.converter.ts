@@ -1,13 +1,17 @@
 import { ComponentSchema } from "../../types/JsonSchema";
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
+import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertRadio(
   component: ComponentSchema
 ): FormilyFieldSchema {
 
   const p = component.properties || {};
+  const base = convertDefaultFieldSchema(component);
 
   return {
+
+    ...base,
 
     type: "string",
 
@@ -24,10 +28,7 @@ export function convertRadio(
     "x-mapping": component.mapping || undefined,
 
     "x-component-props": {
-      componentId: component.id,
-      lookup: component.lookup || null,
-      mapping: component.mapping || null,
-      options: p.options || [],
+      ...base["x-component-props"],
       style: {
         width: p.width || "100%",
         ...(p.style || {})

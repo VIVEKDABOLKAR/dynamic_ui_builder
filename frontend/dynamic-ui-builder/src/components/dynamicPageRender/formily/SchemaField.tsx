@@ -8,6 +8,7 @@ import { Select } from './muiComponents/Select'
 import { Checkbox } from './muiComponents/Checkbox'
 import { Radio } from './muiComponents/Radio'
 import { Card } from './muiComponents/card'
+import { Layout } from './muiComponents/Layout'
 import { DataTable } from './agGridComponents/DataTable'
 
 export const SchemaField = createSchemaField({
@@ -16,6 +17,7 @@ export const SchemaField = createSchemaField({
     CustomButton,
     Heading,
     Textarea,
+    Layout,
     Card,
     Select,
     Checkbox,

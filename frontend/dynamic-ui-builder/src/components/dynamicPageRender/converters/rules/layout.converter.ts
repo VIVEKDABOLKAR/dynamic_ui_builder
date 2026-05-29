@@ -1,48 +1,40 @@
 import { ComponentSchema } from "../../types/JsonSchema";
-
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertComponetToField } from "../componentsToFOrmily";
 import { convertDefaultFieldSchema } from "./default/default.converter";
 
-
-export function convertCard(
+export function convertLayout(
   component: ComponentSchema
 ): FormilyFieldSchema {
-
   const p = component.properties || {};
   const base = convertDefaultFieldSchema(component);
 
-  const properties: Record<string, any> = {};
+  const properties: Record<string, FormilyFieldSchema> = {};
 
-  // recursive conversion
-  const children = [...(component.children || [])]
-    .sort((a, b) => a.sequence - b.sequence);
+  const children = [...(component.children || [])].sort(
+    (a, b) => a.sequence - b.sequence
+  );
 
   for (const child of children) {
-
     const converted = convertComponetToField(child);
-
     if (!converted) continue;
-
     properties[child.name] = converted;
   }
 
   return {
     ...base,
     type: "void",
-
-    "x-component": "Card",
-
+    "x-component": "Layout",
     "x-component-props": {
       ...base["x-component-props"],
-      title: p.title || p.label,
-      description: p.description,
+      direction: p.direction || "column",
+      gap: p.gap ?? 2,
+      justifyContent: p.justifyContent,
+      alignItems: p.alignItems,
+      wrap: p.wrap,
       width: p.width,
-      style: p.style,
+      style: p.style || {},
     },
-
     properties,
-
-    "x-index": component.sequence,
   };
 }

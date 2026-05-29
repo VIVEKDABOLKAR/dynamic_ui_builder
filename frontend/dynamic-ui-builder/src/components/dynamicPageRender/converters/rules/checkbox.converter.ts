@@ -1,12 +1,17 @@
 import { ComponentSchema } from "../../types/JsonSchema";
+import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
+import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertCheckbox(
   component: ComponentSchema
-): any {
+): FormilyFieldSchema {
 
   const p = component.properties || {};
+  const base = convertDefaultFieldSchema(component);
 
   return {
+
+    ...base,
 
     type: "boolean",
 
@@ -17,7 +22,7 @@ export function convertCheckbox(
     "x-component": "Checkbox",
 
     "x-component-props": {
-      componentId: component.id,
+      ...base["x-component-props"],
       style: p.style || {}
     },
 

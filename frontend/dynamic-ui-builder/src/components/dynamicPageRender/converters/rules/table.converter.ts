@@ -1,13 +1,15 @@
 import { ComponentSchema } from "../../types/JsonSchema";
+import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertTable(
   component: ComponentSchema
 ): any {
 
   const p = component.properties || {};
+  const base = convertDefaultFieldSchema(component);
 
   return {
-
+    ...base,
     type: "void",
 
     "x-component": "DataTable",
@@ -15,7 +17,7 @@ export function convertTable(
     "x-mapping": component.mapping || undefined,
 
     "x-component-props": {
-
+      ...base["x-component-props"],
       title: p.title,
 
       columns: p.columns || [],

@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @Service
 public class UiComponentServiceImp implements UiComponentService {
 
+    private static final List<String> ALLOWED_PARENT_TYPES = List.of("card", "layout");
+
     private final UiComponentRepository uiComponentRepository;
     private final UIPageRepository uiPageRepository;
     private final UILookupRepository uiLookupRepository;
@@ -42,6 +44,8 @@ public class UiComponentServiceImp implements UiComponentService {
         UIPage uiPage = uiPageRepository.findByPageCode(dto.getPageCode())
                 .orElseThrow(() -> new RuntimeException("Page not found"));
 
+        Long parentComponentId = validateAndResolveParent(dto.getParentComponentId(), uiPage.getPageCode(), null);
+
         UIComponent component = UIComponent.builder()
                 .uiPage(uiPage)
                 .componentName(dto.getComponentName())
@@ -54,6 +58,7 @@ public class UiComponentServiceImp implements UiComponentService {
                 .isVisible(dto.getIsVisible())
                 .isDisabled(dto.getIsDisabled())
                 .isActive(Boolean.TRUE.equals(dto.getIsActive()) || dto.getIsActive() == null)
+            .parentComponentId(parentComponentId)
                 .build();
 
         UIComponent saved = uiComponentRepository.save(component);
@@ -63,30 +68,9 @@ public class UiComponentServiceImp implements UiComponentService {
             saveLookupValues(saved, dto.getLookupValues(), null);
         }
 
-        // NEW: Update JSON schema
-        List<UILookup> lookups = saved.getUiLookupMaster() != null
-            ? uiLookupRepository.findByUiLookupMaster_Id(saved.getUiLookupMaster().getId())
-            : List.of();
-        uiPageJsonService.addComponentToJson(dto.getPageCode(), saved, lookups);
-
-        // SAVE COLUMN MAPPING
-        // SAVE ENTITY MAPPING
-        if (mappingDTO != null) {
-
-            UIEntityMapping mapping = UIEntityMapping.builder()
-                    .uiComponent(saved)
-                    .tableName(mappingDTO.getTableName())
-                    .columnName(mappingDTO.getColumnName())
-                    .attributeName(mappingDTO.getAttributeName())
-                    .displayName(mappingDTO.getDisplayName())
-                    .isRequired(mappingDTO.getIsRequired())
-                    .isFilterable(mappingDTO.getIsFilterable())
-                    .build();
-
-            uiEntityMappingRepository.save(mapping);
-        }
-
         dto.setId(saved.getId());
+        dto.setParentComponentId(saved.getParentComponentId());
+        uiPageJsonService.syncPageJson(dto.getPageCode());
 
         return dto;
     }
@@ -127,6 +111,7 @@ public class UiComponentServiceImp implements UiComponentService {
         component.setIsVisible(dto.getIsVisible());
         component.setIsDisabled(dto.getIsDisabled());
         component.setIsActive(dto.getIsActive() == null ? component.getIsActive() : dto.getIsActive());
+        component.setParentComponentId(validateAndResolveParent(dto.getParentComponentId(), component.getUiPage().getPageCode(), id));
         // lookup master id removed from DTO; relation handled via UILookupMaster association
 
         UIComponent updated = uiComponentRepository.save(component);
@@ -140,13 +125,7 @@ public class UiComponentServiceImp implements UiComponentService {
             }
         }
 
-
-        // NEW: Update JSON schema
-        List<UILookup> lookups = updated.getUiLookupMaster() != null
-            ? uiLookupRepository.findByUiLookupMaster_Id(updated.getUiLookupMaster().getId())
-            : List.of();
-        uiPageJsonService.updateComponentInJson(dto.getPageCode(), updated, lookups);
-
+        uiPageJsonService.syncPageJson(component.getUiPage().getPageCode());
 
         return mapToDto(updated);
     }
@@ -162,8 +141,7 @@ public class UiComponentServiceImp implements UiComponentService {
         component.setIsVisible(false);
         uiComponentRepository.save(component);
 
-        // NEW: Remove from JSON schema
-        uiPageJsonService.removeComponentFromJson(pageCode, id);
+        uiPageJsonService.syncPageJson(pageCode);
     }
 
     private UIComponentDTO mapToDto(UIComponent component) {
@@ -181,6 +159,7 @@ public class UiComponentServiceImp implements UiComponentService {
                 .isVisible(component.getIsVisible())
                 .isDisabled(component.getIsDisabled())
                 .isActive(component.getIsActive())
+                .parentComponentId(component.getParentComponentId())
                 
                 .lookupValues(component.getUiLookupMaster() != null
                     ? uiLookupRepository.findByUiLookupMaster_Id(component.getUiLookupMaster().getId()).stream()
@@ -241,5 +220,54 @@ public class UiComponentServiceImp implements UiComponentService {
             .collect(Collectors.toList());
 
         uiLookupRepository.saveAll(lookups);
+    }
+
+    private Long validateAndResolveParent(Long parentComponentId, String pageCode, Long currentComponentId) {
+        if (parentComponentId == null) {
+            return null;
+        }
+
+        if (currentComponentId != null && parentComponentId.equals(currentComponentId)) {
+            throw new RuntimeException("Component cannot be parent of itself");
+        }
+
+        UIComponent parent = uiComponentRepository.findById(parentComponentId)
+                .orElseThrow(() -> new RuntimeException("Parent component not found"));
+
+        if (!Boolean.TRUE.equals(parent.getIsActive())) {
+            throw new RuntimeException("Parent component is inactive");
+        }
+
+        String parentPageCode = parent.getUiPage() != null ? parent.getUiPage().getPageCode() : null;
+        if (parentPageCode == null || !parentPageCode.equals(pageCode)) {
+            throw new RuntimeException("Parent component must belong to the same page");
+        }
+
+        if (parent.getComponentType() == null || !ALLOWED_PARENT_TYPES.contains(parent.getComponentType().toLowerCase())) {
+            throw new RuntimeException("Parent component type must be card or layout");
+        }
+
+        ensureNoCycle(parentComponentId, currentComponentId);
+        return parentComponentId;
+    }
+
+    private void ensureNoCycle(Long parentComponentId, Long currentComponentId) {
+        if (currentComponentId == null) {
+            return;
+        }
+
+        Long cursor = parentComponentId;
+        int safetyCounter = 0;
+        while (cursor != null && safetyCounter < 100) {
+            if (cursor.equals(currentComponentId)) {
+                throw new RuntimeException("Invalid parent relationship: cycle detected");
+            }
+            UIComponent node = uiComponentRepository.findById(cursor).orElse(null);
+            if (node == null) {
+                break;
+            }
+            cursor = node.getParentComponentId();
+            safetyCounter++;
+        }
     }
 }

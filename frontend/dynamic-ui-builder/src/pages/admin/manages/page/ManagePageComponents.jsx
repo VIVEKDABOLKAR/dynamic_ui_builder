@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createComponent, deleteComponent, getComponentsByPage, updateComponent } from '../../../../api/componentApi'
+import AdditionalPropertiesPanel from './components/AdditionalPropertiesPanel'
+import DatabaseMappingPanel from './components/DatabaseMappingPanel'
 
 const AVAILABLE_COMPONENTS = [
   { type: 'input', label: 'Text Field', icon: '🔤' },
@@ -10,8 +12,11 @@ const AVAILABLE_COMPONENTS = [
   { type: 'select', label: 'Dropdown', icon: '🔽' },
   { type: 'radio', label: 'Radio Button', icon: '⭕' },
   { type: 'checkbox', label: 'Checkbox', icon: '☑️' },
-  { type: 'card', label: 'Card', icon: '🗂️' }
+  { type: 'card', label: 'Card', icon: '🗂️' },
+  { type: 'layout', label: 'Layout', icon: '📐' }
 ]
+
+const CHILD_PARENT_ALLOWED_TYPES = new Set(['card', 'layout'])
 
 export default function ManagePageComponents() {
   const { pageCode } = useParams()
@@ -29,12 +34,29 @@ export default function ManagePageComponents() {
     placeholder: '',
     width: '',
     sequenceNo: 1,
+    isChildComponent: false,
+    parentComponentId: '',
     isRequired: false,
     isVisible: true,
     isDisabled: false,
   })
   const [lookupValues, setLookupValues] = useState([])
   const [newLookupValue, setNewLookupValue] = useState('')
+  const [parentSearch, setParentSearch] = useState('')
+  const [additionalProperties, setAdditionalProperties] = useState({
+    height: '',
+    border: '',
+    borderRadius: '',
+    className: '',
+  })
+  const [mappingValues, setMappingValues] = useState({
+    tableName: '',
+    columnName: '',
+    attributeName: '',
+    displayName: '',
+    isRequired: false,
+    isFilterable: false,
+  })
 
   const loadComponents = async () => {
     setIsLoading(true)
@@ -68,12 +90,29 @@ export default function ManagePageComponents() {
       labelName: '',
       placeholder: '',
       width: '',
+      isChildComponent: false,
+      parentComponentId: '',
       isRequired: false,
       isVisible: true,
       isDisabled: false,
     }))
     setLookupValues([])
     setNewLookupValue('')
+    setParentSearch('')
+    setAdditionalProperties({
+      height: '',
+      border: '',
+      borderRadius: '',
+      className: '',
+    })
+    setMappingValues({
+      tableName: '',
+      columnName: '',
+      attributeName: '',
+      displayName: '',
+      isRequired: false,
+      isFilterable: false,
+    })
   }
 
   const handleEditRow = (row) => {
@@ -94,11 +133,32 @@ export default function ManagePageComponents() {
       placeholder: row.placeholder || parsedProperties.placeholder || '',
       width: parsedProperties.width || '',
       sequenceNo: row.sequenceNo || 1,
+      isChildComponent: !!(row.parentComponentId || parsedProperties.parentComponentId),
+      parentComponentId: row.parentComponentId
+        ? String(row.parentComponentId)
+        : parsedProperties.parentComponentId
+          ? String(parsedProperties.parentComponentId)
+          : '',
       isRequired: !!row.isRequired,
       isVisible: row.isVisible ?? true,
       isDisabled: row.isDisabled ?? false,
     }))
     setLookupValues(Array.isArray(row.lookupValues) ? row.lookupValues : [])
+    setParentSearch('')
+    setAdditionalProperties({
+      height: parsedProperties.height || '',
+      border: parsedProperties.border || '',
+      borderRadius: parsedProperties.borderRadius || '',
+      className: parsedProperties.className || '',
+    })
+    setMappingValues({
+      tableName: row.tableName || '',
+      columnName: row.columnName || '',
+      attributeName: row.attributeName || '',
+      displayName: row.displayName || '',
+      isRequired: row.mappingRequired ?? false,
+      isFilterable: row.isFilterable ?? false,
+    })
   }
 
   const handleDeleteRow = async (id) => {
@@ -179,10 +239,26 @@ export default function ManagePageComponents() {
 
   const handleChange = (event) => {
     const { name, type, value, checked } = event.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
-    }))
+    const nextValue = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
+
+    setFormData((prev) => {
+      if (name === 'isChildComponent' && !nextValue) {
+        return {
+          ...prev,
+          isChildComponent: false,
+          parentComponentId: '',
+        }
+      }
+
+      return {
+        ...prev,
+        [name]: nextValue,
+      }
+    })
+
+    if (name === 'isChildComponent' && !checked) {
+      setParentSearch('')
+    }
   }
 
   const handleSelect = (item) => {
@@ -216,12 +292,45 @@ export default function ManagePageComponents() {
     setLookupValues((prev) => prev.filter((item) => item.id !== id))
   }
 
+  const handleAdditionalPropertyChange = (field, value) => {
+    setAdditionalProperties((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const handleMappingValueChange = (field, value) => {
+    setMappingValues((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const parentOptions = components
+    .filter((component) => component.id !== editingComponentId)
+    .filter((component) => CHILD_PARENT_ALLOWED_TYPES.has(component.componentType))
+    .filter((component) => {
+      if (!parentSearch.trim()) {
+        return true
+      }
+      const searchValue = parentSearch.trim().toLowerCase()
+      return (
+        String(component.id).includes(searchValue)
+        || (component.componentName || '').toLowerCase().includes(searchValue)
+      )
+    })
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setErrorMessage('')
 
     if (!formData.componentName.trim() || !formData.labelName.trim() || !formData.width.trim() || !formData.sequenceNo) {
       setErrorMessage('Please fill in every required field except placeholder.')
+      return
+    }
+
+    if (formData.isChildComponent && !formData.parentComponentId) {
+      setErrorMessage('Please choose a parent component (card/layout) for this child component.')
       return
     }
 
@@ -233,30 +342,29 @@ export default function ManagePageComponents() {
     setSaving(true)
 
     try {
-      const properties = {
-        label: formData.labelName || undefined,
-        placeholder: formData.placeholder || undefined,
-        width: formData.width || undefined,
-        visible: formData.isVisible,
-        disabled: formData.isDisabled,
-        required: formData.isRequired,
-      }
+      const properties = Object.fromEntries(
+        Object.entries(additionalProperties).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+      )
 
       if (formData.componentType === 'button') {
         properties.text = formData.labelName || formData.componentName
       }
 
       const payload = {
-        pageCode,
-        componentName: formData.componentName,
-        componentType: formData.componentType,
-        labelName: formData.labelName,
-        placeholder: formData.placeholder,
-        sequenceNo: formData.sequenceNo,
-        isRequired: formData.isRequired,
-        isVisible: formData.isVisible,
-        isDisabled: formData.isDisabled,
-        properties: JSON.stringify(properties),
+        component: {
+          pageCode,
+          componentName: formData.componentName,
+          componentType: formData.componentType,
+          labelName: formData.labelName,
+          placeholder: formData.placeholder,
+          sequenceNo: formData.sequenceNo,
+          parentComponentId: formData.isChildComponent ? Number(formData.parentComponentId) : null,
+          isRequired: formData.isRequired,
+          isVisible: formData.isVisible,
+          isDisabled: formData.isDisabled,
+          properties: JSON.stringify(properties),
+        },
+        mappingValues,
       }
 
       // lookupMasterId is managed server-side via relation; do not send it from the UI
@@ -436,21 +544,70 @@ export default function ManagePageComponents() {
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      name="isChildComponent"
+                      checked={formData.isChildComponent}
+                      onChange={handleChange}
+                      className="h-4 w-4 rounded border-slate-300 text-cyan-500"
+                    />
+                    Add as child component
+                  </label>
+
+                  {formData.isChildComponent ? (
+                    <div className="grid gap-3">
+                      <p className="text-xs text-slate-500">Pick the parent container by component name or id.</p>
+                      <input
+                        value={parentSearch}
+                        onChange={(event) => setParentSearch(event.target.value)}
+                        placeholder="Search parent by id or name"
+                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                      />
+                      <select
+                        name="parentComponentId"
+                        value={formData.parentComponentId}
+                        onChange={handleChange}
+                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                      >
+                        <option value="">Select parent component</option>
+                        {parentOptions.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.id} - {item.componentName} ({item.componentType})
+                          </option>
+                        ))}
+                      </select>
+                      {parentOptions.length === 0 ? (
+                        <p className="text-xs text-amber-600">No card/layout components found for this page.</p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
               </div>
 
-              {/* Type-Specific Configuration */}
+              <AdditionalPropertiesPanel
+                value={additionalProperties}
+                onChange={handleAdditionalPropertyChange}
+              />
+
+              <DatabaseMappingPanel
+                value={mappingValues}
+                onChange={handleMappingValueChange}
+              />
+
               {(formData.componentType === 'select' || formData.componentType === 'radio') && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-semibold text-slate-900">Values for {formData.componentType}</h3>
-                
-                <div className="flex gap-2">
+                <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-sm font-semibold text-slate-900">Lookup Values</h3>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={newLookupValue}
                       onChange={(e) => setNewLookupValue(e.target.value)}
                       placeholder="Enter value (e.g., Option 1)"
                       className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
                           handleAddLookupValue()
@@ -469,7 +626,7 @@ export default function ManagePageComponents() {
                   {lookupValues.length > 0 && (
                     <div className="space-y-2">
                       {lookupValues.map((item, idx) => (
-                        <div key={item.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3">
+                        <div key={item.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
                           <div className="flex items-center gap-3">
                             <span className="text-xs font-semibold text-slate-500">{idx + 1}</span>
                             <span className="text-sm text-slate-900">{item.lookupValue}</span>

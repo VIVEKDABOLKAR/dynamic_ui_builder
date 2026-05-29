@@ -54,6 +54,9 @@ public class UIComponent {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "parent_component_id")
+    private Long parentComponentId;
+
     @ManyToOne
     @JoinColumn(name = "lookup_master_id")
     private UILookupMaster uiLookupMaster;

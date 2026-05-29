@@ -1,14 +1,18 @@
 import { ComponentSchema } from "../../types/JsonSchema";
 
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
+import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertTextarea(
   component: ComponentSchema
 ): FormilyFieldSchema {
 
   const p = component.properties || {};
+  const base = convertDefaultFieldSchema(component);
 
   return {
+
+    ...base,
 
     type: "string",
 
@@ -19,7 +23,7 @@ export function convertTextarea(
     "x-component": "Textarea",
 
     "x-component-props": {
-      componentId: component.id,
+      ...base["x-component-props"],
 
       placeholder: p.placeholder,
 

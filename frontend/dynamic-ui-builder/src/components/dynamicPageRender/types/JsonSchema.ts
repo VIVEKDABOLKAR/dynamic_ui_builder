@@ -6,6 +6,7 @@ export type PageStatus = "ACTIVE" | "DRAFT" | "INACTIVE" | "DELETED";
 
 export type ComponentType =
   | "heading"
+  | "layout"
   | "input"
   | "textarea"
   | "select"
