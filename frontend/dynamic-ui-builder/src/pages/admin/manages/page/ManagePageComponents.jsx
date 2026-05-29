@@ -178,7 +178,7 @@ export default function ManagePageComponents() {
 
   const columnDefs = [
     { field: 'id', hide: true },
-    
+
     { field: 'componentName', headerName: 'Name', minWidth: 180, flex: 1 },
     { field: 'componentType', headerName: 'Type', minWidth: 150 },
     { field: 'labelName', headerName: 'Label', minWidth: 180, flex: 1 },
@@ -364,9 +364,8 @@ export default function ManagePageComponents() {
           isDisabled: formData.isDisabled,
           properties: JSON.stringify(properties),
         },
-        mappingValues,
+        mappingValues
       }
-
       // lookupMasterId is managed server-side via relation; do not send it from the UI
 
       if (lookupValues.length > 0) {
@@ -417,9 +416,8 @@ export default function ManagePageComponents() {
                 onClick={() => handleSelect(item)}
                 role="button"
                 tabIndex={0}
-                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${
-                  selectedComponent === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
-                }`}
+                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${selectedComponent === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-500 text-xl text-white shadow-sm">

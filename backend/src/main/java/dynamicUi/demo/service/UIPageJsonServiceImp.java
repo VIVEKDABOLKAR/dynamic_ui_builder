@@ -13,9 +13,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import dynamicUi.demo.entity.UIComponent;
+import dynamicUi.demo.entity.UIEntityMapping;
 import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIPageJson;
 import dynamicUi.demo.repoistory.UIPageJsonRepository;
+import dynamicUi.demo.repoistory.UIEntityMappingRepository;
 import dynamicUi.demo.repoistory.UiComponentRepository;
 
 @Service
@@ -24,13 +26,16 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final UIPageJsonRepository uiPageJsonRepository;
     private final UiComponentRepository uiComponentRepository;
+    private final UIEntityMappingRepository uiEntityMappingRepository;
 
     public UIPageJsonServiceImp(
             UIPageJsonRepository uiPageJsonRepository,
-            UiComponentRepository uiComponentRepository
+            UiComponentRepository uiComponentRepository,
+            UIEntityMappingRepository uiEntityMappingRepository
     ) {
         this.uiPageJsonRepository = uiPageJsonRepository;
         this.uiComponentRepository = uiComponentRepository;
+        this.uiEntityMappingRepository = uiEntityMappingRepository;
     }
 
     @Override
@@ -156,9 +161,53 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
             componentNode.set("lookup", lookupNode);
         }
 
+        uiEntityMappingRepository.findByUiComponent_Id(component.getId())
+                .ifPresent(mapping -> componentNode.set("mapping", toMappingNode(mapping)));
+
         componentNode.set("properties", propertiesNode);
 
+
         return componentNode;
+    }
+
+    private ObjectNode toMappingNode(UIEntityMapping mapping) {
+        ObjectNode mappingNode = OBJECT_MAPPER.createObjectNode();
+        mappingNode.put("type", "ENTITY");
+
+        if (mapping.getAttributeName() != null && !mapping.getAttributeName().isBlank()) {
+            mappingNode.put("source", mapping.getAttributeName());
+        } else if (mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
+            mappingNode.put("source", mapping.getColumnName());
+        } else if (mapping.getTableName() != null && !mapping.getTableName().isBlank()) {
+            mappingNode.put("source", mapping.getTableName());
+        }
+
+        mappingNode.put("source", mapping.getTableName() + '.' + mapping.getColumnName());
+
+        if (mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
+            mappingNode.put("target", mapping.getColumnName());
+        }
+
+        if (mapping.getTableName() != null && !mapping.getTableName().isBlank()) {
+            mappingNode.put("expression", mapping.getTableName());
+        }
+
+        if (mapping.getDisplayName() != null && !mapping.getDisplayName().isBlank()) {
+            mappingNode.put("defaultValue", mapping.getDisplayName());
+        }
+
+        ArrayNode dependencies = OBJECT_MAPPER.createArrayNode();
+        if (Boolean.TRUE.equals(mapping.getIsRequired())) {
+            dependencies.add("required");
+        }
+        if (Boolean.TRUE.equals(mapping.getIsFilterable())) {
+            dependencies.add("filterable");
+        }
+        if (!dependencies.isEmpty()) {
+            mappingNode.set("dependencies", dependencies);
+        }
+
+        return mappingNode;
     }
 
     private String normalizeComponentType(String componentType) {

@@ -51,6 +51,8 @@ function traverseSchema(
     // ONLY ENTITY mappings
     if (
       mapping?.type === "ENTITY"
+      && mapping.source
+      && mapping.source !== "."
     ) {
 
       setNestedValue(

@@ -68,6 +68,24 @@ public class UiComponentServiceImp implements UiComponentService {
             saveLookupValues(saved, dto.getLookupValues(), null);
         }
 
+        // SAVE COLUMN MAPPING
+        // SAVE ENTITY MAPPING
+        if (mappingDTO != null) {
+
+            UIEntityMapping mapping = UIEntityMapping.builder()
+                    .uiComponent(saved)
+                    .tableName(mappingDTO.getTableName())
+                    .columnName(mappingDTO.getColumnName())
+                    .attributeName(mappingDTO.getAttributeName())
+                    .displayName(mappingDTO.getDisplayName())
+                    .isRequired(mappingDTO.getIsRequired())
+                    .isFilterable(mappingDTO.getIsFilterable())
+                    .build();
+
+            uiEntityMappingRepository.save(mapping);
+        }
+
+
         dto.setId(saved.getId());
         dto.setParentComponentId(saved.getParentComponentId());
         uiPageJsonService.syncPageJson(dto.getPageCode());
@@ -96,7 +114,7 @@ public class UiComponentServiceImp implements UiComponentService {
     }
 
     @Override
-    public UIComponentDTO updateComponent(Long id, UIComponentDTO dto) {
+    public UIComponentDTO updateComponent(Long id, UIComponentDTO dto, UIEntityMappingDTO mappingDTO) {
 
         UIComponent component = uiComponentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Component not found"));
@@ -115,6 +133,19 @@ public class UiComponentServiceImp implements UiComponentService {
         // lookup master id removed from DTO; relation handled via UILookupMaster association
 
         UIComponent updated = uiComponentRepository.save(component);
+
+        if (mappingDTO != null) {
+                UIEntityMapping mapping = uiEntityMappingRepository.findByUiComponent_Id(updated.getId())
+                    .orElseGet(UIEntityMapping::new);
+            mapping.setUiComponent(updated);
+            mapping.setTableName(mappingDTO.getTableName());
+            mapping.setColumnName(mappingDTO.getColumnName());
+            mapping.setAttributeName(mappingDTO.getAttributeName());
+            mapping.setDisplayName(mappingDTO.getDisplayName());
+            mapping.setIsRequired(mappingDTO.getIsRequired());
+            mapping.setIsFilterable(mappingDTO.getIsFilterable());
+            uiEntityMappingRepository.save(mapping);
+        }
 
         if (dto.getLookupValues() != null) {
             if (updated.getUiLookupMaster() != null) {

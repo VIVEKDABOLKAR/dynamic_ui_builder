@@ -4,6 +4,7 @@ import dynamicUi.demo.dto.UIComponentDTO;
 import dynamicUi.demo.dto.UIEntityMappingDTO;
 import dynamicUi.demo.service.UiComponentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -34,7 +35,7 @@ public class UiComponentController {
             : null;
 
         Map<String, Object> normalizedComponentMap = componentValue instanceof Map<?, ?> componentMap
-            ? objectMapper.convertValue(componentMap, Map.class)
+            ? objectMapper.convertValue(componentMap, new TypeReference<LinkedHashMap<String, Object>>() {})
             : new LinkedHashMap<>();
 
         if (!normalizedComponentMap.containsKey("lookupValues") && requestBody.containsKey("lookupValues")) {
@@ -66,9 +67,29 @@ public class UiComponentController {
     @PutMapping("/{id}")
     public UIComponentDTO updateComponent(
             @PathVariable Long id,
-            @RequestBody UIComponentDTO dto
+            @RequestBody Map<String, Object> requestBody
     ) {
-        return uiComponentService.updateComponent(id, dto);
+        Object componentValue = requestBody.containsKey("component") ? requestBody.get("component") : requestBody;
+        Object mappingValue = requestBody.containsKey("mappingValues")
+            ? requestBody.get("mappingValues")
+            : componentValue instanceof Map<?, ?> componentMap && componentMap.containsKey("mappingValues")
+            ? componentMap.get("mappingValues")
+            : null;
+
+        Map<String, Object> normalizedComponentMap = componentValue instanceof Map<?, ?> componentMap
+            ? objectMapper.convertValue(componentMap, new TypeReference<LinkedHashMap<String, Object>>() {})
+            : new LinkedHashMap<>();
+
+        if (!normalizedComponentMap.containsKey("lookupValues") && requestBody.containsKey("lookupValues")) {
+            normalizedComponentMap.put("lookupValues", requestBody.get("lookupValues"));
+        }
+
+        UIComponentDTO componentDTO = objectMapper.convertValue(normalizedComponentMap, UIComponentDTO.class);
+        UIEntityMappingDTO mappingDTO = mappingValue != null
+            ? objectMapper.convertValue(mappingValue, UIEntityMappingDTO.class)
+            : null;
+
+        return uiComponentService.updateComponent(id, componentDTO, mappingDTO);
     }
 
     @DeleteMapping("/{id}")

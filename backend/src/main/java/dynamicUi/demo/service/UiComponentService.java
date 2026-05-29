@@ -14,7 +14,7 @@ public interface UiComponentService {
 
     UIComponentDTO getComponentById(Long id);
 
-    UIComponentDTO updateComponent(Long id, UIComponentDTO dto);
+    UIComponentDTO updateComponent(Long id, UIComponentDTO componentDTO, UIEntityMappingDTO mappingDTO);
 
     void deleteComponent(Long id);
 }

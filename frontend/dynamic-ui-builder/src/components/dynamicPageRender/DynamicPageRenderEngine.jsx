@@ -4,6 +4,7 @@ import { form } from './formily/createForm.ts';
 
 import { FormProvider } from '@formily/react'
 import { SchemaField } from './formily/SchemaField.tsx';
+import { PageSchemaContext } from './context/PageSchemaContext'
 
 /**
  * this is the core engine to render dynamic page based on json schema
@@ -32,7 +33,9 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
 
             <div className='bg-white text-black'>
                 <FormProvider form={form}>
-                    <SchemaField schema={formilySchema} />
+                    <PageSchemaContext.Provider value={formilySchema}>
+                        <SchemaField schema={formilySchema} />
+                    </PageSchemaContext.Provider>
                 </FormProvider>
             </div>
 
