@@ -134,6 +134,8 @@ export interface MappingSchema {
 
   source: string;
   target?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE";
+  responsePath?: string;
 
   expression?: string;
 

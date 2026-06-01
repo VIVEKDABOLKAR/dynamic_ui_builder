@@ -38,6 +38,24 @@ public class UIComponentDTO {
 
     private Long parentComponentId;
 
+    private String mappingType;
+
+    private String source;
+
+    private String responsePath;
+
+    private String tableName;
+
+    private String columnName;
+
+    private String attributeName;
+
+    private String displayName;
+
+    private Boolean mappingRequired;
+
+    private Boolean isFilterable;
+
     private List<UILookupDTO> lookupValues;
 
 

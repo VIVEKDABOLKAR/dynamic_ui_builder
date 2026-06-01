@@ -62,7 +62,7 @@ export default function DynamicPageRendering() {
         <div className="border-1 border-white/10 basis-1/2">
           <div> Render json to UI </div>
           {/* <DynamicPageRenderEngine jsonSchema={pageForm} /> */}
-          <DynamicPageRenderEngine jsonSchema={parsedSchema} />
+          <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" />
         </div>
       }
     </main>

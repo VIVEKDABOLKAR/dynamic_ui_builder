@@ -172,7 +172,21 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
 
     private ObjectNode toMappingNode(UIEntityMapping mapping) {
         ObjectNode mappingNode = OBJECT_MAPPER.createObjectNode();
-        mappingNode.put("type", "ENTITY");
+        String mappingType = mapping.getMappingType();
+        if (mappingType == null || mappingType.isBlank()) {
+            mappingType = "ENTITY";
+        }
+        mappingNode.put("type", mappingType);
+
+        if ("API".equalsIgnoreCase(mappingType)) {
+            if (mapping.getSource() != null && !mapping.getSource().isBlank()) {
+                mappingNode.put("source", mapping.getSource());
+            }
+            if (mapping.getResponsePath() != null && !mapping.getResponsePath().isBlank()) {
+                mappingNode.put("responsePath", mapping.getResponsePath());
+            }
+            return mappingNode;
+        }
 
         if (mapping.getAttributeName() != null && !mapping.getAttributeName().isBlank()) {
             mappingNode.put("source", mapping.getAttributeName());
@@ -182,7 +196,10 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
             mappingNode.put("source", mapping.getTableName());
         }
 
-        mappingNode.put("source", mapping.getTableName() + '.' + mapping.getColumnName());
+        if (mapping.getTableName() != null && !mapping.getTableName().isBlank()
+                && mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
+            mappingNode.put("source", mapping.getTableName() + '.' + mapping.getColumnName());
+        }
 
         if (mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
             mappingNode.put("target", mapping.getColumnName());

@@ -7,6 +7,9 @@ import ManagePage from './pages/admin/manages/page/ManagePage'
 import AddNewPage from './pages/admin/manages/page/AddNewPage'
 import ManagePageComponents from './pages/admin/manages/page/ManagePageComponents'
 import DynamicPageRendering from './pages/ui/DynamicPageRendering'
+import DynamicPageRenderEngine from './components/dynamicPageRender/DynamicPageRenderEngine'
+import PageJson from './pages/admin/pageJson/PageJson'
+import DynamicPage from './pages/ui/DynamicPage'
 
 export default function App() {
   return (
@@ -25,9 +28,11 @@ export default function App() {
         <Route path='manage_page/add' element={<AddNewPage />} />
         <Route path='manage_page/:pageCode/edit' element={<AddNewPage />} />
         <Route path='manage_page/:pageCode/components' element={<ManagePageComponents />} />
+        <Route path='page_json' element={<PageJson />} />
       </Route>
 
       <Route path='/ui/*' element={<DynamicPageRendering />} />
+      <Route path='/ui_demo/*' element={<DynamicPage />} />
       {/* <Route path='*' element={<Navigate to='/' replace />} /> */}
     </Routes>
   )

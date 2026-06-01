@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 const items = [
   { label: 'Overview', to: '/admin_panel' },
   { label: 'Manage pages', to: '/admin_panel/manage_page' },
+  { label: 'Page Json', to: '/admin_panel/page_json' },
 ]
 
 export default function Sidebar() {

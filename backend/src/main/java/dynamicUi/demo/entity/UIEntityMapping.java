@@ -21,6 +21,15 @@ public class UIEntityMapping {
     @JoinColumn(name = "component_id")
     private UIComponent uiComponent;
 
+    @Column(name = "mapping_type")
+    private String mappingType;
+
+    @Column(name = "source")
+    private String source;
+
+    @Column(name = "response_path")
+    private String responsePath;
+
     @Column(name = "table_name")
     private String tableName;
 

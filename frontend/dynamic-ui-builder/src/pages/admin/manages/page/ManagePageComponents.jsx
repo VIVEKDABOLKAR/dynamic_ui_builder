@@ -12,6 +12,7 @@ const AVAILABLE_COMPONENTS = [
   { type: 'select', label: 'Dropdown', icon: '🔽' },
   { type: 'radio', label: 'Radio Button', icon: '⭕' },
   { type: 'checkbox', label: 'Checkbox', icon: '☑️' },
+  { type: 'table', label: 'Data Table', icon: '📊' },
   { type: 'card', label: 'Card', icon: '🗂️' },
   { type: 'layout', label: 'Layout', icon: '📐' }
 ]
@@ -57,6 +58,8 @@ export default function ManagePageComponents() {
     isRequired: false,
     isFilterable: false,
   })
+
+  const isTableComponent = formData.componentType === 'table'
 
   const loadComponents = async () => {
     setIsLoading(true)
@@ -346,6 +349,10 @@ export default function ManagePageComponents() {
         Object.entries(additionalProperties).filter(([, value]) => value !== '' && value !== null && value !== undefined)
       )
 
+      if (isTableComponent) {
+        properties.title = formData.labelName || formData.componentName
+      }
+
       if (formData.componentType === 'button') {
         properties.text = formData.labelName || formData.componentName
       }
@@ -473,21 +480,27 @@ export default function ManagePageComponents() {
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Label *</label>
+                    <label className="text-sm font-medium text-slate-700">
+                      {isTableComponent ? 'Table Title *' : 'Label *'}
+                    </label>
                     <input
                       required
                       name="labelName"
                       value={formData.labelName}
                       onChange={handleChange}
+                      placeholder={isTableComponent ? 'Enter table title' : ''}
                       className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
                     />
                   </div>
                   <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Placeholder</label>
+                    <label className="text-sm font-medium text-slate-700">
+                      {isTableComponent ? 'Table Description / Hint' : 'Placeholder'}
+                    </label>
                     <input
                       name="placeholder"
                       value={formData.placeholder}
                       onChange={handleChange}
+                      placeholder={isTableComponent ? 'Optional table hint' : ''}
                       className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
                     />
                   </div>

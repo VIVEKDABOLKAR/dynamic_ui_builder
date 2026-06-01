@@ -1,6 +1,7 @@
 import axios from "axios";
 import { MappingSchema } from "../dynamicPageRender/types/JsonSchema";
 import { resolveApiMapping } from "./rule/api.resolver";
+import resolveEntityMapping from "./rule/entity.resolver";
 
 
 export async function resolveMapping(
@@ -13,6 +14,9 @@ export async function resolveMapping(
 
     case "API":
       return resolveApiMapping(mapping);
+
+    case "ENTITY":
+      return resolveEntityMapping(mapping);
 
     default:
       return null;

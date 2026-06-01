@@ -2,38 +2,45 @@ import axios from "axios";
 import { LookupSchema, MappingSchema } from "../../dynamicPageRender/types/JsonSchema";
 import { API_REGISTRY } from "../apiRegistery/ApiRegistery";
 
+function extractByPath(data: any, path?: string) {
+  if (!path || !path.trim()) {
+    return data;
+  }
+
+  return path
+    .split(".")
+    .filter(Boolean)
+    .reduce((acc, key) => acc?.[key], data);
+}
+
 export async function resolveApiMapping(
   mapping: MappingSchema
 ) {
 
   try {
 
-    const registeryEntry = (API_REGISTRY as any)[mapping.source];
-    if (!registeryEntry || !registeryEntry.url) {
-        registeryEntry.url = mapping.source; // treat source as URL if not found in registry
+    if (!mapping.source || !mapping.source.trim()) {
+      return [];
     }
 
+    const registryEntry = (API_REGISTRY as any)[mapping.source];
+    const isAbsoluteUrl = /^https?:\/\//i.test(mapping.source);
+    const fallbackUrl = isAbsoluteUrl
+      ? mapping.source
+      : `http://localhost:8080${mapping.source}`;
+    const url = registryEntry?.url || fallbackUrl;
+    const method = (mapping.method || registryEntry?.method || "GET").toUpperCase();
+
     const response = await axios({
-      method: (registeryEntry.method || "GET").toUpperCase(),
-      url: registeryEntry.url,
+      method,
+      url,
       headers: {},
       params: {},
     });
 
-    let result = response.data;
+    const result = extractByPath(response.data, mapping.responsePath);
 
-    // resolve responsePath
-    // if (result) {
-
-    //   const paths = mapping.responsePath.split(".");
-
-    //   for (const key of paths) {
-
-    //     result = result?.[key];
-    //   }
-    // }
-
-    return result;
+    return Array.isArray(result) ? result : (result ?? []);
 
   } catch (error) {
 
@@ -55,31 +62,17 @@ export async function resolveApiLookup(
   }
   try {
 
-    let registeryEntry = (API_REGISTRY as any)[lookup.apiUrl];
-    const url = registeryEntry?.url || `http://localhost:8080${lookup.apiUrl}`;
+    const registryEntry = (API_REGISTRY as any)[lookup.apiUrl];
+    const url = registryEntry?.url || `http://localhost:8080${lookup.apiUrl}`;
 
     const response = await axios({
-      method: (registeryEntry?.method || "GET").toUpperCase(),
+      method: (registryEntry?.method || "GET").toUpperCase(),
       url,
       headers: {},
       params: {},
     });
 
-    let result = response.data;
-    console.log(result)
-
-    // resolve responsePath
-    // if (result) {
-
-    //   const paths = mapping.responsePath.split(".");
-
-    //   for (const key of paths) {
-
-    //     result = result?.[key];
-    //   }
-    // }
-
-    return result;
+    return response.data;
 
   } catch (error) {
 

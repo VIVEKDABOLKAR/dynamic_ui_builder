@@ -74,6 +74,9 @@ public class UiComponentServiceImp implements UiComponentService {
 
             UIEntityMapping mapping = UIEntityMapping.builder()
                     .uiComponent(saved)
+                    .mappingType(mappingDTO.getMappingType())
+                    .source(mappingDTO.getSource())
+                    .responsePath(mappingDTO.getResponsePath())
                     .tableName(mappingDTO.getTableName())
                     .columnName(mappingDTO.getColumnName())
                     .attributeName(mappingDTO.getAttributeName())
@@ -138,6 +141,9 @@ public class UiComponentServiceImp implements UiComponentService {
                 UIEntityMapping mapping = uiEntityMappingRepository.findByUiComponent_Id(updated.getId())
                     .orElseGet(UIEntityMapping::new);
             mapping.setUiComponent(updated);
+            mapping.setMappingType(mappingDTO.getMappingType());
+            mapping.setSource(mappingDTO.getSource());
+            mapping.setResponsePath(mappingDTO.getResponsePath());
             mapping.setTableName(mappingDTO.getTableName());
             mapping.setColumnName(mappingDTO.getColumnName());
             mapping.setAttributeName(mappingDTO.getAttributeName());
@@ -177,7 +183,7 @@ public class UiComponentServiceImp implements UiComponentService {
 
     private UIComponentDTO mapToDto(UIComponent component) {
 
-        return UIComponentDTO.builder()
+        UIComponentDTO.UIComponentDTOBuilder builder = UIComponentDTO.builder()
                 .id(component.getId())
                 .pageCode(component.getUiPage().getPageCode())
                 .componentName(component.getComponentName())
@@ -191,13 +197,25 @@ public class UiComponentServiceImp implements UiComponentService {
                 .isDisabled(component.getIsDisabled())
                 .isActive(component.getIsActive())
                 .parentComponentId(component.getParentComponentId())
-                
                 .lookupValues(component.getUiLookupMaster() != null
                     ? uiLookupRepository.findByUiLookupMaster_Id(component.getUiLookupMaster().getId()).stream()
                         .map(this::mapToDto)
                         .collect(Collectors.toList())
-                    : List.of())
-                .build();
+                    : List.of());
+
+        uiEntityMappingRepository.findByUiComponent_Id(component.getId()).ifPresent(mapping -> {
+            builder.mappingType(mapping.getMappingType());
+            builder.source(mapping.getSource());
+            builder.responsePath(mapping.getResponsePath());
+            builder.tableName(mapping.getTableName());
+            builder.columnName(mapping.getColumnName());
+            builder.attributeName(mapping.getAttributeName());
+            builder.displayName(mapping.getDisplayName());
+            builder.mappingRequired(mapping.getIsRequired());
+            builder.isFilterable(mapping.getIsFilterable());
+        });
+
+        return builder.build();
     }
 
     private UILookupDTO mapToDto(UILookup lookup) {

@@ -9,6 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 public class UIEntityMappingDTO {
 
+    private String mappingType;
+
+    private String source;
+
+    private String responsePath;
+
     private String tableName;
 
     private String columnName;

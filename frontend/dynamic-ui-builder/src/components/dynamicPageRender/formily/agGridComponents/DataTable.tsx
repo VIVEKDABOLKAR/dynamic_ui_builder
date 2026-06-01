@@ -10,7 +10,9 @@ import { DynamicRows, generateColumns } from "../../../dataMappingEngine/utils/g
 
 interface DataTableProps {
 
-    title?: string;
+    label?: string;
+
+    placeholder?: string;
 
     columns?: any[];
 
@@ -22,7 +24,8 @@ interface DataTableProps {
 }
 
 export const DataTable = ({
-    title,
+    label,
+    placeholder,
     columns = [],
     data = [],
     height = 400,
@@ -51,33 +54,44 @@ export const DataTable = ({
         <div
             style={{
                 width: "100%",
-                marginTop: 20
             }}
+            className="mt-5 overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)]"
         >
-
-            {title && (
-                <h2>{title}</h2>
-            )}
-
-            <div
-                className="ag-theme-alpine"
-                style={{
-                    width: "100%",
-                    height
-                }}
-            >
-
-                <AgGridReact
-                    rowData={rows}
-                    columnDefs={dynamicColumns}
-                    pagination={true}
-                    paginationPageSize={10}
-                    paginationPageSizeSelector={[10, 20, 50, 100]}
-
-                />
-
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200/80 bg-white/70 px-5 py-4 backdrop-blur">
+                <div className="space-y-1">
+                    {label && (
+                        <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+                            {label}
+                        </h2>
+                    )}
+                    {placeholder && (
+                        <p className="max-w-2xl text-sm text-slate-500">
+                            {placeholder}
+                        </p>
+                    )}
+                </div>
+                <div className="hidden rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700 sm:block">
+                    Dynamic table
+                </div>
             </div>
 
+            <div className="p-4 sm:p-5">
+                <div
+                    className="ag-theme-alpine overflow-hidden rounded-2xl border border-slate-200 shadow-sm"
+                    style={{
+                        width: "100%",
+                        height
+                    }}
+                >
+                    <AgGridReact
+                        rowData={rows}
+                        columnDefs={dynamicColumns}
+                        pagination={true}
+                        paginationPageSize={10}
+                        paginationPageSizeSelector={[10, 20, 50, 100]}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

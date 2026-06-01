@@ -31,7 +31,7 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
         <>
             <div>DynamicPageRenderEngine:- {jsonSchema.pageName}</div>
 
-            <div className='bg-white text-black'>
+            <div className='bg-white text-black m-1 p-1'>
                 <FormProvider form={form}>
                     <PageSchemaContext.Provider value={formilySchema}>
                         <SchemaField schema={formilySchema} />
