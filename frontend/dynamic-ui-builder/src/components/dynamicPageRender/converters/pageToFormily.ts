@@ -1,4 +1,3 @@
-//import types
 import { DynamicPageSchema } from "../types/JsonSchema";
 import { FormilyPageSchema, FormilyFieldSchema } from "../types/JsonSchemaFormily";
 import { convertComponetToField } from "./componentsToFOrmily";
@@ -8,7 +7,7 @@ import { convertComponetToField } from "./componentsToFOrmily";
 export function convertPageToFormily(
     page: DynamicPageSchema | null
 ): FormilyPageSchema {
-   
+
 
     // safety check
     if (!page || !Array.isArray(page.components)) {
@@ -27,16 +26,20 @@ export function convertPageToFormily(
     );
 
     for (const comp of sorted) {
-        const field = convertComponetToField(comp);
+        const field = convertComponetToField(comp, page.actions || {});
+
 
         if (field) {
             properties[comp.name] = field;
         }
+        
+
     }
 
     return {
         type: "object",
-        properties
+        properties,
+        "x-actions": page.actions || {}
     }
 
 }

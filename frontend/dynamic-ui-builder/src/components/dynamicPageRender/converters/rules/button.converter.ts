@@ -1,13 +1,14 @@
-import { ComponentSchema } from "../../types/JsonSchema";
+import { ActionRegistry, ComponentSchema } from "../../types/JsonSchema";
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertDefaultFieldSchema } from "./default/default.converter";
 
 
 export function convertButton(
-  component: ComponentSchema
+  component: ComponentSchema,
+  actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema {
   const p = component.properties;
-  const base = convertDefaultFieldSchema(component);
+  const base = convertDefaultFieldSchema(component, actionRegistry);
 
   return {
     ...base,
@@ -18,7 +19,7 @@ export function convertButton(
       text: p.text,
       variant: p.variant,
       style: p.style || {},
-      action: component.action || []
+      action: base["x-component-props"]?.action || []
     },
     "x-index": component.sequence
   };

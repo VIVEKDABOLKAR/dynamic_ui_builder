@@ -1,4 +1,5 @@
 import { ComponentSchema } from "../types/JsonSchema";
+import { ActionRegistry } from "../types/JsonSchema";
 import { FormilyFieldSchema } from "../types/JsonSchemaFormily";
 import { convertButton } from "./rules/button.converter";
 import { convertCard } from "./rules/card.converter";
@@ -13,39 +14,40 @@ import { convertTextarea } from "./rules/textarea.converter";
 
 
 export function convertComponetToField(
-    component: ComponentSchema
+    component: ComponentSchema,
+    actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema | null {
 
     switch (component.type) {
         case "input":
-            return convertInput(component);
+            return convertInput(component, actionRegistry);
 
         case "button":
-            return convertButton(component);
+            return convertButton(component, actionRegistry);
 
         case "heading":
-            return convertHeading(component);
+            return convertHeading(component, actionRegistry);
 
         case "layout":
-            return convertLayout(component);
+            return convertLayout(component, actionRegistry);
 
         case "card":
-            return convertCard(component);
+            return convertCard(component, actionRegistry);
 
         case "textarea":
-            return convertTextarea(component);
+            return convertTextarea(component, actionRegistry);
 
         case "select":
-            return convertSelect(component);
+            return convertSelect(component, actionRegistry);
 
         case "checkbox":
-            return convertCheckbox(component);
+            return convertCheckbox(component, actionRegistry);
 
         case "radio":
-            return convertRadio(component);
+            return convertRadio(component, actionRegistry);
 
         case "table":
-            return convertTable(component);
+            return convertTable(component, actionRegistry);
 
         default:
             console.warn(`Unsupported type: ${component.type}`);

@@ -1,4 +1,4 @@
-import { ComponentSchema } from "../../types/JsonSchema";
+import { ActionRegistry, ComponentSchema } from "../../types/JsonSchema";
 
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertComponetToField } from "../componentsToFOrmily";
@@ -6,11 +6,12 @@ import { convertDefaultFieldSchema } from "./default/default.converter";
 
 
 export function convertCard(
-  component: ComponentSchema
+  component: ComponentSchema,
+  actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema {
 
   const p = component.properties || {};
-  const base = convertDefaultFieldSchema(component);
+  const base = convertDefaultFieldSchema(component, actionRegistry);
 
   const properties: Record<string, any> = {};
 
@@ -20,7 +21,7 @@ export function convertCard(
 
   for (const child of children) {
 
-    const converted = convertComponetToField(child);
+    const converted = convertComponetToField(child, actionRegistry);
 
     if (!converted) continue;
 

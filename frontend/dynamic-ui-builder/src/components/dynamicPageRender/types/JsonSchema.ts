@@ -28,6 +28,25 @@ export type MappingType =
   | "ENTITY";
 
 
+  // create genralize apiConfig , to use everywhere we need apidefination
+
+// ============================================
+// API CONFIG
+// Generalized API definition used across actions, lookups and mappings
+// ============================================
+export interface ApiConfig {
+  url: string; // full URL or registry key
+  method?: "GET" | "POST" | "PUT" | "DELETE";
+  headers?: Record<string, string>;
+  params?: Record<string, any>;
+  body?: any;
+  responsePath?: string; // optional path inside response to extract
+  lazyLoad?: boolean;
+  // label/value mapping for lookups
+  labelKey?: string;
+  valueKey?: string;
+}
+
 // ============================================
 // ROOT PAGE JSON SCHEMA
 // ============================================
@@ -35,6 +54,7 @@ export type MappingType =
 export interface DynamicPageSchema {
   page: PageMeta;
   components: ComponentSchema[];
+  actions?: ActionRegistry;
 }
 
 
@@ -65,7 +85,6 @@ export interface ComponentSchema {
   mapping?: MappingSchema;
   lookup?: LookupSchema;
   action?: ActionSchema[];
-  // layout?: LayoutSchema;
 }
 
 
@@ -74,19 +93,60 @@ export interface ComponentSchema {
 // components specfice action array for functionlity
 // ============================================
 export interface ActionSchema {
-  event: string;
-  type?: ActionType;
-  api?: {
-    url: string;
-    method?: "GET" | "POST" | "PUT";
-    headers?: Record<string, string>;
-  }
-  value?: string;
+ event: ActionEvent;
+ ref: string;
+ condition: string;
+}
+
+export type ActionEvent=
+  | "onClick"
+  | "onLoad"
+  | "onChange"
+  | "onHover"
+  | "onBlur"
+  | "onFocus"
+  | "onNavigation"; 
+
+export interface ActionRegistry {
+  [actionName: string]: ActionConfig;
+}
+
+export interface ActionConfig {
+  type: ActionType;
+  api?: ApiConfig;
+  navigate?: NavigateConfig;
+  setField?: SetFieldConfig; //can use to toggel field as well
+    toast?: ToastConfig;
+  chain?: string[];          // list of other actionNames to run in sequence
+  onSuccess?: string;        // actionName to run on success
+  onError?: string;          // actionName to run on error
 }
 
 export type ActionType =
-| "SUBMIT_FORM";
+  | "SUBMIT_FORM"
+  | "FETCH_DATA"
+  | "NAVIGATE"
+  | "SET_FIELD_VALUE"
+  | "SHOW_TOAST"
+  | "TOGGLE_VISIBLE"
+  | "RESET_FORM"
+  | "CONFIRM_DIALOG"
+  | "CHAIN";
 
+  export interface NavigateConfig {
+  path: string;              // e.g. "/ui/employee-list"
+  params?: Record<string, string>; // field refs: { id: "$form.employeeId" }
+}
+
+export interface SetFieldConfig {
+  field: string;             // target field name
+  value: any;                // static value or "$response.fieldName"
+}
+
+export interface ToastConfig {
+  message: string;
+  severity: "success" | "error" | "info" | "warning";
+}
 // ============================================
 // COMPONENT PROPERTIES
 // shared UI + behavior config

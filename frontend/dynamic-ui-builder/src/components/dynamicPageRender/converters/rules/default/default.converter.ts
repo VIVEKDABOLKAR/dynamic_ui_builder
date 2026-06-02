@@ -1,8 +1,10 @@
-import { ComponentSchema } from "../../../types/JsonSchema";
+import { ActionRegistry, ComponentSchema } from "../../../types/JsonSchema";
 import { FormilyFieldSchema } from "../../../types/JsonSchemaFormily";
+import { resolveComponentActions } from "../../../actionRenders/ActionDispacther";
 
 export function convertDefaultFieldSchema(
-  component: ComponentSchema
+  component: ComponentSchema,
+  actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema {
   const properties = component.properties || {};
 
@@ -29,7 +31,7 @@ export function convertDefaultFieldSchema(
       defaultValue: properties.defaultValue,
       options: properties.options || [],
       style: properties.style || {},
-      action: component.action || [],
+      action: resolveComponentActions(component.action || [], actionRegistry),
       mapping: component.mapping || undefined,
       lookup: component.lookup || undefined,
     },

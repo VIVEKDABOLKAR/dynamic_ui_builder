@@ -1,13 +1,14 @@
-import { ComponentSchema } from "../../types/JsonSchema";
+import { ActionRegistry, ComponentSchema } from "../../types/JsonSchema";
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertInput(
-    comp: ComponentSchema
+    comp: ComponentSchema,
+    actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema {
 
     const prop = comp.properties;
-    const base = convertDefaultFieldSchema(comp);
+    const base = convertDefaultFieldSchema(comp, actionRegistry);
 
     return {
         ...base,

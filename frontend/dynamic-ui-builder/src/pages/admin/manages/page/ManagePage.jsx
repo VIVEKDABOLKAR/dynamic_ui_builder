@@ -33,14 +33,15 @@ export default function ManagePage() {
     }
 
     const columnDefs = [
-        { field: 'id', minWidth: 90 },
-        { field: 'pageName', minWidth: 180 },
-        { field: 'pageCode', minWidth: 180 },
-        { field: 'description', minWidth: 260, flex: 1 },
+        { field: 'id', minWidth: 90 , filter: true},
+        { field: 'pageName', minWidth: 180 , filter: true},
+        { field: 'pageCode', minWidth: 180 , filter: true},
+        { field: 'description', minWidth: 260, flex: 1 , filter: true},
         {
             field: 'isActive',
             headerName: 'Status',
             minWidth: 120,
+             filter: true,
             valueFormatter: (params) => (params.value ? 'Active' : 'Inactive'),
         },
         {
@@ -125,7 +126,7 @@ export default function ManagePage() {
                                 <p>Create a new page to get started.</p>
                             </div>
                         ) : (
-                            <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+                            <AgGridReact rowData={rowData} columnDefs={columnDefs} f/>
                         )}
                     </div>
                 </div>

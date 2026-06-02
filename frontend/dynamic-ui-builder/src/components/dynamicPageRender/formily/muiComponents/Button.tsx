@@ -32,12 +32,14 @@ export const CustomButton = ({ text, style, variant = "contained", action = [] }
         const api = act?.api || {};
         const method = (api.method || "POST").toUpperCase();
 
+        console.log(values)
+
         try {
           await axios({
             method,
             url: resolveUrl(api.url),
             headers: api.headers || {},
-            data: payload,
+            data: values,
           });
         } catch (error) {
           console.error("Button action SUBMIT_FORM failed", error);
@@ -64,6 +66,8 @@ export const CustomButton = ({ text, style, variant = "contained", action = [] }
       }
     }
   };
+
+  console.log(first)
 
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 1, mb: 2 }}>

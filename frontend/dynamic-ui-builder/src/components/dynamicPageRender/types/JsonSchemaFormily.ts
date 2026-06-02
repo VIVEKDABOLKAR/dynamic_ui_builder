@@ -1,4 +1,6 @@
 
+import { ActionRegistry, ApiConfig, ActionConfig } from "./JsonSchema";
+
 export type FormilyFieldType =
     | "object"
     | "string"
@@ -41,6 +43,8 @@ export interface FormilyReaction {
   when?: string;
 }
 
+export type ResolvedActionSchema = ActionConfig;
+
 export interface FormilyFieldSchema {
     type?: FormilyFieldType;
 
@@ -56,7 +60,11 @@ export interface FormilyFieldSchema {
 
     // UI Rendering
     "x-component"?: string;
-    "x-component-props"?: Record<string, any>;
+    "x-component-props"?: Record<string, any> & {
+      api?: ApiConfig;
+      // action?: ResolvedActionSchema[];
+      action?: Record<string, ResolvedActionSchema>;
+    };
     "x-mapping"?: Record<string, any>;
     "x-lookup"?: Record<string, any>;
 
@@ -81,4 +89,5 @@ export interface FormilyFieldSchema {
 export interface FormilyPageSchema {
   type: "object";
   properties: Record<string, FormilyFieldSchema>;
+  "x-actions"?: ActionRegistry;
 }

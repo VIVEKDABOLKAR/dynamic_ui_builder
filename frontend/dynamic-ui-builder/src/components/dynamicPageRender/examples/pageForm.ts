@@ -9,6 +9,16 @@ export const pageForm: DynamicPageSchema = {
     status: "ACTIVE",
   },
 
+  actions: {
+    savePage: {
+      type: "SUBMIT_FORM",
+      api: {
+        url: "/api/admin/pages",
+        method: "POST",
+      },
+    },
+  },
+
   components: [
     {
       id: 1,
@@ -193,13 +203,8 @@ export const pageForm: DynamicPageSchema = {
               action: [
                 {
                   event: "onClick",
-
-                  type: "SUBMIT_FORM",
-
-                  api: {
-                    url: "/api/admin/pages",
-                    method: "POST",
-                  },
+                  ref: "savePage",
+                  condition: "true",
                 },
               ],
             },
@@ -225,7 +230,8 @@ export const pageForm: DynamicPageSchema = {
       },
 
       properties: {
-        title: "Page List",
+        label: "Page List",
+        placeholder: "All configured pages appear in this table.",
         height: 500,
       },
     },

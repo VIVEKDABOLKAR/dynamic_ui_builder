@@ -1,12 +1,13 @@
-import { ComponentSchema } from "../../types/JsonSchema";
+import { ActionRegistry, ComponentSchema } from "../../types/JsonSchema";
 import { convertDefaultFieldSchema } from "./default/default.converter";
 
 export function convertTable(
-  component: ComponentSchema
+  component: ComponentSchema,
+  actionRegistry: ActionRegistry = {}
 ): any {
 
   const p = component.properties || {};
-  const base = convertDefaultFieldSchema(component);
+  const base = convertDefaultFieldSchema(component, actionRegistry);
 
   return {
     ...base,
