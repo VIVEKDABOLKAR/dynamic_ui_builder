@@ -31,7 +31,7 @@ export function convertDefaultFieldSchema(
       defaultValue: properties.defaultValue,
       options: properties.options || [],
       style: properties.style || {},
-      action: resolveComponentActions(component.action || [], actionRegistry),
+      action: component.action,
       mapping: component.mapping || undefined,
       lookup: component.lookup || undefined,
     },

@@ -63,11 +63,7 @@ export interface FormilyFieldSchema {
 
     // UI Rendering
     "x-component"?: string;
-    "x-component-props"?: Record<string, any> & {
-      api?: ApiConfig;
-      action?: ResolvedActionSchema;
-      // action?: Record<string, ResolvedActionSchema>;
-    };
+    "x-component-props"?: Record<string, any> 
     "x-mapping"?: Record<string, any>;
     "x-lookup"?: Record<string, any>;
 

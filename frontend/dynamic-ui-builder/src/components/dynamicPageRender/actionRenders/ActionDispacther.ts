@@ -1,3 +1,4 @@
+
 import { ActionRegistry, ActionSchema } from '../types/JsonSchema';
 import { ResolvedActionSchema } from '../types/JsonSchemaFormily';
 import ExecuteAction from './ExecuteAction';
@@ -24,9 +25,11 @@ import ExecuteAction from './ExecuteAction';
 // 	};
 // }
 
+
 export function resolveComponentActions(
 	actions: ActionSchema[] = [],
-	actRegiestery: ActionRegistry = {}
+	actRegiestery: ActionRegistry = {},
+    ctx: {}
 ): ResolvedActionSchema {
 	
     const result: ResolvedActionSchema = {};
@@ -38,7 +41,7 @@ export function resolveComponentActions(
         }
 
         //override same action event
-         result[action.event] =  () => ExecuteAction(action.ref, action.condition, actRegiestery, null);
+         result[action.event] =  () => ExecuteAction(action.ref, action.condition, actRegiestery, ctx);
     });
 
     console.log('handler :- ' , result)
