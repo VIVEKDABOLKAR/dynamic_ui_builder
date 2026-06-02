@@ -43,7 +43,10 @@ export interface FormilyReaction {
   when?: string;
 }
 
-export type ResolvedActionSchema = ActionConfig;
+export type ResolvedAction = Function;
+
+export type ResolvedActionSchema =
+    Record<string, ResolvedAction>;
 
 export interface FormilyFieldSchema {
     type?: FormilyFieldType;
@@ -62,8 +65,8 @@ export interface FormilyFieldSchema {
     "x-component"?: string;
     "x-component-props"?: Record<string, any> & {
       api?: ApiConfig;
-      // action?: ResolvedActionSchema[];
-      action?: Record<string, ResolvedActionSchema>;
+      action?: ResolvedActionSchema;
+      // action?: Record<string, ResolvedActionSchema>;
     };
     "x-mapping"?: Record<string, any>;
     "x-lookup"?: Record<string, any>;

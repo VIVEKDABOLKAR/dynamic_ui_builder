@@ -19,7 +19,7 @@ export function convertButton(
       text: p.text,
       variant: p.variant,
       style: p.style || {},
-      action: base["x-component-props"]?.action || []
+      action: base["x-component-props"]?.action
     },
     "x-index": component.sequence
   };

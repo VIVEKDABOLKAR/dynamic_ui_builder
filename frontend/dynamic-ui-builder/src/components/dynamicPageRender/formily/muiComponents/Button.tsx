@@ -67,7 +67,6 @@ export const CustomButton = ({ text, style, variant = "contained", action = [] }
     }
   };
 
-  console.log(first)
 
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 1, mb: 2 }}>

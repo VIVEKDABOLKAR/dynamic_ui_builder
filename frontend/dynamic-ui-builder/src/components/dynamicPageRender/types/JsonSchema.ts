@@ -105,7 +105,8 @@ export type ActionEvent=
   | "onHover"
   | "onBlur"
   | "onFocus"
-  | "onNavigation"; 
+  | "onNavigation"
+  | string; 
 
 export interface ActionRegistry {
   [actionName: string]: ActionConfig;

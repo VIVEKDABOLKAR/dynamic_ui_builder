@@ -206,6 +206,11 @@ export const pageForm: DynamicPageSchema = {
                   ref: "savePage",
                   condition: "true",
                 },
+                {
+                  event: "onMouseEnter",
+                  ref: "hoverSavePage",
+                  condition: "true",
+                }
               ],
             },
           ],
