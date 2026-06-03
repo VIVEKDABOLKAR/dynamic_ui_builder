@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+
 import dynamicUi.demo.entity.UIPageAction;
 import dynamicUi.demo.service.inter.UIPageActionService;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/actions")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class UIPageActionController {
 
     private final UIPageActionService service;
 
     @PostMapping("/{pageCode}")
-    public UIPageAction create(@RequestBody UIPageAction uiPageAction,@PathVariable String pageCode) {
+    public UIPageAction create(@RequestBody UIPageAction uiPageAction, @PathVariable String pageCode) {
+        uiPageAction.setUiPagecode(pageCode);
         return service.create(pageCode , uiPageAction);
     }
 

@@ -49,8 +49,8 @@ export default function DynamicPageRendering() {
           <h1 className="mt-4 text-4xl font-semibold text-white">{title}</h1>
           <p className="mt-4 text-lg text-slate-300">{message}</p>
           <pre className="mt-6 overflow-auto rounded-2xl bg-slate-900/80 p-4 text-left text-xs text-slate-300">
-            {/* {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : { title, message }, null, 2)}  */}
-            {JSON.stringify(pageForm, null, 2)}
+            {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : { title, message }, null, 2)} 
+            {/* {JSON.stringify(pageForm, null, 2)} */}
           </pre>
         </div>
       </section>
@@ -61,8 +61,8 @@ export default function DynamicPageRendering() {
       {pageJson &&
         <div className="border-1 border-white/10 basis-1/2">
           <div> Render json to UI </div>
-          <DynamicPageRenderEngine jsonSchema={pageForm} />
-          {/* <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" /> */}
+          {/* <DynamicPageRenderEngine jsonSchema={pageForm} /> */}
+          <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" />
         </div>
       }
     </main>

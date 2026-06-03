@@ -1,279 +1,161 @@
-import React, { useEffect, useState } from 'react'
-import { AgGridReact } from 'ag-grid-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { createComponent, deleteComponent, getComponentsByPage, updateComponent } from '../../../../../api/componentApi'
-import AdditionalPropertiesPanel from './../components/AdditionalPropertiesPanel'
-import DatabaseMappingPanel from './../components/DatabaseMappingPanel'
-
-const AVAILABLE_EVENTS = [
-  { type: 'onClick', label: 'On Click', icon: '🖱️' },
-  { type: 'onLoad', label: 'On Load', icon: '🚀' },
-  { type: 'onChange', label: 'On Change', icon: '✏️' },
-  { type: 'onHover', label: 'On Hover', icon: '👆' },
-  { type: 'onBlur', label: 'On Blur', icon: '🔍' },
-  { type: 'onFocus', label: 'On Focus', icon: '🎯' },
-  { type: 'onNavigation', label: 'On Navigation', icon: '🧭' }
-]
+import React, { useState } from 'react'
+import { Link, useParams } from 'react-router'
+import ActionTable from './ActionTable';
+import { createPageAction } from '../../../../../api/actionsPageApi';
 
 const AVAILABLE_ACTIONS = [
-  'SUBMIT_FORM',
-  'FETCH_DATA',
-  'NAVIGATE',
-  'SET_FIELD_VALUE',
-  'SHOW_TOAST',
-  'TOGGLE_VISIBLE',
-  'RESET_FORM',
-  'CONFIRM_DIALOG',
-  'CHAIN'
-]
+  { type: "SUBMIT_FORM", label: "Submit Form", icon: "📤" },
+  { type: "FETCH_DATA", label: "Fetch Data", icon: "📥" },
+  { type: "NAVIGATE", label: "Navigate", icon: "🧭" },
+  { type: "SHOW_TOAST", label: "Show Toast", icon: "🔔" },
+  { type: "SET_FIELD_VALUE", label: "Set Field Value", icon: "✏️" },
+  { type: "RESET_FORM", label: "Reset Form", icon: "🔄" },
+  { type: "CHAIN", label: "Chain Actions", icon: "⛓️" }
+];
+
 
 export default function ManagePageAction() {
-  const { pageCode } = useParams()
-  const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
+  const { pageCode } = useParams();
+  const [selectedActions, setSelectedActions] = useState(null);
   const [formData, setFormData] = useState({
-    actionName: '',
-    actionEvent: 'onClick',
-    actionType: 'SUBMIT_FORM',
-    targetComponentId: '',
-    sequenceNo: 1
-  })
-  const [properties, setProperties] = useState({
-    apiUrl: '',
-    navigationUrl: '',
-    message: '',
-    targetField: '',
-    targetValue: ''
-  })
-  
+    uiPagecode: pageCode,
+    actionName: "",
+    actionType: "SUBMIT_FORM",
+    path: "",
+    url: "",
+    method: "GET",
+    toastMessage: "",
+    toastType: "success",
+    fieldName: "",
+    fieldValue: "",
+    chainActions: ""
+  });
 
-  const columnDefs = [
-    { field: 'id', hide: true },
-
-    { field: 'componentName', headerName: 'Name', minWidth: 180, flex: 1 },
-    { field: 'componentType', headerName: 'Type', minWidth: 150 },
-    { field: 'labelName', headerName: 'Label', minWidth: 180, flex: 1 },
-    {
-      field: 'sequenceNo',
-      headerName: 'Order',
-      minWidth: 120,
-    },
-    {
-      field: 'isRequired',
-      headerName: 'Required',
-      minWidth: 110,
-      valueFormatter: (params) => (params.value ? 'Yes' : 'No'),
-    },
-    {
-      field: 'isVisible',
-      headerName: 'Visible',
-      minWidth: 110,
-      valueFormatter: (params) => (params.value ? 'Yes' : 'No'),
-    },
-    {
-      headerName: 'Action',
-      field: 'actions',
-      pinned: 'right',
-      lockPinned: true,
-      lockPosition: true,
-      suppressMovable: true,
-      sortable: false,
-      filter: false,
-      minWidth: 190,
-      maxWidth: 220,
-      cellRenderer: (params) => (
-        <div className="flex h-full items-center gap-2 py-1">
-          <button
-            type="button"
-            onClick={() => handleEditRow(params.data)}
-            className="rounded-md bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-200"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDeleteRow(params.data.id)}
-            className="rounded-md bg-red-100 px-2 py-1 text-xs font-semibold text-red-700 hover:bg-red-200"
-          >
-            Delete
-          </button>
-        </div>
-      ),
-    },
-  ]
-
-  useEffect(() => {
-    if (pageCode) {
-      loadComponents()
-    }
-  }, [pageCode])
-
-  const handleChange = (event) => {
-    const { name, type, value, checked } = event.target
-    const nextValue = type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
-
-    setFormData((prev) => {
-      if (name === 'isChildComponent' && !nextValue) {
-        return {
-          ...prev,
-          isChildComponent: false,
-          parentComponentId: '',
-        }
-      }
-
-      return {
-        ...prev,
-        [name]: nextValue,
-      }
-    })
-
-    if (name === 'isChildComponent' && !checked) {
-      setParentSearch('')
-    }
-  }
+  const [actions, setActions] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const handleSelect = (item) => {
-    setSelectedComponent(item.type)
+    setSelectedActions(item.type);
+
     setFormData((prev) => ({
       ...prev,
-      componentType: item.type,
-      componentName: item.label,
-    }))
-    setLookupValues([])
-    setNewLookupValue('')
-  }
-
-  const handleAddLookupValue = () => {
-    if (newLookupValue.trim()) {
-      setLookupValues((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          lookupValue: newLookupValue.trim(),
-          displayValue: newLookupValue.trim(),
-          sequenceNo: prev.length + 1,
-          isActive: true,
-        },
-      ])
-      setNewLookupValue('')
-    }
-  }
-
-  const handleRemoveLookupValue = (id) => {
-    setLookupValues((prev) => prev.filter((item) => item.id !== id))
-  }
-
-  const handleAdditionalPropertyChange = (field, value) => {
-    setAdditionalProperties((prev) => ({
+      actionType: item.type,
+    }));
+  };
+  const handleChange = (e) => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: value,
-    }))
-  }
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-  const handleMappingValueChange = (field, value) => {
-    setMappingValues((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  const parentOptions = components
-    .filter((component) => component.id !== editingComponentId)
-    .filter((component) => CHILD_PARENT_ALLOWED_TYPES.has(component.componentType))
-    .filter((component) => {
-      if (!parentSearch.trim()) {
-        return true
-      }
-      const searchValue = parentSearch.trim().toLowerCase()
-      return (
-        String(component.id).includes(searchValue)
-        || (component.componentName || '').toLowerCase().includes(searchValue)
-      )
-    })
+    const config = buildConfig()
+    const newAction = {
+      id: editingId || null,
+      pageCode: pageCode,
+      actionName: formData.actionName,
+      actionType: formData.actionType,
+      properties: JSON.stringify(config),
+    };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    setErrorMessage('')
+    const res = createPageAction(pageCode, newAction);
+    console.log(res)
 
-    if (!formData.componentName.trim() || !formData.labelName.trim() || !formData.width.trim() || !formData.sequenceNo) {
-      setErrorMessage('Please fill in every required field except placeholder.')
-      return
+    if (editingId) {
+      setActions((prev) =>
+        prev.map((action) =>
+          action.id === editingId ? newAction : action
+        )
+      );
+    } else {
+      setActions((prev) => [...prev, newAction]);
     }
 
-    if (formData.isChildComponent && !formData.parentComponentId) {
-      setErrorMessage('Please choose a parent component (card/layout) for this child component.')
-      return
+    console.log(newAction)
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setFormData({
+      uiPagecode: pageCode,
+      actionName: "",
+      actionType: "SUBMIT_FORM",
+      properties: "{}",
+
+      path: "",
+
+      url: "",
+      method: "GET",
+
+      toastMessage: "",
+      toastType: "success",
+
+      fieldName: "",
+      fieldValue: "",
+
+      chainActions: ""
+    });
+
+    setEditingId(null);
+    setSelectedActions(null);
+  };
+
+  const buildConfig = () => {
+    switch (formData.actionType) {
+      case "NAVIGATE":
+        return {
+          navigate: {
+            path: formData.path,
+          },
+        };
+
+      case "FETCH_DATA":
+      case "SUBMIT_FORM":
+        return {
+          api: {
+            url: formData.url,
+            method: formData.method,
+          },
+        };
+
+      case "SHOW_TOAST":
+        return {
+          toast: {
+            message: formData.toastMessage,
+            type: formData.toastType,
+          },
+        };
+
+      case "SET_FIELD_VALUE":
+        return {
+          setField: {
+            fieldName: formData.fieldName,
+            value: formData.fieldValue,
+          },
+        };
+
+      case "CHAIN":
+        return {
+          chain: formData.chainActions
+            ?.split(",")
+            .map((x) => x.trim())
+            .filter(Boolean),
+        };
+
+      default:
+        return {};
     }
-
-    if ((formData.componentType === 'select' || formData.componentType === 'radio') && lookupValues.length === 0) {
-      setErrorMessage('Please add at least one lookup value for select or radio components.')
-      return
-    }
-
-    setSaving(true)
-
-    try {
-      const properties = Object.fromEntries(
-        Object.entries(additionalProperties).filter(([, value]) => value !== '' && value !== null && value !== undefined)
-      )
-
-      if (isTableComponent) {
-        properties.title = formData.labelName || formData.componentName
-      }
-
-      if (formData.componentType === 'button') {
-        properties.text = formData.labelName || formData.componentName
-      }
-
-      const payload = {
-        component: {
-          pageCode,
-          componentName: formData.componentName,
-          componentType: formData.componentType,
-          labelName: formData.labelName,
-          placeholder: formData.placeholder,
-          sequenceNo: formData.sequenceNo,
-          parentComponentId: formData.isChildComponent ? Number(formData.parentComponentId) : null,
-          isRequired: formData.isRequired,
-          isVisible: formData.isVisible,
-          isDisabled: formData.isDisabled,
-          properties: JSON.stringify(properties),
-        },
-        mappingValues
-      }
-      // lookupMasterId is managed server-side via relation; do not send it from the UI
-
-      if (lookupValues.length > 0) {
-        payload.lookupValues = lookupValues.map(({ id, ...rest }) => ({
-          ...rest,
-          lookupType: formData.componentType,
-        }))
-      }
-
-      if (editingComponentId) {
-        await updateComponent(editingComponentId, payload)
-      } else {
-        await createComponent(payload)
-      }
-
-      await loadComponents()
-      resetForm()
-      navigate(`./`)
-    } catch (error) {
-      console.error('Failed to create component', error)
-    } finally {
-      setSaving(false)
-    }
-  }
-
+  };
   return (
     <div className="space-y-6">
+      {/* title bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">Page Components</h1>
-          <p className="text-sm text-slate-500">Manage components available for page <span className="font-semibold">{pageCode}</span>.</p>
+          <h1 className="text-xl font-semibold text-slate-900">Page Actions</h1>
+          <p className="text-sm text-slate-500">Manage Actions available for page <span className="font-semibold">{pageCode}</span>.</p>
         </div>
         <Link
           to="/admin_panel/manage_page"
@@ -283,17 +165,18 @@ export default function ManagePageAction() {
         </Link>
       </div>
 
+      {/* add actions form  */}
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Available Components</h2>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Available Actions</h2>
           <div className="space-y-3">
-            {AVAILABLE_COMPONENTS.map((item) => (
+            {AVAILABLE_ACTIONS.map((item) => (
               <div
                 key={item.type}
                 onClick={() => handleSelect(item)}
                 role="button"
                 tabIndex={0}
-                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${selectedComponent === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
+                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${selectedActions === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
                   }`}
               >
                 <div className="flex items-center gap-3">
@@ -312,266 +195,187 @@ export default function ManagePageAction() {
 
         <div className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Add Component</h2>
-            <form onSubmit={handleSubmit} className="grid gap-6">
-              {errorMessage ? (
-                <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
-                  {errorMessage}
-                </div>
-              ) : null}
-              {/* Common Fields */}
-              <div className="space-y-4 border-b border-slate-200 pb-4">
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700">Component Name *</label>
-                  <input
-                    required
-                    name="componentName"
-                    value={formData.componentName}
-                    onChange={handleChange}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                  />
-                </div>
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Add Action
+            </h2>
 
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700">Component Type</label>
-                  <select
-                    name="componentType"
-                    value={formData.componentType}
-                    onChange={handleChange}
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                  >
-                    {AVAILABLE_COMPONENTS.map((item) => (
-                      <option key={item.type} value={item.type}>
-                        {item.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      {isTableComponent ? 'Table Title *' : 'Label *'}
-                    </label>
-                    <input
-                      required
-                      name="labelName"
-                      value={formData.labelName}
-                      onChange={handleChange}
-                      placeholder={isTableComponent ? 'Enter table title' : ''}
-                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">
-                      {isTableComponent ? 'Table Description / Hint' : 'Placeholder'}
-                    </label>
-                    <input
-                      name="placeholder"
-                      value={formData.placeholder}
-                      onChange={handleChange}
-                      placeholder={isTableComponent ? 'Optional table hint' : ''}
-                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700">Width *</label>
-                  <input
-                    required
-                    name="width"
-                    value={formData.width}
-                    onChange={handleChange}
-                    placeholder="e.g. 200px or 50%"
-                    className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                  />
-                </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Sequence *</label>
-                    <input
-                      required
-                      type="number"
-                      name="sequenceNo"
-                      value={formData.sequenceNo}
-                      onChange={handleChange}
-                      min={1}
-                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Status</label>
-                    <div className="flex gap-3">
-                      <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-                        <input
-                          type="checkbox"
-                          name="isRequired"
-                          checked={formData.isRequired}
-                          onChange={handleChange}
-                          className="h-4 w-4 rounded border-slate-300 text-cyan-500"
-                        />
-                        Required
-                      </label>
-                      <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-                        <input
-                          type="checkbox"
-                          name="isVisible"
-                          checked={formData.isVisible}
-                          onChange={handleChange}
-                          className="h-4 w-4 rounded border-slate-300 text-cyan-500"
-                        />
-                        Visible
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <input
-                      type="checkbox"
-                      name="isChildComponent"
-                      checked={formData.isChildComponent}
-                      onChange={handleChange}
-                      className="h-4 w-4 rounded border-slate-300 text-cyan-500"
-                    />
-                    Add as child component
-                  </label>
-
-                  {formData.isChildComponent ? (
-                    <div className="grid gap-3">
-                      <p className="text-xs text-slate-500">Pick the parent container by component name or id.</p>
-                      <input
-                        value={parentSearch}
-                        onChange={(event) => setParentSearch(event.target.value)}
-                        placeholder="Search parent by id or name"
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                      />
-                      <select
-                        name="parentComponentId"
-                        value={formData.parentComponentId}
-                        onChange={handleChange}
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                      >
-                        <option value="">Select parent component</option>
-                        {parentOptions.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.id} - {item.componentName} ({item.componentType})
-                          </option>
-                        ))}
-                      </select>
-                      {parentOptions.length === 0 ? (
-                        <p className="text-xs text-amber-600">No card/layout components found for this page.</p>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* action name */}
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Action Name *
+                </label>
+                <input
+                  required
+                  name="actionName"
+                  value={formData.actionName}
+                  onChange={handleChange}
+                  placeholder="Enter action name"
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                />
               </div>
 
-              <AdditionalPropertiesPanel
-                value={additionalProperties}
-                onChange={handleAdditionalPropertyChange}
-              />
+              {/* action types */}
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Action Type
+                </label>
+                <select
+                  name="actionType"
+                  value={formData.actionType}
+                  onChange={handleChange}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                >
+                  {AVAILABLE_ACTIONS.map((item) => (
+                    <option key={item.type} value={item.type}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <DatabaseMappingPanel
-                value={mappingValues}
-                onChange={handleMappingValueChange}
-              />
-
-              {(formData.componentType === 'select' || formData.componentType === 'radio') && (
-                <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <h3 className="text-sm font-semibold text-slate-900">Lookup Values</h3>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newLookupValue}
-                      onChange={(e) => setNewLookupValue(e.target.value)}
-                      placeholder="Enter value (e.g., Option 1)"
-                      className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          handleAddLookupValue()
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddLookupValue}
-                      className="inline-flex items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-200"
-                    >
-                      Add
-                    </button>
-                  </div>
-
-                  {lookupValues.length > 0 && (
-                    <div className="space-y-2">
-                      {lookupValues.map((item, idx) => (
-                        <div key={item.id} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs font-semibold text-slate-500">{idx + 1}</span>
-                            <span className="text-sm text-slate-900">{item.lookupValue}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveLookupValue(item.id)}
-                            className="text-xs font-semibold text-red-500 transition hover:text-red-700"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              {formData.actionType === "NAVIGATE" && (
+                <div className="grid gap-2">
+                  <label>Path</label>
+                  <input
+                    name="path"
+                    value={formData.path}
+                    onChange={handleChange}
+                    placeholder="/home"
+                    className="rounded-xl border border-slate-200 px-3 py-2"
+                  />
                 </div>
               )}
 
+              {(formData.actionType === "FETCH_DATA" || formData.actionType === "SUBMIT_FORM") && (
+                <>
+                  <div className="grid gap-2">
+                    <label>API URL</label>
+                    <input
+                      name="url"
+                      value={formData.url}
+                      onChange={handleChange}
+                      placeholder="/api/users"
+                      className="rounded-xl border border-slate-200 px-3 py-2"
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <label>Method</label>
+                    <select
+                      name="method"
+                      value={formData.method}
+                      onChange={handleChange}
+                      className="rounded-xl border border-slate-200 px-3 py-2"
+                    >
+                      <option>GET</option>
+                      <option>POST</option>
+                      <option>PUT</option>
+                      <option>DELETE</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {formData.actionType === "SHOW_TOAST" && (
+                <>
+                  <div className="grid gap-2">
+                    <label>Message</label>
+                    <input
+                      name="toastMessage"
+                      value={formData.toastMessage}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <label>Type</label>
+                    <select
+                      name="toastType"
+                      value={formData.toastType}
+                      onChange={handleChange}
+                    >
+                      <option value="success">Success</option>
+                      <option value="error">Error</option>
+                      <option value="warning">Warning</option>
+                      <option value="info">Info</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {formData.actionType === "SET_FIELD_VALUE" && (
+                <>
+                  <div className="grid gap-2">
+                    <label>Field Name</label>
+                    <input
+                      name="fieldName"
+                      value={formData.fieldName}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <label>Field Value</label>
+                    <input
+                      name="fieldValue"
+                      value={formData.fieldValue}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.actionType === "CHAIN" && (
+                <div className="grid gap-2">
+                  <label>Action Names</label>
+                  <input
+                    name="chainActions"
+                    value={formData.chainActions}
+                    onChange={handleChange}
+                    placeholder="saveUser,showSuccess,navigateHome"
+                  />
+                </div>
+              )}
+
+
+
               <button
                 type="submit"
-                disabled={saving || (formData.componentType === 'select' || formData.componentType === 'radio') && lookupValues.length === 0}
-                className="inline-flex items-center justify-center rounded-full bg-cyan-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center rounded-full bg-cyan-500 px-5 py-2 text-sm font-semibold text-white hover:bg-cyan-400"
               >
-                {saving ? (editingComponentId ? 'Updating...' : 'Adding...') : (editingComponentId ? 'Update Component' : 'Add Component')}
+                {editingId ? "Update Action" : "Add Action"}
               </button>
-              {editingComponentId ? (
+
+              {editingId && (
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="inline-flex items-center justify-center rounded-full bg-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-300"
+                  className="ml-2 inline-flex items-center justify-center rounded-full bg-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-300"
                 >
                   Cancel Edit
                 </button>
-              ) : null}
+              )}
             </form>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Components on this page</h2>
-                <p className="text-sm text-slate-500">Review the page-specific component list below.</p>
+                <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Action on this page</h2>
+                <p className="text-sm text-slate-500">Review the page-specific Action list below.</p>
               </div>
             </div>
             <div className="overflow-hidden rounded-2xl border border-slate-200">
-              <div className="h-[360px] w-full">
-                {isLoading ? (
-                  <div className="flex h-full items-center justify-center gap-3 text-sm text-slate-500">
-                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
-                    Loading components...
-                  </div>
-                ) : components.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-slate-500">
-                    <p className="font-semibold text-slate-700">No components yet</p>
-                    <p>Add your first component using the form above.</p>
-                  </div>
-                ) : (
-                  <AgGridReact rowData={components} columnDefs={columnDefs} />
-                )}
-              </div>
+              {/* list of added action table */}
+              <ActionTable pageCode={pageCode} />
             </div>
           </div>
         </div>
+
       </div>
+
+
     </div>
   )
 }

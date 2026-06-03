@@ -26,7 +26,17 @@ public class UIPageActionServiceImp implements UIPageActionService {
     public UIPageAction create(
             String pageCode,
             UIPageAction action) {
+        //store it in action table
+        UIPageAction uiPageAction = UIPageAction.builder()
+                .actionName(action.getActionName())
+                .actionType(action.getActionType())
+                .properties(action.getProperties())
+                .uiPagecode(action.getUiPagecode())
+                .build();
 
+        repository.save(uiPageAction);
+
+        //store in page json
         UIPageJson pageJson = uiPageJsonRepository
                 .findByUiPage_PageCode(pageCode)
                 .orElseThrow(() -> new RuntimeException("Page JSON not found"));

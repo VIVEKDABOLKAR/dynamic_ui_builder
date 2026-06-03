@@ -222,6 +222,12 @@ export default function ManagePageComponents() {
           >
             Edit
           </button>
+          <Link
+            to={`/admin_panel/manage_page/${params.data.pageCode}/addAction`}
+            className="rounded-md bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 hover:bg-blue-200"
+          >
+            Add Actions
+          </Link>
           <button
             type="button"
             onClick={() => handleDeleteRow(params.data.id)}
