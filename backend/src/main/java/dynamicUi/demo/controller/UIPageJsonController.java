@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dynamicUi.demo.entity.UIPageJson;
-import dynamicUi.demo.service.UIPageJsonService;
+import dynamicUi.demo.service.inter.UIPageJsonService;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController

@@ -1,6 +1,5 @@
-package dynamicUi.demo.service;
+package dynamicUi.demo.service.inter;
 
-import dynamicUi.demo.dto.UILookupDTO;
 import dynamicUi.demo.entity.UIEntityMapping;
 
 import java.util.List;

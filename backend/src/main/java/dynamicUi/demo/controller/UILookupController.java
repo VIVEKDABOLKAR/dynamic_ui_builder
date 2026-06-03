@@ -1,7 +1,7 @@
 package dynamicUi.demo.controller;
 
 import dynamicUi.demo.dto.UILookupDTO;
-import dynamicUi.demo.service.UILookupService;
+import dynamicUi.demo.service.inter.UILookupService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

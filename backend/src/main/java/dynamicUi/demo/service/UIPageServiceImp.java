@@ -2,6 +2,7 @@ package dynamicUi.demo.service;
 
 import java.util.List;
 
+import dynamicUi.demo.service.inter.UIPageService;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

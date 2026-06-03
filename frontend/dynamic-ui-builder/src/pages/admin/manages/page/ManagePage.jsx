@@ -50,8 +50,8 @@ export default function ManagePage() {
         },
         {
             headerName: 'Action',
-            minWidth: 320,
-            maxWidth: 380,
+            minWidth: 360,
+            maxWidth: 420,
             pinned: 'right',
             lockPinned: true,
             lockPosition: true,
@@ -59,7 +59,7 @@ export default function ManagePage() {
             sortable: false,
             filter: false,
             cellRenderer: (params) => (
-                <div className="flex h-full items-center gap-2 py-1">
+                <div className="flex h-full items-center gap-2 py-1 ">
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
                         className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-700"
@@ -79,6 +79,13 @@ export default function ManagePage() {
                     >
                         Add Component
                     </Link>
+                    <Link
+                        to={`/admin_panel/manage_page/${params.data.pageCode}/action`}
+                        className="rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-400"
+                    >
+                        Add Action
+                    </Link>
+                    
                 </div>
             ),
         },
@@ -114,7 +121,7 @@ export default function ManagePage() {
                 </div>
 
                 <div className="overflow-auto">
-                    <div className="h-[350px] ">
+                    <div className="h-[350px]  ">
                         {isLoading ? (
                             <div className="flex h-full items-center justify-center gap-3 text-sm text-slate-500">
                                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
@@ -126,7 +133,7 @@ export default function ManagePage() {
                                 <p>Create a new page to get started.</p>
                             </div>
                         ) : (
-                            <AgGridReact rowData={rowData} columnDefs={columnDefs} f/>
+                            <AgGridReact rowData={rowData} columnDefs={columnDefs}  />
                         )}
                     </div>
                 </div>

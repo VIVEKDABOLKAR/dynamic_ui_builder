@@ -2,7 +2,7 @@ package dynamicUi.demo.controller;
 
 import dynamicUi.demo.dto.UIComponentDTO;
 import dynamicUi.demo.dto.UIEntityMappingDTO;
-import dynamicUi.demo.service.UiComponentService;
+import dynamicUi.demo.service.inter.UiComponentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.web.bind.annotation.*;

@@ -5,6 +5,8 @@ import dynamicUi.demo.dto.UIEntityMappingDTO;
 import dynamicUi.demo.dto.UILookupDTO;
 import dynamicUi.demo.entity.*;
 import dynamicUi.demo.repoistory.*;
+import dynamicUi.demo.service.inter.UIPageJsonService;
+import dynamicUi.demo.service.inter.UiComponentService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

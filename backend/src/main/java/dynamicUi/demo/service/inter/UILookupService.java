@@ -1,4 +1,4 @@
-package dynamicUi.demo.service;
+package dynamicUi.demo.service.inter;
 
 import dynamicUi.demo.dto.UILookupDTO;
 

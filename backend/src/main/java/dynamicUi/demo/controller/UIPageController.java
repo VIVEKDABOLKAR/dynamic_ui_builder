@@ -3,7 +3,7 @@ package dynamicUi.demo.controller;
 import dynamicUi.demo.entity.UIPage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import dynamicUi.demo.service.UIPageService;
+import dynamicUi.demo.service.inter.UIPageService;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")

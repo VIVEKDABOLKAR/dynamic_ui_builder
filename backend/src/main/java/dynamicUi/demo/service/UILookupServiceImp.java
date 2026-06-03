@@ -4,6 +4,7 @@ import dynamicUi.demo.dto.UILookupDTO;
 import dynamicUi.demo.entity.UILookup;
 import dynamicUi.demo.repoistory.UILookupMasterRepository;
 import dynamicUi.demo.repoistory.UILookupRepository;
+import dynamicUi.demo.service.inter.UILookupService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
