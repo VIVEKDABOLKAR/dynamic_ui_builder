@@ -1,5 +1,6 @@
 package dynamicUi.demo.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,9 +17,8 @@ public class UIPageAction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "page_id")
-    private UIPage uiPage;
+    @Column(name = "page_code")
+    private String uiPagecode;
 
     @Column(name = "action_name")
     private String actionName;

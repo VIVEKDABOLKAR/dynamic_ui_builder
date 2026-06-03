@@ -14,35 +14,35 @@ public class UIPageActionController {
 
     private final UIPageActionService service;
 
-    @PostMapping
-    public UIPageAction create(@RequestBody UIPageAction uiPageAction) {
-        return service.create(uiPageAction);
+    @PostMapping("/{pageCode}")
+    public UIPageAction create(@RequestBody UIPageAction uiPageAction,@PathVariable String pageCode) {
+        return service.create(pageCode , uiPageAction);
     }
 
-    @PutMapping("/{id}")
-    public UIPageAction update(
-            @PathVariable Long id,
-            @RequestBody UIPageAction uiPageAction) {
-        return service.update(id, uiPageAction);
-    }
-
-    @GetMapping("/{id}")
-    public UIPageAction getById(@PathVariable Long id) {
-        return service.getById(id);
-    }
-
-    @GetMapping
-    public List<UIPageAction> getAll() {
-        return service.getAll();
-    }
-
-    @GetMapping("/page/{pageId}")
-    public List<UIPageAction> getByPageId(@PathVariable Long pageId) {
-        return service.getByPageId(pageId);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
-    }
+//    @PutMapping("/{id}")
+//    public UIPageAction update(
+//            @PathVariable Long id,
+//            @RequestBody UIPageAction uiPageAction) {
+//        return service.update(id, uiPageAction);
+//    }
+//
+//    @GetMapping("/{id}")
+//    public UIPageAction getById(@PathVariable Long id) {
+//        return service.getById(id);
+//    }
+//
+//    @GetMapping
+//    public List<UIPageAction> getAll() {
+//        return service.getAll();
+//    }
+//
+//    @GetMapping("/page/{pageId}")
+//    public List<UIPageAction> getByPageId(@PathVariable Long pageId) {
+//        return service.getByPageId(pageId);
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public void delete(@PathVariable Long id) {
+//        service.delete(id);
+//    }
 }

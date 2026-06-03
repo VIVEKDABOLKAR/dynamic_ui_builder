@@ -6,15 +6,15 @@ import java.util.List;
 
 public interface UIPageActionService {
 
-    UIPageAction create(UIPageAction uiPageAction);
+    UIPageAction create(String pageCode , UIPageAction uiPageAction);
 
-    UIPageAction update(Long id, UIPageAction uiPageAction);
+//    UIPageAction update(Long id, UIPageAction uiPageAction);
+//
+//    UIPageAction getById(Long id);
+//
+//    List<UIPageAction> getAll();
+//
+//    List<UIPageAction> getByPageId(Long pageId);
 
-    UIPageAction getById(Long id);
-
-    List<UIPageAction> getAll();
-
-    List<UIPageAction> getByPageId(Long pageId);
-
-    void delete(Long id);
+//    void delete(Long id);
 }
