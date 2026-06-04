@@ -6,7 +6,7 @@ export const createPage = async (payload) => {
 }
 
 export const getAllPages = async () => {
-  const response = await adminClient.get('/pages')
+  const response = await adminClient.get('/pages/total')
   return response.data
 }
 

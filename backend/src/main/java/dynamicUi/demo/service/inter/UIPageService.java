@@ -1,6 +1,8 @@
 package dynamicUi.demo.service.inter;
 
 import dynamicUi.demo.entity.UIPage;
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 
 public interface UIPageService {
@@ -11,4 +13,5 @@ public interface UIPageService {
     UIPage updatePageStatus(String pageCode, boolean status);
     void deletePage(String pageCode);
 
+    List<UIPage> getAllPages1();
 }

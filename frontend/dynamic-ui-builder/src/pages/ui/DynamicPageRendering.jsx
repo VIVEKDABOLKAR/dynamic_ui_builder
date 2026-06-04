@@ -20,6 +20,7 @@ export default function DynamicPageRendering() {
       if (!pageCode) return
       try {
         const response = await getUiPageByCode(pageCode)
+        console.log(response)
         setPageJson(response)
         console.log(JSON.parse(response.jsonSchema));
       } catch (error) {
@@ -50,7 +51,7 @@ export default function DynamicPageRendering() {
           <h1 className="mt-4 text-4xl font-semibold text-white">{title}</h1>
           <p className="mt-4 text-lg text-slate-300">{message}</p>
           <pre className="mt-6 overflow-auto rounded-2xl bg-slate-900/80 p-4 text-left text-xs text-slate-300">
-            {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : pageForm, null, 2)} 
+            {JSON.stringify(pageJson?.jsonSchema ? parsedSchema : null, null, 2)} 
             {/* {JSON.stringify(pageForm, null, 2)} */}
           </pre>
         </div>

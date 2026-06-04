@@ -28,6 +28,11 @@ public class UIPageController {
         return ResponseEntity.ok(uiPageService.getAllPages());
     }
 
+    @GetMapping("/total")
+    public ResponseEntity<List<UIPage>> getAllPages1() {
+        return ResponseEntity.ok(uiPageService.getAllPages1());
+    }
+
     @GetMapping("/{pageCode}")
     public UIPage getPageByCode(
             @PathVariable String pageCode

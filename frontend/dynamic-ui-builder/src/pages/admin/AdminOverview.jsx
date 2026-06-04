@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllPages } from '../../api/adminPageApi'
+import { getComponentsByPage } from '../../api/componentApi'
+import { getActionsByPageCode } from '../../api/actionsPageApi'
 
 function StatCard({ icon, label, value, sub, accent }) {
   const accents = {
-    cyan:    { bg: 'bg-cyan-50',    ring: 'ring-cyan-100',    icon: 'bg-cyan-500',    text: 'text-cyan-600' },
-    slate:   { bg: 'bg-slate-50',   ring: 'ring-slate-100',   icon: 'bg-slate-700',   text: 'text-slate-600' },
+    cyan: { bg: 'bg-cyan-50', ring: 'ring-cyan-100', icon: 'bg-cyan-500', text: 'text-cyan-600' },
+    slate: { bg: 'bg-slate-50', ring: 'ring-slate-100', icon: 'bg-slate-700', text: 'text-slate-600' },
     emerald: { bg: 'bg-emerald-50', ring: 'ring-emerald-100', icon: 'bg-emerald-500', text: 'text-emerald-600' },
-    amber:   { bg: 'bg-amber-50',   ring: 'ring-amber-100',   icon: 'bg-amber-500',   text: 'text-amber-600' },
+    amber: { bg: 'bg-amber-50', ring: 'ring-amber-100', icon: 'bg-amber-500', text: 'text-amber-600' },
   }
   const c = accents[accent] ?? accents.slate
   return (
@@ -62,9 +64,8 @@ function PageRow({ page }) {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-          page.isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'
-        }`}>
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${page.isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-500'
+          }`}>
           {page.isActive ? 'Active' : 'Off'}
         </span>
         <Link
@@ -84,13 +85,50 @@ export default function AdminOverview() {
 
   useEffect(() => {
     getAllPages()
-      .then((data) => setPages(Array.isArray(data) ? data : []))
+      .then((data) =>setPages(Array.isArray(data) ? data : []))
       .catch(() => setPages([]))
       .finally(() => setLoading(false))
   }, [])
+  console.log(pages)
+  useEffect(() => {
+  if (pages.length > 0) {
+         loadTotalComponents();
+         loadTotalActions();
+    }
+  },[pages])
 
+  const [components, setComponents] = useState([]);
+  const [totalComponents, setTotalComponents] = useState(0);
+
+  const loadTotalComponents = async () => {
+    let count = 0;
+
+    for (const page of pages) {
+      const components = await getComponentsByPage(page.pageCode);
+      count += components.length;
+    }
+
+    setTotalComponents(count);
+  };
+
+
+
+  const [actions,setActions] = useState([]);
+  const [totalActions,setTotalActions] = useState(0);
+
+  const loadTotalActions = async () => {
+    let count = 0;
+    for (const page of pages){
+          const actions = await getActionsByPageCode(page.pageCode);
+          console.log(actions);
+          count += actions.length;
+    }
+    setTotalActions(count);
+  }
+
+  
+  
   const activePages = pages.filter((p) => p.isActive)
-  const recentPages = [...pages].reverse().slice(0, 5)
 
   return (
     <>
@@ -110,18 +148,20 @@ export default function AdminOverview() {
           </p>
         </div>
 
-        <div className="slide-up-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-2">
-          <StatCard icon="📄" label="Total Pages"   value={loading ? '—' : pages.length}        sub="pages configured"              accent="slate"   />
-          <StatCard icon="✅" label="Active Pages"  value={loading ? '—' : activePages.length}  sub={`${pages.length - activePages.length} inactive`} accent="emerald" />
+        <div className="slide-up-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard icon="📄" label="Total Pages" value={loading ? '—' : pages.length} sub="pages configured" accent="slate" />
+          <StatCard icon="✅" label="Active Pages" value={loading ? '—' : activePages.length} sub={`${pages.length - activePages.length} inactive`} accent="emerald" />
+          <StatCard icon="🧩" label="Components"   value={loading ? "—" : totalComponents} sub="across all pages" accent="cyan" />
+          <StatCard icon="⚡" label="Actions" value={loading ? "—" : totalActions}  sub="configured globally" accent="amber" />
         </div>
 
         <div className="slide-up-3">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Quick Access</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <QuickLink to="/admin_panel/manage_page"     icon="📄" title="Manage Pages" desc="Create, edit and delete UI pages" />
-            <QuickLink to="/admin_panel/manage_page/add" icon="➕" title="New Page"     desc="Configure a new page from scratch" badge="New" />
-            <QuickLink to="/admin_panel/page_json"       icon="{ }" title="Page JSON"  desc="Inspect the generated JSON schema per page" />
-            <QuickLink to="/ui"                          icon="🖥️" title="Preview UI"  desc="See the dynamic rendering engine in action" />
+            <QuickLink to="/admin_panel/manage_page" icon="📄" title="Manage Pages" desc="Create, edit and delete UI pages" />
+            <QuickLink to="/admin_panel/manage_page/add" icon="➕" title="New Page" desc="Configure a new page from scratch" />
+            <QuickLink to="/admin_panel/page_json" icon="{ }" title="Page JSON" desc="Inspect the generated JSON schema per page" />
+            <QuickLink to="/ui" icon="🖥️" title="Preview UI" desc="See the dynamic rendering engine in action" />
           </div>
         </div>
 

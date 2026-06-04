@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dynamicUi.demo.repoistory.UIPageRepository;
 import dynamicUi.demo.service.inter.UIPageJsonService;
 import org.springframework.stereotype.Service;
 
@@ -28,29 +29,34 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
     private final UIPageJsonRepository uiPageJsonRepository;
     private final UiComponentRepository uiComponentRepository;
     private final UIEntityMappingRepository uiEntityMappingRepository;
+    private  final UIPageRepository uiPageRepository;
 
     public UIPageJsonServiceImp(
             UIPageJsonRepository uiPageJsonRepository,
             UiComponentRepository uiComponentRepository,
-            UIEntityMappingRepository uiEntityMappingRepository
+            UIEntityMappingRepository uiEntityMappingRepository, UIPageRepository uiPageRepository
     ) {
         this.uiPageJsonRepository = uiPageJsonRepository;
         this.uiComponentRepository = uiComponentRepository;
         this.uiEntityMappingRepository = uiEntityMappingRepository;
+        this.uiPageRepository = uiPageRepository;
     }
 
     @Override
     public UIPageJson getByPageCode(String pageCode) {
-        return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
-            .orElseGet(() -> {
-                UIPageJson j = UIPageJson.builder().id(-1L).build();
-                UIPage p = new UIPage();
-                p.setPageCode(pageCode);
-                j.setUiPage(p);
-                return j;
-            });
-    }
 
+        UIPage page = uiPageRepository.findByPageCode(pageCode)
+                .orElseThrow(() ->
+                        new RuntimeException("Page not found"));
+
+        if (!Boolean.TRUE.equals(page.getIsActive())) {
+            throw new RuntimeException("Page is inactive");
+        }
+
+        return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
+                .orElseThrow(() ->
+                        new RuntimeException("Page schema not found"));
+    }
     @Override
     public void syncPageJson(String pageCode) {
         ObjectNode root = parseOrCreateRoot(pageCode, null);

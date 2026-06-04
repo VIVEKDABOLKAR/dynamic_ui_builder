@@ -86,8 +86,12 @@ public class UIPageServiceImp implements UIPageService {
 
     @Override
     public UIPage getPageByCode(String pageCode) {
-        return uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page not found with code: " + pageCode));
+
+        UIPage page = uiPageRepository.findByPageCode(pageCode)
+                .orElseThrow(() ->
+                        new RuntimeException("Page not found with code: " + pageCode));
+        System.out.println(page);
+        return page;
     }
 
     @Override
@@ -119,6 +123,11 @@ public class UIPageServiceImp implements UIPageService {
                 .orElseThrow(() -> new RuntimeException("Page not found with code: " + pageCode));
         page.setActive(false);
         uiPageRepository.save(page);
+    }
+
+    @Override
+    public List<UIPage> getAllPages1() {
+        return uiPageRepository.findAll();
     }
 
     @Override

@@ -13,4 +13,5 @@ public interface UIPageRepository  extends JpaRepository<UIPage, Long> {
     boolean existsByPageCode(String pageCode);
     Optional<UIPage> findByPageCode(String pageCode);
     List<UIPage> findByIsActiveTrue();
+    List<UIPage> findAll();
 }
