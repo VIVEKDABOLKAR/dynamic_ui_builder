@@ -29,9 +29,9 @@ export default function DynamicPageRenderEngine({ jsonSchema }) {
 
     return (
         <>
-            <div>DynamicPageRenderEngine:- {jsonSchema.pageName}</div>
+            {/* <div>DynamicPageRenderEngine:- {jsonSchema.pageName}</div> */}
 
-            <div className='bg-white text-black m-1 p-1'>
+            <div className='bg-white text-black m-2 p-2'>
                 <FormProvider form={form}>
                     <PageSchemaContext.Provider value={formilySchema}>
                         <SchemaField schema={formilySchema} />
