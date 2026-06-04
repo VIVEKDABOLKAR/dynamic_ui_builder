@@ -11,4 +11,6 @@ import java.util.List;
 public interface UIPageActionRepository extends JpaRepository<UIPageAction, Long> {
 
 //    List<UIPageAction> findByUiPageId(Long pageId);
+
+List<UIPageAction> findByUiPagecode(String pageCode);
 }

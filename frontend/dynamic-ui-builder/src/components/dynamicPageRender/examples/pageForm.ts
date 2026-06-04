@@ -207,11 +207,11 @@ export const pageForm: DynamicPageSchema = {
               },
 
               action: [
-                // {
-                //   event: "onClick",
-                //   ref: "savePage",
-                //   condition: "true",
-                // },
+                {
+                  event: "onClick",
+                  ref: "savePage",
+                  condition: "true",
+                },
                 {
                   event: "onClick",
                   ref: "navHome",

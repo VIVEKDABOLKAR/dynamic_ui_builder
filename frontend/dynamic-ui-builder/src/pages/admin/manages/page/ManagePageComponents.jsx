@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createComponent, deleteComponent, getComponentsByPage, updateComponent } from '../../../../api/componentApi'
 import AdditionalPropertiesPanel from './components/AdditionalPropertiesPanel'
 import DatabaseMappingPanel from './components/DatabaseMappingPanel'
+import ComponentActionModal from './components/ComponentActionModel'
 
 const AVAILABLE_COMPONENTS = [
   { type: 'input', label: 'Text Field', icon: '🔤' },
@@ -22,6 +23,7 @@ const CHILD_PARENT_ALLOWED_TYPES = new Set(['card', 'layout'])
 export default function ManagePageComponents() {
   const { pageCode } = useParams()
   const navigate = useNavigate()
+  const [actionModalComponent, setActionModalComponent] = useState(null)
   const [components, setComponents] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -222,12 +224,13 @@ export default function ManagePageComponents() {
           >
             Edit
           </button>
-          <Link
-            to={`/admin_panel/manage_page/${params.data.pageCode}/addAction`}
+          <button
+            type="button"
+            onClick={() => setActionModalComponent(params.data)}
             className="rounded-md bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 hover:bg-blue-200"
           >
-            Add Actions
-          </Link>
+            Add Action
+          </button>
           <button
             type="button"
             onClick={() => handleDeleteRow(params.data.id)}
@@ -405,6 +408,7 @@ export default function ManagePageComponents() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -709,5 +713,15 @@ export default function ManagePageComponents() {
         </div>
       </div>
     </div>
+
+      {actionModalComponent && (
+        <ComponentActionModal
+          component={actionModalComponent}
+          onClose={(saved) => {
+            setActionModalComponent(null);
+          }}
+        />
+      )}
+    </>
   )
 }
