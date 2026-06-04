@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Link } from 'react-router-dom'
-import { deletePage, getAllPages } from '../../../../api/adminPageApi'
+import { deletePage, getAllPages, updatePageStatus } from '../../../../api/adminPageApi'
 
 export default function ManagePage() {
     const [rowData, setRowData] = useState([])
@@ -32,17 +32,47 @@ export default function ManagePage() {
         }
     }
 
+    const handleStatusToggle = async (params) => {
+        try {
+            const updatedStatus = !params.data.isActive;
+            const payload = {
+                status: updatedStatus
+            }
+
+            const res = await updatePageStatus(
+                params.data.pageCode,
+                payload
+            );
+
+            setRowData(prev =>
+                prev.map(page =>
+                    page.pageCode === params.data.pageCode
+                        ? { ...page, isActive: updatedStatus }
+                        : page
+                )
+            );
+        } catch (error) {
+            console.error('Failed to update status', error);
+        }
+    };
+
     const columnDefs = [
-        { field: 'id', minWidth: 90 , filter: true},
-        { field: 'pageName', minWidth: 180 , filter: true},
-        { field: 'pageCode', minWidth: 180 , filter: true},
-        { field: 'description', minWidth: 260, flex: 1 , filter: true},
+        { field: 'id', minWidth: 90, filter: true },
+        { field: 'pageName', minWidth: 180, filter: true },
+        { field: 'pageCode', minWidth: 180, filter: true },
+        { field: 'description', minWidth: 260, flex: 1, filter: true },
         {
             field: 'isActive',
             headerName: 'Status',
             minWidth: 120,
-             filter: true,
+            filter: true,
             valueFormatter: (params) => (params.value ? 'Active' : 'Inactive'),
+            cellStyle: (params) => ({
+                cursor: 'pointer',
+                color: params.value ? '#16a34a' : '#dc2626',
+                fontWeight: 600
+            }),
+            onCellClicked: handleStatusToggle
         },
         {
             field: 'createdAt',
@@ -75,7 +105,7 @@ export default function ManagePage() {
                     </button>
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
-                        className="rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-400"
+                        className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-400"
                     >
                         Add Component
                     </Link>
@@ -85,7 +115,7 @@ export default function ManagePage() {
                     >
                         Add Action
                     </Link>
-                    
+
                 </div>
             ),
         },
@@ -133,7 +163,7 @@ export default function ManagePage() {
                                 <p>Create a new page to get started.</p>
                             </div>
                         ) : (
-                            <AgGridReact rowData={rowData} columnDefs={columnDefs}  />
+                            <AgGridReact rowData={rowData} columnDefs={columnDefs} />
                         )}
                     </div>
                 </div>

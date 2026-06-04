@@ -171,7 +171,7 @@ public class UIPageActionServiceImp implements UIPageActionService {
             JsonNode root =
                     OBJECT_MAPPER.readTree(page.getJsonSchema());
 
-        
+
 
 
 

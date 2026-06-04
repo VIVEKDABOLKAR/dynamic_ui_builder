@@ -8,5 +8,7 @@ public interface UIPageService {
     UIPage getPageByCode(String pageCode);
     List<UIPage> getAllPages();
     UIPage updatePage(String pageCode, UIPage uiPage);
+    UIPage updatePageStatus(String pageCode, boolean status);
     void deletePage(String pageCode);
+
 }

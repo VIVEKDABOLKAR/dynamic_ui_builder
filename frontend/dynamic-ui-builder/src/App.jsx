@@ -19,7 +19,7 @@ export default function App() {
       <Route path='/' element={<Landing />} />
       <Route path='/admin_panel' element={<AdminLayout />}>
         <Route
-          index
+          path='overview'
           element={
             // <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
             //   Admin overview

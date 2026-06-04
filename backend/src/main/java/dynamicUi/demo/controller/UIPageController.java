@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.dto.PageStatusRequest;
 import dynamicUi.demo.entity.UIPage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,19 @@ public class UIPageController {
             @RequestBody UIPage uIPage
     ) {
         return uiPageService.updatePage(pageCode, uIPage);
+    }
+
+    @PutMapping("/status/{pageCode}")
+    public ResponseEntity<UIPage> updatePageStatus(
+            @PathVariable String pageCode,
+            @RequestBody PageStatusRequest request) {
+
+        UIPage updatedPage =
+                uiPageService.updatePageStatus(
+                        pageCode,
+                        request.isStatus());
+
+        return ResponseEntity.ok(updatedPage);
     }
 
     @DeleteMapping("/{pageCode}")

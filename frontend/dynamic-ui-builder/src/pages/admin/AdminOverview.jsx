@@ -110,11 +110,9 @@ export default function AdminOverview() {
           </p>
         </div>
 
-        <div className="slide-up-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="slide-up-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-2">
           <StatCard icon="📄" label="Total Pages"   value={loading ? '—' : pages.length}        sub="pages configured"              accent="slate"   />
           <StatCard icon="✅" label="Active Pages"  value={loading ? '—' : activePages.length}  sub={`${pages.length - activePages.length} inactive`} accent="emerald" />
-          <StatCard icon="🧩" label="Components"    value="—"                                    sub="across all pages"              accent="cyan"    />
-          <StatCard icon="⚡" label="Actions"       value="—"                                    sub="configured globally"           accent="amber"   />
         </div>
 
         <div className="slide-up-3">

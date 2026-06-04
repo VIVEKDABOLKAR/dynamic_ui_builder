@@ -10,6 +10,11 @@ export const getAllPages = async () => {
   return response.data
 }
 
+export const updatePageStatus = async (pageCode,payload) => {
+  const response = await adminClient.put(`/pages/status/${pageCode}`, payload)
+  return response.data;
+}
+
 export const getPageByCode = async (pageCode) => {
   const response = await adminClient.get(`/pages/${pageCode}`)
   return response.data

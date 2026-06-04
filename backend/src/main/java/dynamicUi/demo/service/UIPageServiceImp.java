@@ -120,4 +120,20 @@ public class UIPageServiceImp implements UIPageService {
         page.setActive(false);
         uiPageRepository.save(page);
     }
+
+    @Override
+    public UIPage updatePageStatus(
+            String pageCode,
+            boolean status) {
+
+        UIPage page =
+                uiPageRepository.findByPageCode(pageCode)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Page not found"));
+
+        page.setActive(status);
+
+        return uiPageRepository.save(page);
+    }
 }
