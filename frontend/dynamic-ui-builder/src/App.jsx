@@ -11,6 +11,7 @@ import DynamicPageRenderEngine from './components/dynamicPageRender/DynamicPageR
 import PageJson from './pages/admin/pageJson/PageJson'
 import DynamicPage from './pages/ui/DynamicPage'
 import ManagePageAction from './pages/admin/manages/page/action/ManagePageAction'
+import AdminOverview from './pages/admin/AdminOverview'
 
 export default function App() {
   return (
@@ -20,9 +21,10 @@ export default function App() {
         <Route
           index
           element={
-            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
-              Admin overview
-            </div>
+            // <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 shadow-sm">
+            //   Admin overview
+            // </div>
+            <AdminOverview />
           }
         />
         <Route path='manage_page' element={<ManagePage />} />
