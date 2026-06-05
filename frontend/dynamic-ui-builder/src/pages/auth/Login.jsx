@@ -1,0 +1,86 @@
+import React, { useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { login, isLoggedIn } from '../../api/authApi'
+
+export default function Login() {
+  const navigate = useNavigate()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  // Already logged in — let React Router handle the redirect declaratively
+  
+  if (isLoggedIn()) {
+    return <Navigate to="/admin_panel/overview" replace />
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await login(username, password)
+      navigate('/admin_panel/overview', { replace: true })
+    } catch (err) {
+      setError(
+        err.response?.status === 401
+          ? 'Invalid username or password.'
+          : 'Something went wrong. Try again.'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-slate-900 rounded-2xl p-8 border border-slate-800">
+        <p className="text-xs font-semibold uppercase tracking-widest text-cyan-300 mb-2">
+          Dynamic UI Builder
+        </p>
+        <h1 className="text-2xl font-semibold text-white mb-6">Sign in</h1>
+
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400"
+              placeholder="Enter username"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400"
+              placeholder="Enter password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-full bg-cyan-400 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
+    </main>
+  )
+}

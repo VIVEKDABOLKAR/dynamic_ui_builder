@@ -23,6 +23,12 @@ export default function Landing() {
             >
               Go to admin panel
             </Link>
+            <Link
+              to="/login"    // was "/admin_panel"
+              className="inline-flex rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              Go to admin panel
+            </Link>
           </div>
         </div>
       </section>
