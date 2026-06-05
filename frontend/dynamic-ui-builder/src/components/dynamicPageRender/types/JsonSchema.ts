@@ -16,7 +16,8 @@ export type ComponentType =
   | "divider"
   | "table"
   | "custom"
-  | "radio";
+  | "radio"
+  | "datepicker";
 
 export type MappingType =
   | "STATIC"
@@ -170,6 +171,8 @@ export interface ComponentProperties {
   options?: SelectOption[];
 
   style?: Record<string, any>;
+
+  formate?: string,
 
   [key: string]: any; // extensible
 }

@@ -11,6 +11,7 @@ import DynamicPage from './pages/ui/DynamicPage'
 import PageJson from './pages/admin/pageJson/PageJson'
 import ManagePageAction from './pages/admin/manages/page/action/ManagePageAction'
 import AdminOverview from './pages/admin/AdminOverview'
+import DynamicPageRenderingPageForm from './pages/ui/DynamicPageRenderingPageForm'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route path='/ui_pageform' element={<DynamicPageRenderingPageForm />} />
       <Route path="/ui_demo/*" element={<DynamicPage />} />
     </Routes>
   )

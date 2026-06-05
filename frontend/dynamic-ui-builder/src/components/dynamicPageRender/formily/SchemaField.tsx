@@ -10,6 +10,7 @@ import { Radio } from './muiComponents/Radio'
 import { Card } from './muiComponents/card'
 import { Layout } from './muiComponents/Layout'
 import { DataTable } from './agGridComponents/DataTable'
+import Datepicker from './muiComponents/DatePicker'
 
 export const SchemaField = createSchemaField({
   components: {
@@ -23,6 +24,7 @@ export const SchemaField = createSchemaField({
     Checkbox,
     Radio,
     DataTable,
+    Datepicker,
   },    
   
 })  

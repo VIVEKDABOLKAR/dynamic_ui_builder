@@ -1,3 +1,4 @@
+import { DatePicker } from '@mui/x-date-pickers'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout, getUsername } from '../../api/authApi'
@@ -35,6 +36,7 @@ export default function Navbar() {
           Logout
         </button>
       </div>
+
     </header>
   )
 }

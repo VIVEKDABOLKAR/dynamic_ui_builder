@@ -13,7 +13,7 @@ export const pageForm: DynamicPageSchema = {
     savePage: {
       type: "SUBMIT_FORM",
       api: {
-        url: "/api/admin/pages",
+        url: "/api/test",
         method: "POST",
       },
     },
@@ -212,15 +212,42 @@ export const pageForm: DynamicPageSchema = {
                   ref: "savePage",
                   condition: "true",
                 },
-                {
-                  event: "onClick",
-                  ref: "navHome",
-                  condition: "true",
-                }
+                // {
+                //   event: "onClick",
+                //   ref: "navHome",
+                //   condition: "true",
+                // }
               ],
             },
+
+            
           ],
+          
         },
+
+        {
+              id: 26,
+              name: "datepickercustom",
+              type: "datepicker",
+              sequence: 2,
+
+              properties: {
+                text: "Create Page",
+                label: "page create date",
+
+                style: {
+                  backgroundColor: "#2563eb",
+                  color: "#ffffff",
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                },
+
+              },
+              mapping: {
+                type: "ENTITY",
+                source: "UIPage.date",
+              },
+            },
       ],
     },
 

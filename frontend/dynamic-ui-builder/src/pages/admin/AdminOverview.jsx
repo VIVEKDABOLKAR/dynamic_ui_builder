@@ -89,7 +89,7 @@ export default function AdminOverview() {
       .catch(() => setPages([]))
       .finally(() => setLoading(false))
   }, [])
-  console.log(pages)
+  
   useEffect(() => {
   if (pages.length > 0) {
          loadTotalComponents();
@@ -120,7 +120,6 @@ export default function AdminOverview() {
     let count = 0;
     for (const page of pages){
           const actions = await getActionsByPageCode(page.pageCode);
-          console.log(actions);
           count += actions.length;
     }
     setTotalActions(count);
