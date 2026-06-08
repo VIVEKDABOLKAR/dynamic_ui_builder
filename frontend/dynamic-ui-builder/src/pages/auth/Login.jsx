@@ -14,8 +14,12 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      await login(username, password)
+       const data = await login(username, password)
+    if (data.role === 'ROLE_ADMIN') {
       navigate('/admin_panel/overview', { replace: true })
+    } else {
+      navigate('/ui/home', { replace: true })
+    }
     } catch (err) {
       setError(
         err.response?.status === 401
