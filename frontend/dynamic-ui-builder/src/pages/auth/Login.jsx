@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { login, isLoggedIn } from '../../api/authApi'
+import { useNavigate } from 'react-router-dom'
+import { login } from '../../api/authApi'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -8,12 +8,6 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  // Already logged in — let React Router handle the redirect declaratively
-  
-  if (isLoggedIn()) {
-    return <Navigate to="/admin_panel/overview" replace />
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Landing from './pages/landing/Landing'
 import Login from './pages/auth/Login'
 import AdminLayout from './pages/admin/Admin_Layout'
@@ -17,39 +17,31 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 export default function App() {
   return (
     <Routes>
+
       {/* Public */}
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
 
       {/* Admin — ROLE_ADMIN only */}
-      <Route
-        path="/admin_panel"
-        element={
-          <ProtectedRoute requiredRole="ROLE_ADMIN">
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="overview" element={<AdminOverview />} />
-        <Route path="manage_page" element={<ManagePage />} />
-        <Route path="manage_page/add" element={<AddNewPage />} />
-        <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
-        <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
-        <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
-        <Route path="page_json" element={<PageJson />} />
+      <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+        <Route path="/admin_panel" element={<AdminLayout />}>
+          <Route path="overview" element={<AdminOverview />} />
+          <Route path="manage_page" element={<ManagePage />} />
+          <Route path="manage_page/add" element={<AddNewPage />} />
+          <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
+          <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
+          <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
+          <Route path="page_json" element={<PageJson />} />
+        </Route>
       </Route>
 
       {/* UI pages — any authenticated user */}
-      <Route
-        path="/ui/*"
-        element={
-          <ProtectedRoute>
-            <DynamicPageRendering />
-          </ProtectedRoute>
-        }
-      />
-      <Route path='/ui_pageform' element={<DynamicPageRenderingPageForm />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/ui/*" element={<DynamicPageRendering />} />
+      </Route>
+
       <Route path="/ui_demo/*" element={<DynamicPage />} />
+
     </Routes>
   )
 }
