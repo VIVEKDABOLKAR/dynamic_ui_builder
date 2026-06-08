@@ -160,7 +160,7 @@ export default function AdminOverview() {
             <QuickLink to="/admin_panel/manage_page" icon="📄" title="Manage Pages" desc="Create, edit and delete UI pages" />
             <QuickLink to="/admin_panel/manage_page/add" icon="➕" title="New Page" desc="Configure a new page from scratch" />
             <QuickLink to="/admin_panel/page_json" icon="{ }" title="Page JSON" desc="Inspect the generated JSON schema per page" />
-            <QuickLink to="/ui" icon="🖥️" title="Preview UI" desc="See the dynamic rendering engine in action" />
+            <QuickLink to="/ui_demo/10010" icon="🖥️" title="Preview UI" desc="See the dynamic rendering engine in action" />
           </div>
         </div>
 

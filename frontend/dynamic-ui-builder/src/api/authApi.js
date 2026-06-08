@@ -2,6 +2,14 @@ import axios from 'axios'
 
 const BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080') + '/api/auth'
 
+export const signup = async (username, password) => {
+  const { data } = await axios.post(`${BASE}/register`, { username, password, role:   'ROLE_VIEWER' })
+  localStorage.setItem('token', data.token)
+  localStorage.setItem('role', data.role)
+  localStorage.setItem('username', username)
+  return data
+}
+
 export const login = async (username, password) => {
   const { data } = await axios.post(`${BASE}/login`, { username, password })
   localStorage.setItem('token', data.token)
@@ -9,6 +17,7 @@ export const login = async (username, password) => {
   localStorage.setItem('username', username)
   return data
 }
+
 
 export const logout = () => {
   localStorage.removeItem('token')

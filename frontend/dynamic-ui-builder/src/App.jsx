@@ -13,17 +13,18 @@ import ManagePageAction from './pages/admin/manages/page/action/ManagePageAction
 import AdminOverview from './pages/admin/AdminOverview'
 import DynamicPageRenderingPageForm from './pages/ui/DynamicPageRenderingPageForm'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import UI_layout from './pages/ui/UI_layout'
+import Signup from './pages/auth/Signup'
 
 export default function App() {
   return (
     <Routes>
 
       {/* Public */}
-      
-      <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Landing />} />
-      </Route>
+      <Route path="/" element={<Landing />} />
+
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       {/* Admin — ROLE_ADMIN only */}
       <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
@@ -39,11 +40,15 @@ export default function App() {
       </Route>
 
       {/* UI pages — any authenticated user */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/ui/*" element={<DynamicPageRendering />} />
+      <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+        <Route element={<UI_layout />}>
+          <Route path="/ui/*" element={<DynamicPageRendering />} />
+        </Route>
       </Route>
 
-      <Route path="/ui_demo/*" element={<DynamicPage />} />
+      <Route element={<UI_layout />}>
+        <Route path="/ui_demo/*" element={<DynamicPage />} />
+      </Route>
 
     </Routes>
   )
