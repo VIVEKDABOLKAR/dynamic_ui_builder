@@ -18,7 +18,10 @@ export default function App() {
     <Routes>
 
       {/* Public */}
-      <Route path="/" element={<Landing />} />
+      
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Landing />} />
+      </Route>
       <Route path="/login" element={<Login />} />
 
       {/* Admin — ROLE_ADMIN only */}
