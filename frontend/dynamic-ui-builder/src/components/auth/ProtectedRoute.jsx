@@ -6,7 +6,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   const loggedIn = isLoggedIn()
   const role = getRole()
 
-  if (!loggedIn) {
+  if (!loggedIn) {  
     return <Navigate to="/login" replace />
   }
 

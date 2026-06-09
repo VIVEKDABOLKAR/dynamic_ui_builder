@@ -12,7 +12,7 @@ import PageJson from './pages/admin/pageJson/PageJson'
 import ManagePageAction from './pages/admin/manages/page/action/ManagePageAction'
 import AdminOverview from './pages/admin/AdminOverview'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-
+import ViewerHome from './pages/ui/ViewerHome'
 export default function App() {
   return (
     <Routes>
@@ -39,6 +39,7 @@ export default function App() {
 
       {/* UI pages — any authenticated user */}
       <Route element={<ProtectedRoute />}>
+        <Route path="/ui" element={<ViewerHome />} />   
         <Route path="/ui/*" element={<DynamicPageRendering />} />
       </Route>
 

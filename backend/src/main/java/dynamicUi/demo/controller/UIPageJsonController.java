@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.entity.UIPage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dynamicUi.demo.entity.UIPageJson;
 import dynamicUi.demo.service.inter.UIPageJsonService;
+
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -24,5 +27,10 @@ public class UIPageJsonController {
     @GetMapping("/{pageCode}")
     public ResponseEntity<UIPageJson> getPageJson(@PathVariable String pageCode) {
         return ResponseEntity.ok(uiPageJsonService.getByPageCode(pageCode));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UIPage>> getAllActivePages() {
+        return ResponseEntity.ok(uiPageJsonService.getAllActivePages());
     }
 }

@@ -23,7 +23,7 @@ export default function ActionTable({ pageCode, onEdit, refreshKey }) {
     useEffect(() => {
         loadActions();
     }, [pageCode, refreshKey]);
-
+ 
     const handleDeleteAction = async (id) => {
         const confirmed = window.confirm('Delete this action?');
         if (!confirmed) return;
