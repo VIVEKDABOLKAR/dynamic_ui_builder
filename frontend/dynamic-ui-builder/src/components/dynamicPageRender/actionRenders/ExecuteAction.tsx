@@ -61,7 +61,6 @@ export default async function ExecuteAction(
         }
 
         case "NAVIGATE": {
-
             console.log("Navigate to", action.navigate?.path);
             ctx.navigate?.(action.navigate?.path || "/");
             break;

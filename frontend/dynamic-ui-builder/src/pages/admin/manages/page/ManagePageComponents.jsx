@@ -15,6 +15,7 @@ const AVAILABLE_COMPONENTS = [
   { type: 'checkbox', label: 'Checkbox', icon: '☑️' },
   { type: 'table', label: 'Data Table', icon: '📊' },
   { type: 'card', label: 'Card', icon: '🗂️' },
+  { type: 'datepicker', label: 'DatePicker', icon: '📅' },
   { type: 'layout', label: 'Layout', icon: '📐' }
 ]
 

@@ -4,6 +4,7 @@ import { FormilyFieldSchema } from "../types/JsonSchemaFormily";
 import { convertButton } from "./rules/button.converter";
 import { convertCard } from "./rules/card.converter";
 import { convertCheckbox } from "./rules/checkbox.converter";
+import { convertDatePicker } from "./rules/datepicker.converter";
 import { convertHeading } from "./rules/heading.converter";
 import { convertInput } from "./rules/input.converter";
 import { convertLayout } from "./rules/layout.converter";
@@ -48,6 +49,9 @@ export function convertComponetToField(
 
         case "table":
             return convertTable(component, actionRegistry);
+
+        case "datepicker":
+            return convertDatePicker(component, actionRegistry);
 
         default:
             console.warn(`Unsupported type: ${component.type}`);

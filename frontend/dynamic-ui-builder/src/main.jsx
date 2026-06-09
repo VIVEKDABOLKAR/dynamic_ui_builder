@@ -8,15 +8,14 @@ import { AllCommunityModule } from 'ag-grid-community'
 
 import './index.css'
 import App from './App.jsx'
+import Provider from './Provider.jsx'
 
 const modules = [AllCommunityModule];
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AgGridProvider modules={modules}>
-      <BrowserRouter>
+    <Provider>
         <App />
-      </BrowserRouter>
-    </AgGridProvider>
+    </Provider>
   </StrictMode>,
 )

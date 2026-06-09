@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../../api/authApi'
 
 
@@ -19,7 +19,7 @@ export default function Login() {
       if (data.role === 'ROLE_ADMIN') {
         navigate('/admin_panel/overview', { replace: true })
       } else {
-        navigate('/ui', { replace: true })   // ← sends viewer to home dashboard
+        navigate('/ui_demo/home', { replace: true })
       }
     } catch (err) {
       if (err.response?.status === 429) {
@@ -40,7 +40,11 @@ export default function Login() {
         <p className="text-xs font-semibold uppercase tracking-widest text-cyan-300 mb-2">
           Dynamic UI Builder
         </p>
-        <h1 className="text-2xl font-semibold text-white mb-6">Sign in</h1>
+        <h1 className="text-2xl font-semibold text-white mb-2">Sign in</h1>
+
+        <p className="text-sm text-slate-400 mb-6">
+          Welcome back. Sign in to continue.
+        </p>
 
         {error && (
           <div className="mb-4 rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
@@ -81,6 +85,17 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-sm text-slate-400">
+          Don't have an account?{' '}
+          <Link
+            to="/signup"
+            className="font-medium text-cyan-400 hover:text-cyan-300"
+          >
+            Sign up
+          </Link>
+        </p>
+
       </div>
     </main>
   )

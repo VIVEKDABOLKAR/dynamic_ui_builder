@@ -7,7 +7,8 @@ export type FormilyFieldType =
     | "number"
     | "boolean"
     | "array"
-    | "void";
+    | "void"
+    | "date";
 
 export interface FormilyEnumOption {
     label: string;

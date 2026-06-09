@@ -161,7 +161,7 @@ export default function PageJson() {
         <div className="flex flex-1 overflow-hidden" style={{ minHeight: 0 }}>
 
           {/* sidebar */}
-          <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
+          <aside className="flex h-[500px] w-64 shrink-0 flex-col border-r border-slate-200 bg-white overflow-hidden">
             <div className="border-b border-slate-100 px-3 py-3">
               <input
                 value={search}

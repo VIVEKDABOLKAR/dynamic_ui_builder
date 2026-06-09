@@ -1,3 +1,4 @@
+import { DatePicker } from '@mui/x-date-pickers'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout, getUsername } from '../../api/authApi'
@@ -13,18 +14,14 @@ export default function Navbar() {
   }
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-6">
+    <header className="flex items-center justify-between border-b border-slate-200 bg-blue-100 px-4 py-4 sm:px-6">
       <div>
         <p className="text-sm font-medium text-slate-500">Welcome back</p>
         <h2 className="text-lg font-semibold text-slate-900">{username}</h2>
       </div>
 
       <div className="flex items-center gap-3">
-        <input
-          type="search"
-          placeholder="Search..."
-          className="hidden rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm outline-none placeholder:text-slate-400 focus:border-slate-300 sm:block"
-        />
+        
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
           {initial}
         </div>
@@ -35,6 +32,7 @@ export default function Navbar() {
           Logout
         </button>
       </div>
+
     </header>
   )
 }
