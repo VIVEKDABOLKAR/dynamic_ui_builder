@@ -10,6 +10,7 @@ export default function DynamicPageRendering() {
   //can use * in path insted of location 
   const location = useLocation()
   const [pageJson, setPageJson] = useState(null)
+  
 
   // derive the full path after /ui/
   const rawPath = location.pathname || ''

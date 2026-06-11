@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
   }
 
   if (requiredRole && role !== requiredRole) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/ui_demo/home" replace />
   }
 
   // Support both usage patterns:
