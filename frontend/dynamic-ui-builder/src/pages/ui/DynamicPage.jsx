@@ -10,14 +10,19 @@ export default function DynamicPage() {
     //can use * in path insted of location 
     const location = useLocation()
     const [pageJson, setPageJson] = useState(null)
+    const [loading, setLoading] = useState(false);
 
     // derive the full path after /ui/
     const rawPath = location.pathname || ''
     const pageCode = rawPath.startsWith('/ui_demo/') ? rawPath.slice(9) : rawPath.replace(/^\//, '')
 
     useEffect(() => {
+        setLoading(true);
         const loadPage = async () => {
-            if (!pageCode) return
+            if (!pageCode) {
+                setLoading(false)
+                return
+            }
             console.log(pageCode)
 
             try {
@@ -26,8 +31,9 @@ export default function DynamicPage() {
                 console.log(JSON.parse(response.jsonSchema));
             } catch (error) {
                 console.error('Failed to load page json', error)
+            } finally {
+                setLoading(false);
             }
-
         }
 
         loadPage()
@@ -43,13 +49,16 @@ export default function DynamicPage() {
     const title = parsedSchema?.title || 'Hello World'
     const message = parsedSchema?.children?.[0]?.value || 'Hello world'
 
-    if(!parsedSchema) {
+    if (loading) {
         return (
-            <>
-                <h1>Loading</h1>
-            </>
+            <div className="flex min-h-screen items-center justify-center">
+                <h1 className="text-lg font-medium">Loading...</h1>
+            </div>
         )
     }
+
+
+
     return (
         <>
             <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" />

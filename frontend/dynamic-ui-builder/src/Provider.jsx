@@ -14,10 +14,10 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 export default function Provider({ children }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <BrowserRouter>
-            {children}
-        </ BrowserRouter >
+            <BrowserRouter>
+                {children}
+            </ BrowserRouter >
         </LocalizationProvider>
-        
+
     )
 }
