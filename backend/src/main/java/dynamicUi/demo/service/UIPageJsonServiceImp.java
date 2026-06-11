@@ -260,4 +260,9 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         pageJson.setJsonSchema(root.toString());
         uiPageJsonRepository.save(pageJson);
     }
+
+    @Override
+    public List<UIPage> getAllActivePages() {
+        return uiPageRepository.findByIsActiveTrue();
+    }
 }

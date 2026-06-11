@@ -15,7 +15,7 @@ import DynamicPageRenderingPageForm from './pages/ui/DynamicPageRenderingPageFor
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import UI_layout from './pages/ui/UI_layout'
 import Signup from './pages/auth/Signup'
-
+import ViewerHome from './pages/ui/ViewerHome'
 export default function App() {
   return (
     <Routes>
@@ -42,6 +42,7 @@ export default function App() {
       {/* UI pages — any authenticated user */}
       <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
         <Route element={<UI_layout />}>
+        <Route path="/ui" element={<ViewerHome />} />   
           <Route path="/ui/*" element={<DynamicPageRendering />} />
         </Route>
       </Route>

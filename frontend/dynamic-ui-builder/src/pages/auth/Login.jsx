@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../../api/authApi'
 
+
 export default function Login() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
@@ -21,11 +22,13 @@ export default function Login() {
         navigate('/ui_demo/home', { replace: true })
       }
     } catch (err) {
-      setError(
-        err.response?.status === 401
-          ? 'Invalid username or password.'
-          : 'Something went wrong. Try again.'
-      )
+      if (err.response?.status === 429) {
+        setError(err.response?.data?.error || 'Too many attempts. Please try again later.')
+      } else if (err.response?.status === 401) {
+        setError('Invalid username or password.')
+      } else {
+        setError('Something went wrong. Try again.')
+      }
     } finally {
       setLoading(false)
     }
