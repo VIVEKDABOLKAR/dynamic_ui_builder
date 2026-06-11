@@ -40,9 +40,10 @@ export default function App() {
       </Route>
 
       {/* UI pages — any authenticated user */}
-      <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+      {/* UI pages — ROLE_VIEWER (any authenticated user) */}
+      <Route element={<ProtectedRoute />}>   {/* ← remove requiredRole="ROLE_ADMIN" */}
         <Route element={<UI_layout />}>
-        <Route path="/ui" element={<ViewerHome />} />   
+          <Route path="/ui" element={<ViewerHome />} />
           <Route path="/ui/*" element={<DynamicPageRendering />} />
         </Route>
       </Route>

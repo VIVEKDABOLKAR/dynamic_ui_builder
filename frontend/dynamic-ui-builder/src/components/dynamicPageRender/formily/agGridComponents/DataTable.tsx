@@ -41,7 +41,6 @@ export const DataTable = ({
 
             setDynamicColumns(generated as any);
             setRows(data);
-
         }
 
         loadData();
