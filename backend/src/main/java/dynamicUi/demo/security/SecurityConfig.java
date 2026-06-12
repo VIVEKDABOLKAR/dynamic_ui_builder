@@ -32,7 +32,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfig()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws-native/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/api/ui/**").authenticated()
                         .requestMatchers("/").authenticated()
                         .requestMatchers("/api/test/**").permitAll()

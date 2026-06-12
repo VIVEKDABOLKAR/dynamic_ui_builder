@@ -1,14 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getAllUiPages } from '../../api/uiPageApi'
-import { getUsername, logout } from '../../api/authApi'
-
+import React, { useEffect, useState,useCallback } from 'react';x
+import { useNavigate } from 'react-router-dom';
+import { getAllUiPages } from '../../api/uiPageApi';
+import { getUsername, logout } from '../../api/authApi';
+import usePageUpdates from '../../hooks/usePageUpdates';
+import { toast } from 'react-toastify';
 export default function ViewerHome() {
   const navigate = useNavigate()
   const [pages, setPages] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const handlePageUpdate = useCallback((update) => {
+    console.log('WebSocket update received:', update)
+
+    if (update.action === 'CREATED') {
+      // Add the new page to the list
+      setPages((prev) => [
+        ...prev,
+        {
+          pageCode:    update.pageCode,
+          pageName:    update.pageName,
+          description: update.description || '',
+          updatedAt:   update.updatedAt,
+          isActive:    true,
+        },
+      ])
+       toast.info(`"${update.pageName}" was updated`)
+    }
+  }, [])  
+
 
   const username = getUsername()
 
@@ -26,10 +46,6 @@ export default function ViewerHome() {
     fetchPages()
   }, [])
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login', { replace: true })
-  }
 
   const filtered = pages.filter((p) =>
     p.pageName.toLowerCase().includes(search.toLowerCase()) ||
@@ -37,24 +53,12 @@ export default function ViewerHome() {
     (p.description || '').toLowerCase().includes(search.toLowerCase())
   )
 
+
+usePageUpdates(handlePageUpdate)
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
 
-      {/* Navbar */}
-      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur px-6 py-4 flex items-center justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-cyan-300">
-            Dynamic UI Builder
-          </p>
-          <h1 className="text-lg font-semibold text-white">Welcome, {username}</h1>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10"
-        >
-          Logout
-        </button>
-      </header>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
 

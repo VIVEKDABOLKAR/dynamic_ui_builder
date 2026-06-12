@@ -16,6 +16,7 @@
     "@formily/react": "^2.3.7",
     "@mui/material": "^9.0.1",
     "@mui/x-date-pickers": "^9.4.0",
+    "@stomp/stompjs": "^7.3.0",
     "@tailwindcss/vite": "^4.3.0",
     "ag-grid-react": "^35.3.0",
     "axios": "^1.16.1",
@@ -24,8 +25,11 @@
     "moment": "^2.30.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hot-toast": "^2.6.0",
     "react-router": "^7.15.1",
     "react-router-dom": "^7.15.1",
+    "react-toastify": "^11.1.0",
+    "sockjs-client": "^1.6.1",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {

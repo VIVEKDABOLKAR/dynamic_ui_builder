@@ -1,8 +1,11 @@
 package dynamicUi.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import dynamicUi.demo.demo.PageUpdateMessage;
 import dynamicUi.demo.service.inter.UIPageService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +22,14 @@ public class UIPageServiceImp implements UIPageService {
 
     private final UIPageRepository uiPageRepository;
     private final UIPageJsonRepository uiPageJsonRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public UIPageServiceImp(UIPageRepository uiPageRepository, UIPageJsonRepository uiPageJsonRepository) {
+    public UIPageServiceImp(UIPageRepository uiPageRepository, UIPageJsonRepository uiPageJsonRepository, SimpMessagingTemplate messagingTemplate) {
         this.uiPageRepository = uiPageRepository;
         this.uiPageJsonRepository = uiPageJsonRepository;
+        this.messagingTemplate = messagingTemplate;
     }
+
     @Override
     public UIPage createPage(UIPage uiPage) {
 
@@ -80,6 +86,15 @@ public class UIPageServiceImp implements UIPageService {
         );
 
         uiPageJsonRepository.save(uiPageJson);
+        messagingTemplate.convertAndSend(
+                "/topic/page-updates",
+                PageUpdateMessage.builder()
+                        .pageCode(uiPageSaved.getPageCode())
+                        .pageName(uiPageSaved.getPageName())
+                        .action("CREATED")
+                        .updatedAt(LocalDateTime.now())
+                        .build()
+        );
 
         return uiPageSaved;
     }
