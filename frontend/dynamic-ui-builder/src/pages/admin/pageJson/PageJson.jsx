@@ -141,13 +141,13 @@ export default function PageJson() {
               <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                 {selectedPage.pageCode}
               </span>
-              {/* <button
+              <button
                 onClick={handleCopy}
                 className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"
               >
                 {copied ? '✓ Copied!' : '⎘ Copy'}
               </button>
-              <button
+              {/* <button
                 onClick={handleDownload}
                 className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
               >

@@ -6,17 +6,21 @@ import {
   connect,
   mapProps
 } from "@formily/react";
+import { useComponentProps } from "../utils";
 
-const MuiTextarea = ({
-  value,
-  onInput,
-  label,
-  required,
-  height,
-  width = "100%",
-  style,
-  ...props
-}: any) => {
+const MuiTextarea = (incomingProps: any) => {
+
+  const {
+    value,
+    onInput,
+    label,
+    required,
+    height,
+    width = "100%",
+    style,
+    ...props
+  } = useComponentProps(incomingProps);
+
   return (
     <TextField
       multiline
@@ -24,7 +28,9 @@ const MuiTextarea = ({
       value={value || ""}
       label={label}
       required={required}
-      onChange={(e) => onInput(e.target.value)}
+      onChange={(e) => {
+        onInput?.(e.target.value);
+      }}
       sx={{
         width,
         mb: 2,

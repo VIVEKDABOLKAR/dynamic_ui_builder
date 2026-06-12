@@ -1,29 +1,21 @@
-import React from 'react'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import axios from 'axios'
-import { useForm } from '@formily/react'
-import { useContext } from 'react'
-import { PageSchemaContext } from '../../context/PageSchemaContext'
-import { buildEntityPayload } from '../../../dataMappingEngine/utils/buildEntityPayload'
-import { useNavigate } from 'react-router'
-import { resolveComponentActions } from '../../actionRenders/ActionDispacther'
-import { useActionContext } from '../../context/useActionContext'
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import { useComponentProps } from "../utils";
 
-export const CustomButton = ({ text, style, variant = "contained", action = [] }: any) => {
-  const form = useForm();
-  const pageSchema = useContext(PageSchemaContext);
-  const ctx = useActionContext(form?.values);
 
-  const handler = resolveComponentActions(action, pageSchema?.["x-actions"],
-    ctx
-  )
-  console.log(handler);
+export const CustomButton = (props: any) => {
+  const {
+    text,
+    style,
+    variant = "contained",
+    action,
+    ...rest
+  } = useComponentProps(props);
 
   return (
     <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 1, mb: 2 }}>
       <Button
-        {...handler} // event handler
+        {...rest}
         variant={variant}
         sx={{
           textTransform: "none",
@@ -36,5 +28,5 @@ export const CustomButton = ({ text, style, variant = "contained", action = [] }
         {text}
       </Button>
     </Box>
-  )
-}
+  );
+};

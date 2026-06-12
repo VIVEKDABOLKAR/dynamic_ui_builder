@@ -148,6 +148,19 @@ export const pageForm: DynamicPageSchema = {
                 type: "ENTITY",
                 source: "UIPage.description",
               },
+
+              action: [
+                // {
+                //   event: "onClick",
+                //   ref: "savePage",
+                //   condition: "true",
+                // },
+                {
+                  event: "onClick",
+                  ref: "navHome",
+                  condition: "true",
+                }
+              ],
             },
           ],
         },
@@ -160,7 +173,7 @@ export const pageForm: DynamicPageSchema = {
           id: 102,
           name: "actionRow",
           type: "layout",
-          sequence: 3,
+          sequence: 4,
 
           properties: {
             direction: "row",
@@ -229,7 +242,7 @@ export const pageForm: DynamicPageSchema = {
               id: 26,
               name: "datepickercustom",
               type: "datepicker",
-              sequence: 2,
+              sequence: 3,
 
               properties: {
                 text: "Create Page",

@@ -13,92 +13,96 @@ import {
 } from "@formily/react";
 
 import { resolveApiLookup } from "../../../dataMappingEngine/rule/api.resolver";
+import { useComponentProps } from "../utils";
 
-const BaseSelect = ({
+const BaseSelect = (incomingProps: any) => {
+
+  const {
     label,
     options = [],
     value,
     onChange,
     placeholder,
     style,
-    lookup
-}: any) => {
-    const [runtimeOptions, setRuntimeOptions] = useState(options);
+    lookup,
+  } = useComponentProps(incomingProps);
 
-    useEffect(() => {
-        let mounted = true;
+  const [runtimeOptions, setRuntimeOptions] = useState(options);
 
-        const loadOptions = async () => {
-            if (!lookup) {
-                if (mounted) setRuntimeOptions(options || []);
-                return;
-            }
+  useEffect(() => {
+    let mounted = true;
 
-            try {
-                const response = await resolveApiLookup(lookup);
-                if (!mounted) return;
+    const loadOptions = async () => {
+      if (!lookup) {
+        if (mounted) setRuntimeOptions(options || []);
+        return;
+      }
 
-                const labelKey = lookup.labelKey || "displayValue";
-                const valueKey = lookup.valueKey || "lookupValue";
+      try {
+        const response = await resolveApiLookup(lookup);
 
-                const mapped = Array.isArray(response)
-                    ? response.map((item: any) => ({
-                        label: item?.[labelKey] ?? item?.label ?? String(item),
-                        value: item?.[valueKey] ?? item?.value ?? item?.id ?? item,
-                    }))
-                    : [];
+        if (!mounted) return;
 
-                setRuntimeOptions(mapped);
-            } catch (error) {
-                console.error("Failed to load select lookup options", error);
-                if (mounted) setRuntimeOptions(options || []);
-            }
-        };
+        const labelKey = lookup.labelKey || "displayValue";
+        const valueKey = lookup.valueKey || "lookupValue";
 
-        loadOptions();
+        const mapped = Array.isArray(response)
+          ? response.map((item: any) => ({
+              label: item?.[labelKey] ?? item?.label ?? String(item),
+              value: item?.[valueKey] ?? item?.value ?? item?.id ?? item,
+            }))
+          : [];
 
-        return () => {
-            mounted = false;
-        };
-    }, [lookup, options]);
+        setRuntimeOptions(mapped);
+      } catch (error) {
+        console.error(error);
 
-    const menuItems = useMemo(() => runtimeOptions || [], [runtimeOptions]);
+        if (mounted) {
+          setRuntimeOptions(options || []);
+        }
+      }
+    };
 
-    return (
-        <FormControl
-            fullWidth
-            sx={{
-                mb: 2,
-                ...style,
-            }}
-        >
-            <InputLabel>
-                {label}
-            </InputLabel>
+    loadOptions();
 
-            <MuiSelect
-                value={value || ""}
-                label={label}
-                onChange={ (event) => {
-                    onChange?.(event.target.value);
-                }}
-            >
+    return () => {
+      mounted = false;
+    };
+  }, [lookup, options]);
 
-                {menuItems.map((item: any) => (
+  const menuItems = useMemo(
+    () => runtimeOptions || [],
+    [runtimeOptions]
+  );
 
-                    <MenuItem
-                        key={item.value}
-                        value={item.value}
-                    >
-                        {item.label}
-                    </MenuItem>
+  return (
+    <FormControl
+      fullWidth
+      sx={{
+        mb: 2,
+        ...style,
+      }}
+    >
+      <InputLabel>{label}</InputLabel>
 
-                ))}
-
-            </MuiSelect>
-
-        </FormControl>
-    );
+      <MuiSelect
+        value={value || ""}
+        label={label}
+        onChange={(event) => {
+          onChange?.(event.target.value);
+        }}
+      >
+        {menuItems.map((item: any) => (
+          <MenuItem
+            key={item.value}
+            value={item.value}
+          >
+            {item.label}
+          </MenuItem>
+        ))}
+      </MuiSelect>
+    </FormControl>
+  );
 };
 
 export const Select = connect(

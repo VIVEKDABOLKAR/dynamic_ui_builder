@@ -14,15 +14,18 @@ import {
 } from "@formily/react";
 
 import { resolveApiLookup } from "../../../dataMappingEngine/rule/api.resolver";
+import { useComponentProps } from "../utils";
 
-const BaseRadio = ({
-  label,
-  options = [],
-  value,
-  onChange,
-  style,
-  lookup
-}: any) => {
+const BaseRadio = (incomingProps: any) => {
+
+  const {
+    label,
+    options = [],
+    value,
+    onChange,
+    style,
+    lookup,
+  } = useComponentProps(incomingProps);
 
   const [runtimeOptions, setRuntimeOptions] = useState(options);
 
@@ -37,6 +40,7 @@ const BaseRadio = ({
 
       try {
         const response = await resolveApiLookup(lookup);
+
         if (!mounted) return;
 
         const labelKey = lookup.labelKey || "displayValue";
@@ -51,8 +55,11 @@ const BaseRadio = ({
 
         setRuntimeOptions(mapped);
       } catch (error) {
-        console.error("Failed to load radio lookup options", error);
-        if (mounted) setRuntimeOptions(options || []);
+        console.error(error);
+
+        if (mounted) {
+          setRuntimeOptions(options || []);
+        }
       }
     };
 
@@ -63,20 +70,19 @@ const BaseRadio = ({
     };
   }, [lookup, options]);
 
-  const menuItems = useMemo(() => runtimeOptions || [], [runtimeOptions]);
+  const menuItems = useMemo(
+    () => runtimeOptions || [],
+    [runtimeOptions]
+  );
 
   return (
-
     <FormControl
       sx={{
         mb: 2,
         ...style,
       }}
     >
-
-      <FormLabel>
-        {label}
-      </FormLabel>
+      <FormLabel>{label}</FormLabel>
 
       <RadioGroup
         value={value || ""}
@@ -84,20 +90,15 @@ const BaseRadio = ({
           onChange?.(e.target.value);
         }}
       >
-
         {menuItems.map((item: any) => (
-
           <FormControlLabel
             key={item.value}
             value={item.value}
             control={<MuiRadio />}
             label={item.label}
           />
-
         ))}
-
       </RadioGroup>
-
     </FormControl>
   );
 };

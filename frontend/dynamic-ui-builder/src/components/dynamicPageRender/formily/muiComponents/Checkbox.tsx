@@ -10,13 +10,17 @@ import {
   connect,
   mapProps
 } from "@formily/react";
+import { useComponentProps } from "../utils";
 
-const BaseCheckbox = ({
-  label,
-  checked,
-  onChange,
-  style
-}: any) => {
+
+const BaseCheckbox = (incomingProps: any) => {
+
+  const {
+    label,
+    checked,
+    onChange,
+    style,
+  } = useComponentProps(incomingProps);
 
   return (
     <Box
@@ -41,7 +45,6 @@ const BaseCheckbox = ({
     </Box>
   );
 };
-
 export const Checkbox = connect(
   BaseCheckbox,
 

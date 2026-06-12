@@ -8,20 +8,22 @@ import {
   useField,
   useFieldSchema
 } from "@formily/react";
+import { useComponentProps } from "../utils";
 
-const MuiInput = ({
-  value,
-  onInput,
-  label,
-  required,
-  width = "100%",
-  style,
-  ...props
-}: any) => {
+const MuiInput = (incomingProps: any) => {
+
+  const {
+    value,
+    onInput,
+    label,
+    required,
+    width = "100%",
+    style,
+    ...props
+  } = useComponentProps(incomingProps);
+
   const field = useField();
   const fieldSchema = useFieldSchema();
-  
-  const mapping = fieldSchema["x-mapping"];
 
   return (
     <TextField
@@ -29,7 +31,7 @@ const MuiInput = ({
       value={value || ""}
       label={label}
       required={required}
-      onChange={(e) => onInput(e.target.value)}
+      onChange={(e) => onInput?.(e.target.value)}
       sx={{
         width,
         mb: 2,
