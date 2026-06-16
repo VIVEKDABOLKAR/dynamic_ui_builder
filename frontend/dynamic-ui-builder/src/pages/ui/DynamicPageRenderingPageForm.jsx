@@ -9,7 +9,7 @@ import { pageForm } from '../../components/dynamicPageRender/examples/pageForm'
 export default function DynamicPageRenderingPageForm() {
   //can use * in path insted of location 
  
-  const [pageJson, setPageJson] = useState(pageForm)
+  const [pageJson, setPageJson] = useState(basicFormSchema)
 
 
 

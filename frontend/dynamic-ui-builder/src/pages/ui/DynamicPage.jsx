@@ -41,9 +41,9 @@ export default function DynamicPage() {
 
     let parsedSchema = null
     try {
-        parsedSchema = pageJson?.jsonSchema ? JSON.parse(pageJson.jsonSchema) : pageForm
+        parsedSchema = pageJson?.jsonSchema ? JSON.parse(pageJson.jsonSchema) : basicFormSchema
     } catch (error) {
-        parsedSchema = pageForm
+        parsedSchema = basicFormSchema
     }
 
     const title = parsedSchema?.title || 'Hello World'

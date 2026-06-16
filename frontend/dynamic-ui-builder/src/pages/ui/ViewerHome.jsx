@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useCallback } from 'react';x
+import React, { useEffect, useState,useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllUiPages } from '../../api/uiPageApi';
 import { getUsername, logout } from '../../api/authApi';

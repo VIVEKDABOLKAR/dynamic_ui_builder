@@ -1,6 +1,6 @@
 
 import { ActionRegistry, ActionSchema } from '../types/JsonSchema';
-import { ResolvedActionSchema } from '../types/JsonSchemaFormily';
+import { FormilyPageSchema, ResolvedActionSchema } from '../types/JsonSchemaFormily';
 import ExecuteAction from './ExecuteAction';
 
 // export default function ActionDispacther(
@@ -28,11 +28,12 @@ import ExecuteAction from './ExecuteAction';
 
 export function resolveComponentActions(
 	actions: ActionSchema[] = [],
-	actRegiestery: ActionRegistry = {},
+	pageSchema: FormilyPageSchema,
     ctx: {}
 ): ResolvedActionSchema {
 	
     const result: ResolvedActionSchema = {};
+   
 
     actions.forEach((action) => {
         //null check
@@ -41,7 +42,7 @@ export function resolveComponentActions(
         }
 
         //override same action event
-         result[action.event] =  () => ExecuteAction(action.ref, action.condition, actRegiestery, ctx);
+         result[action.event] =  () => ExecuteAction(action.ref, action.condition, pageSchema, ctx);
     });
 
     console.log('handler :- ' , result)

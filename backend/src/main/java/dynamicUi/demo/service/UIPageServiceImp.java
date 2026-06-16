@@ -5,6 +5,7 @@ import java.util.List;
 
 import dynamicUi.demo.demo.PageUpdateMessage;
 import dynamicUi.demo.service.inter.UIPageService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

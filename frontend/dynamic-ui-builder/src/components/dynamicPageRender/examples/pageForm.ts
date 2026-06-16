@@ -90,7 +90,7 @@ export const pageForm: DynamicPageSchema = {
 
               mapping: {
                 type: "ENTITY",
-                source: "UIPage.pageName",
+                source: "pageName",
               },
             },
 
@@ -108,7 +108,7 @@ export const pageForm: DynamicPageSchema = {
 
               mapping: {
                 type: "ENTITY",
-                source: "UIPage.pageCode",
+                source: "pageCode",
               },
             },
           ],
@@ -146,21 +146,9 @@ export const pageForm: DynamicPageSchema = {
 
               mapping: {
                 type: "ENTITY",
-                source: "UIPage.description",
+                source: "description",
               },
 
-              action: [
-                // {
-                //   event: "onClick",
-                //   ref: "savePage",
-                //   condition: "true",
-                // },
-                {
-                  event: "onClick",
-                  ref: "navHome",
-                  condition: "true",
-                }
-              ],
             },
           ],
         },
@@ -198,7 +186,7 @@ export const pageForm: DynamicPageSchema = {
 
               mapping: {
                 type: "ENTITY",
-                source: "UIPage.isActive",
+                source: "isActive",
               },
             },
 

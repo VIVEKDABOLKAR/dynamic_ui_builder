@@ -1,12 +1,13 @@
 import { useForm } from "@formily/react";
 import { useContext, useMemo } from "react";
 import { useActionContext } from "../context/useActionContext";
-import { PageSchemaContext } from "../context/PageSchemaContext";
+import { usePageSchema } from "../context/PageSchemaContext";
 import { resolveComponentActions } from "../actionRenders/ActionDispacther";
+import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 
 export const useResolvedActions  = (action: []) => {
   const form = useForm();
-  const pageSchema = useContext(PageSchemaContext);
+  const pageSchema = usePageSchema();
   const ctx = useActionContext(form?.values);
 
    return useMemo(() => {
@@ -16,7 +17,7 @@ export const useResolvedActions  = (action: []) => {
 
     return resolveComponentActions(
       action,
-      pageSchema?.["x-actions"],
+      pageSchema,
       ctx
     );
   }, [action, pageSchema, ctx]);

@@ -2,17 +2,28 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 const items = [
-  { label: 'Overview',     to: '/admin_panel/overview'  },
-  { label: 'Manage Pages', to: '/admin_panel/manage_page' },
-  { label: 'Page JSON',    to: '/admin_panel/page_json' },
+  { icon: '◰', label: 'Overview', to: '/admin_panel/overview' },
+  { icon: '▤', label: 'Manage Pages', to: '/admin_panel/manage_page' },
+  { icon: '⌘', label: 'Page JSON', to: '/admin_panel/page_json' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ sidebarOpen, handleSidebarChange }) {
+  if (!sidebarOpen) return null;
+
   return (
     <aside className="border-b border-slate-200 bg-white lg:min-h-screen lg:border-b-0 lg:border-r">
-      <div className="px-4 py-4 lg:px-5 lg:py-6">
-        <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Admin</div>
-        <p className="mt-1 text-sm font-semibold text-slate-900">Control panel</p>
+      <div className="px-4 py-4 lg:px-5 lg:py-6 flex justify-between">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">Admin</div>
+          <p className="mt-1 text-sm font-semibold text-slate-900">Control panel</p>
+        </div>
+
+        <button
+          onClick={handleSidebarChange}
+          className="rounded p-2 hover:bg-slate-200"
+        >
+          ✕
+        </button>
       </div>
 
       <nav className="flex gap-1 overflow-x-auto px-3 pb-4 lg:flex-col lg:pb-4">
@@ -21,10 +32,9 @@ export default function Sidebar() {
             key={item.label}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition lg:whitespace-normal ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              `flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition lg:whitespace-normal ${isActive
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`
             }
           >
@@ -34,7 +44,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      
+
     </aside>
   )
-}
+} 

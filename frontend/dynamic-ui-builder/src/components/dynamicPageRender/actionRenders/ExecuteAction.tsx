@@ -1,5 +1,9 @@
 import axios from "axios";
-import { ActionRegistry } from "../types/JsonSchema";
+import { ActionRegistry, DynamicPageSchema } from "../types/JsonSchema";
+import { buildEntityPayload } from "../../dataMappingEngine/utils/buildEntityPayload";
+import { useContext } from "react";
+import { PageSchemaContext } from "../context/PageSchemaContext";
+import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 
 const resolveUrl = (url: string | undefined) => {
     if (!url) return "";
@@ -21,9 +25,14 @@ export interface ActionContext {
 export default async function ExecuteAction(
     ref: string,
     cond: string,
-    actRegistry: ActionRegistry,
+    pageSchema: FormilyPageSchema,
     ctx: ActionContext
 ) {
+    const actRegistry = pageSchema?.["x-actions"];
+    if(!actRegistry) {
+        console.warn(`Action Registry not found`);
+        return;
+    }
 
     const action = actRegistry[ref];
 
@@ -36,6 +45,8 @@ export default async function ExecuteAction(
     switch (action.type) {
 
         case "SUBMIT_FORM": {
+            console.log(buildEntityPayload(ctx.formData, pageSchema));
+            console.log(ctx.formData);
 
             const response = await axios({
                 method: action.api?.method || "POST",

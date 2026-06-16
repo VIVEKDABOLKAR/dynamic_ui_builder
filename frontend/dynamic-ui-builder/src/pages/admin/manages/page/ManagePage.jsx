@@ -6,6 +6,7 @@ import { deletePage, getAllPages, updatePageStatus } from '../../../../api/admin
 export default function ManagePage() {
     const [rowData, setRowData] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
     const loadPages = async () => {
         setIsLoading(true)
@@ -20,17 +21,26 @@ export default function ManagePage() {
         }
     }
 
-    const handleDelete = async (pageCode) => {
-        const confirmed = window.confirm('Delete this page?')
-        if (!confirmed) return
 
+
+    const handleDeleteClick = (pageCode) => {
+        setDeleteTarget(pageCode);
+    };
+
+    const confirmDelete = async () => {
         try {
-            await deletePage(pageCode)
-            await loadPages()
+            await deletePage(deleteTarget);
+            await loadPages();
         } catch (error) {
-            console.error('Failed to delete page', error)
+            console.error('Failed to delete page', error);
+        } finally {
+            setDeleteTarget(null);
         }
-    }
+    };
+
+    const cancelDelete = () => {
+        setDeleteTarget(null);
+    };
 
     const handleStatusToggle = async (params) => {
         try {
@@ -98,7 +108,7 @@ export default function ManagePage() {
                     </Link>
                     <button
                         type="button"
-                        onClick={() => handleDelete(params.data.pageCode)}
+                        onClick={() => handleDeleteClick(params.data.pageCode)}
                         className="rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-red-400"
                     >
                         Delete
@@ -168,6 +178,45 @@ export default function ManagePage() {
                     </div>
                 </div>
             </div>
+
+            {deleteTarget && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                    onClick={cancelDelete}
+                >
+                    <div
+                        className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+
+                        <h2 className="text-lg font-semibold text-slate-900">
+                            Confirm Delete
+                        </h2>
+
+                        <p className="mt-2 text-sm text-slate-600">
+                            This action cannot be undone. Are you sure you want to delete this page?
+                        </p>
+
+                        <div className="mt-6 flex justify-end gap-3">
+
+                            <button
+                                onClick={cancelDelete}
+                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={confirmDelete}
+                                className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -26,6 +26,7 @@ export const updatePage = async (pageCode, payload) => {
 }
 
 export const deletePage = async (pageCode) => {
+  console.log("delete function called")
   const response = await adminClient.delete(`/pages/${pageCode}`)
   return response.data
 }

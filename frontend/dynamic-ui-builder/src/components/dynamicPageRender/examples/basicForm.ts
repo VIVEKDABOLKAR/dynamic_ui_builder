@@ -8,6 +8,17 @@ export const basicFormSchema: DynamicPageSchema = {
     route: "/ui/employee_onboarding",
     status: "ACTIVE",
   },
+
+  actions: {
+    saveEmployee: {
+      type: "SUBMIT_FORM",
+      api: {
+        url: "/api/test",
+        method: "POST",
+      },
+    },
+  },
+
   components: [
     {
       id: 1,
@@ -18,15 +29,18 @@ export const basicFormSchema: DynamicPageSchema = {
         text: "Employee Onboarding Form",
       },
     },
+
     {
       id: 2,
       name: "employeeDetailsCard",
       type: "card",
       sequence: 2,
+
       properties: {
         label: "Employee Details",
         title: "Employee Details",
-        description: "Capture the main information for the new employee.",
+        description:
+          "Capture the main information for the new employee.",
         width: "100%",
         style: {
           border: "1px solid #dbeafe",
@@ -35,66 +49,158 @@ export const basicFormSchema: DynamicPageSchema = {
           backgroundColor: "#ffffff",
         },
       },
+
       children: [
+        // ============================================
+        // BASIC INFO ROW
+        // ============================================
+
         {
-          id: 21,
-          name: "firstName",
-          type: "input",
+          id: 100,
+          name: "basicInfoRow",
+          type: "layout",
           sequence: 1,
+
           properties: {
-            label: "First Name",
-            placeholder: "Enter first name",
-            required: true,
+            direction: "row",
+            gap: 20,
+            justifyContent: "space-between",
+            alignItems: "center",
             width: "100%",
           },
+
+          children: [
+            {
+              id: 21,
+              name: "firstName",
+              type: "input",
+              sequence: 1,
+
+              properties: {
+                label: "First Name",
+                placeholder: "Enter first name",
+                required: true,
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.firstName",
+              },
+            },
+
+            {
+              id: 22,
+              name: "lastName",
+              type: "input",
+              sequence: 2,
+
+              properties: {
+                label: "Last Name",
+                placeholder: "Enter last name",
+                required: true,
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.lastName",
+              },
+            },
+          ],
         },
+
+        // ============================================
+        // CONTACT INFO ROW
+        // ============================================
+
         {
-          id: 22,
-          name: "lastName",
-          type: "input",
+          id: 101,
+          name: "contactInfoRow",
+          type: "layout",
           sequence: 2,
+
           properties: {
-            label: "Last Name",
-            placeholder: "Enter last name",
-            required: true,
+            direction: "column",
+            gap: 10,
             width: "100%",
           },
+
+          children: [
+            {
+              id: 23,
+              name: "email",
+              type: "input",
+              sequence: 1,
+
+              properties: {
+                label: "Email Address",
+                placeholder: "name@company.com",
+                required: true,
+                width: "100%",
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.email",
+              },
+            },
+          ],
         },
+
+        // ============================================
+        // BIO ROW
+        // ============================================
+
         {
-          id: 23,
-          name: "email",
-          type: "input",
+          id: 102,
+          name: "bioRow",
+          type: "layout",
           sequence: 3,
+
           properties: {
-            label: "Email Address",
-            placeholder: "name@company.com",
-            required: true,
+            direction: "column",
+            gap: 10,
             width: "100%",
           },
-        },
-        {
-          id: 24,
-          name: "bio",
-          type: "textarea",
-          sequence: 4,
-          properties: {
-            label: "Short Bio",
-            placeholder: "Write a short bio",
-            height: 120,
-            width: "100%",
-          },
+
+          children: [
+            {
+              id: 24,
+              name: "bio",
+              type: "textarea",
+              sequence: 1,
+
+              properties: {
+                label: "Short Bio",
+                placeholder: "Write a short bio",
+                height: 120,
+                width: "100%",
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.bio",
+              },
+            },
+          ],
         },
       ],
     },
+
+    // ============================================
+    // WORK INFORMATION CARD
+    // ============================================
+
     {
       id: 3,
       name: "workInfoCard",
       type: "card",
       sequence: 3,
+
       properties: {
         label: "Work Information",
         title: "Work Information",
-        description: "Set the employee role and access preferences.",
+        description:
+          "Set the employee role and access preferences.",
         width: "100%",
         style: {
           border: "1px solid #dbeafe",
@@ -103,95 +209,225 @@ export const basicFormSchema: DynamicPageSchema = {
           backgroundColor: "#ffffff",
         },
       },
+
       children: [
+        // ============================================
+        // DEPARTMENT + ROLE
+        // ============================================
+
         {
-          id: 31,
-          name: "department",
-          type: "select",
+          id: 200,
+          name: "workInfoRow",
+          type: "layout",
           sequence: 1,
+
           properties: {
-            label: "Department",
-            placeholder: "Select department",
-            options: [
-              { label: "Engineering", value: "engineering" },
-              { label: "Sales", value: "sales" },
-              { label: "HR", value: "hr" },
-            ],
+            direction: "row",
+            gap: 20,
+            justifyContent: "space-between",
+            alignItems: "center",
             width: "100%",
           },
+
+          children: [
+            {
+              id: 31,
+              name: "department",
+              type: "select",
+              sequence: 1,
+
+              properties: {
+                label: "Department",
+                placeholder: "Select department",
+                options: [
+                  {
+                    label: "Engineering",
+                    value: "engineering",
+                  },
+                  {
+                    label: "Sales",
+                    value: "sales",
+                  },
+                  {
+                    label: "HR",
+                    value: "hr",
+                  },
+                ],
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.department",
+              },
+            },
+
+            {
+              id: 32,
+              name: "role",
+              type: "select",
+              sequence: 2,
+
+              properties: {
+                label: "Role",
+                placeholder: "Select role",
+                options: [
+                  {
+                    label: "Manager",
+                    value: "manager",
+                  },
+                  {
+                    label: "Developer",
+                    value: "developer",
+                  },
+                  {
+                    label: "Analyst",
+                    value: "analyst",
+                  },
+                ],
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.role",
+              },
+            },
+          ],
         },
+
+        // ============================================
+        // GENDER
+        // ============================================
+
         {
-          id: 32,
-          name: "role",
-          type: "select",
+          id: 201,
+          name: "genderRow",
+          type: "layout",
           sequence: 2,
+
           properties: {
-            label: "Role",
-            placeholder: "Select role",
-            options: [
-              { label: "Manager", value: "manager" },
-              { label: "Developer", value: "developer" },
-              { label: "Analyst", value: "analyst" },
-            ],
+            direction: "column",
+            gap: 10,
             width: "100%",
           },
+
+          children: [
+            {
+              id: 33,
+              name: "gender",
+              type: "radio",
+              sequence: 1,
+
+              properties: {
+                label: "Gender",
+                placeholder: "Select gender",
+
+                options: [
+                  {
+                    label: "Male",
+                    value: "male",
+                  },
+                  {
+                    label: "Female",
+                    value: "female",
+                  },
+                ],
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.gender",
+              },
+            },
+          ],
         },
+
+        // ============================================
+        // ACTION ROW
+        // ============================================
+
         {
-          id: 33,
-          name: "gender",
-          type: "radio",
+          id: 202,
+          name: "actionRow",
+          type: "layout",
           sequence: 3,
+
           properties: {
-            label: "gender",
-            placeholder: "Select gender",
-            options: [
-              { label: "Male", value: "male" },
-              { label: "Women", value: "women" },
-            ],
+            direction: "row",
+            gap: 16,
+            justifyContent: "space-between",
+            alignItems: "center",
             width: "100%",
+            marginTop: 20,
           },
-        },
-        {
-          id: 34,
-          name: "isActive",
-          type: "checkbox",
-          sequence: 4,
-          properties: {
-            label: "Active employee",
-            defaultValue: true,
-          },
+
+          children: [
+            {
+              id: 34,
+              name: "isActive",
+              type: "checkbox",
+              sequence: 1,
+
+              properties: {
+                label: "Active Employee",
+                defaultValue: true,
+              },
+
+              mapping: {
+                type: "ENTITY",
+                source: "Employee.isActive",
+              },
+            },
+
+            {
+              id: 35,
+              name: "saveEmployeeButton",
+              type: "button",
+              sequence: 2,
+
+              properties: {
+                text: "Create Employee",
+
+                style: {
+                  backgroundColor: "#2563eb",
+                  color: "#ffffff",
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                },
+              },
+
+              action: [
+                {
+                  event: "onClick",
+                  ref: "saveEmployee",
+                  condition: "true",
+                },
+              ],
+            },
+          ],
         },
       ],
     },
+
+    // ============================================
+    // EMPLOYEE LIST TABLE
+    // ============================================
+
     {
-      id: 4,
-      name: "saveButton",
-      type: "button",
+      id: 50,
+      name: "employeeTable",
+      type: "table",
       sequence: 4,
+
+      mapping: {
+        type: "API",
+        source: "EMPLOYEE_LIST_API",
+        expression: "isActive = true",
+      },
+
       properties: {
-        text: "Create Employee",
-        style: {
-          backgroundColor: "#2563eb",
-          color: "#ffffff",
-          padding: "10px 16px",
-          borderRadius: "8px",
-        },
+        title: "Employees List",
+        height: 400,
       },
     },
-    {
-      "id": 50,
-      "name": "pagesTable",
-      "type": "table",
-      "sequence": 5,
-      "mapping": {
-        "type": "API",
-        "source": "PAGE_LIST_API",
-        "expression": "status = 'ACTIVE'"
-      },
-      "properties": {
-        "title": "Pages List",
-        "height": 400
-      }
-    }
   ],
 };
