@@ -28,7 +28,7 @@ export default function DynamicPage() {
             try {
                 const response = await getUiPageByCode(pageCode)
                 setPageJson(response)
-                console.log(JSON.parse(response.jsonSchema));
+                console.log(response);
             } catch (error) {
                 console.error('Failed to load page json', error)
             } finally {
@@ -41,8 +41,9 @@ export default function DynamicPage() {
 
     let parsedSchema = null
     try {
-        parsedSchema = pageJson?.jsonSchema ? JSON.parse(pageJson.jsonSchema) : basicFormSchema
+        parsedSchema = pageJson?.jsonSchema ? pageJson.jsonSchema : null
     } catch (error) {
+        console.log(error)
         parsedSchema = basicFormSchema
     }
 
@@ -58,7 +59,7 @@ export default function DynamicPage() {
     }
 
 
-
+    console.log("this schema is rendering....",parsedSchema)
     return (
         <>
             <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" />

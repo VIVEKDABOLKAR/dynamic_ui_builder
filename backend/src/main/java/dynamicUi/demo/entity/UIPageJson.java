@@ -11,38 +11,14 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UIPageJson {
-        private static final String DEFAULT_JSON_SCHEMA = """
-                        {
-                              "page": {
-                                  "id": 1,
-                                  "pageCode": "home",
-                                  "pageName": "Home Page"
-                              },
-                              "components": [
-                                  {
-                                      "id": 1,
-                                      "name": "testButton",
-                                      "type": "button",
-                                      "sequence": 1,
-                                      "properties": {
-                                          "text": "Click Me",
-                                          "color": "blue"
-                                      }
-                                  },
-                                  {
-                                      "id": 2,
-                                      "name": "testInput",
-                                      "type": "input",
-                                      "sequence": 2,
-                                      "properties": {
-                                          "label": "input field",
-                                          "placeholder": "Enter text",
-                                          "width": 200
-                                      }
-                                  }
-                              ]
-                        }
-                        """;
+
+    // FIX 1: Removed DEFAULT_JSON_SCHEMA constant — it was defined but never
+    //         referenced anywhere in the codebase (dead code).
+    //
+    // FIX 2: Field initialiser  jsonSchema = ""  is bypassed by both Lombok's
+    //         @AllArgsConstructor and JPA's no-arg constructor, so jsonSchema
+    //         could arrive as null and cause NPE in OBJECT_MAPPER.readTree().
+    //         Fix: use @PrePersist to guarantee a non-null default before DB insert.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,5 +30,12 @@ public class UIPageJson {
 
     @Lob
     @Column(name = "json_schema", nullable = false, columnDefinition = "LONGTEXT")
-    private String jsonSchema = "";
+    private String jsonSchema;
+
+    @PrePersist
+    public void prePersist() {
+        if (jsonSchema == null) {
+            jsonSchema = "{}";
+        }
+    }
 }

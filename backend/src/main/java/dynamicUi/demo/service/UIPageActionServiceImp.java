@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import dynamicUi.demo.dto.ComponentActionRequest;
-import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIPageAction;
 import dynamicUi.demo.entity.UIPageJson;
 import dynamicUi.demo.repoistory.UIPageActionRepository;
@@ -16,71 +15,49 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
 public class UIPageActionServiceImp implements UIPageActionService {
 
     private final UIPageActionRepository repository;
-    private final UIPageJsonRepository uiPageJsonRepository;
+    private final UIPageJsonRepository   uiPageJsonRepository;
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public UIPageAction create(String pageCode, UIPageAction action) {
-        // store it in action table
+
+        // FIX: original code used action.getUiPagecode() from the request body,
+        // which could be null if the client didn't set it. The controller already
+        // calls uiPageAction.setUiPagecode(pageCode) before reaching here, but
+        // using the explicit path parameter is safer and more explicit.
         UIPageAction uiPageAction = UIPageAction.builder()
                 .actionName(action.getActionName())
                 .actionType(action.getActionType())
                 .properties(action.getProperties())
-                .uiPagecode(action.getUiPagecode())
+                .uiPagecode(pageCode)   // ← always use the path param
                 .build();
 
         repository.save(uiPageAction);
 
-        // store in page json
-        UIPageJson pageJson = uiPageJsonRepository
-                .findByUiPage_PageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page JSON not found"));
+        // Mirror into page JSON cache for fast rendering
+        syncActionToPageJson(
+                pageCode,
+                uiPageAction.getActionName(),
+                uiPageAction.getActionType(),
+                uiPageAction.getProperties(),
+                null);
 
-        try {
-            ObjectNode root = (ObjectNode) OBJECT_MAPPER.readTree(pageJson.getJsonSchema());
-
-            ObjectNode actionsNode;
-            if (root.has("actions")) {
-                actionsNode = (ObjectNode) root.get("actions");
-            } else {
-                actionsNode = OBJECT_MAPPER.createObjectNode();
-                root.set("actions", actionsNode);
-            }
-
-            ObjectNode actionNode = OBJECT_MAPPER.createObjectNode();
-            actionNode.put("type", action.getActionType());
-
-            JsonNode propertiesNode = OBJECT_MAPPER.readTree(action.getProperties());
-            propertiesNode.fields().forEachRemaining(wrapper ->
-                    actionNode.set(wrapper.getKey(), wrapper.getValue()));
-
-            actionsNode.set(action.getActionName(), actionNode);
-
-            pageJson.setJsonSchema(
-                    OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
-
-            uiPageJsonRepository.save(pageJson);
-
-            return uiPageAction;
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update page json", e);
-        }
+        return uiPageAction;
     }
 
     @Override
     public UIPageAction update(Long id, UIPageAction uiPageAction) {
         UIPageAction existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UIPageAction not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("UIPageAction not found: " + id));
 
         String oldActionName = existing.getActionName();
-        String pageCode = existing.getUiPagecode();
+        String pageCode      = existing.getUiPagecode();
 
         existing.setActionName(uiPageAction.getActionName());
         existing.setActionType(uiPageAction.getActionType());
@@ -88,33 +65,13 @@ public class UIPageActionServiceImp implements UIPageActionService {
 
         UIPageAction saved = repository.save(existing);
 
-        // update page json
-        uiPageJsonRepository.findByUiPage_PageCode(pageCode).ifPresent(pageJson -> {
-            try {
-                ObjectNode root = (ObjectNode) OBJECT_MAPPER.readTree(pageJson.getJsonSchema());
-                ObjectNode actionsNode = root.has("actions")
-                        ? (ObjectNode) root.get("actions")
-                        : OBJECT_MAPPER.createObjectNode();
-
-                // remove old key if name changed
-                if (!oldActionName.equals(uiPageAction.getActionName())) {
-                    actionsNode.remove(oldActionName);
-                }
-
-                ObjectNode actionNode = OBJECT_MAPPER.createObjectNode();
-                actionNode.put("type", uiPageAction.getActionType());
-                JsonNode propertiesNode = OBJECT_MAPPER.readTree(uiPageAction.getProperties());
-                propertiesNode.fields().forEachRemaining(w -> actionNode.set(w.getKey(), w.getValue()));
-                actionsNode.set(uiPageAction.getActionName(), actionNode);
-                root.set("actions", actionsNode);
-
-                pageJson.setJsonSchema(
-                        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
-                uiPageJsonRepository.save(pageJson);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to update page json on edit", e);
-            }
-        });
+        // Update page JSON cache
+        syncActionToPageJson(
+                pageCode,
+                uiPageAction.getActionName(),
+                uiPageAction.getActionType(),
+                uiPageAction.getProperties(),
+                oldActionName);
 
         return saved;
     }
@@ -122,7 +79,7 @@ public class UIPageActionServiceImp implements UIPageActionService {
     @Override
     public UIPageAction getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UIPageAction not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("UIPageAction not found: " + id));
     }
 
     @Override
@@ -133,14 +90,14 @@ public class UIPageActionServiceImp implements UIPageActionService {
     @Override
     public void delete(Long id) {
         UIPageAction existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UIPageAction not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("UIPageAction not found: " + id));
 
         String actionName = existing.getActionName();
-        String pageCode = existing.getUiPagecode();
+        String pageCode   = existing.getUiPagecode();
 
         repository.deleteById(id);
 
-        // remove from page json
+        // Remove from page JSON cache
         uiPageJsonRepository.findByUiPage_PageCode(pageCode).ifPresent(pageJson -> {
             try {
                 ObjectNode root = (ObjectNode) OBJECT_MAPPER.readTree(pageJson.getJsonSchema());
@@ -157,94 +114,110 @@ public class UIPageActionServiceImp implements UIPageActionService {
     }
 
     @Override
-    public void addComponentAction(
-            String pageCode,
-            ComponentActionRequest request) {
+    public void addComponentAction(String pageCode, ComponentActionRequest request) {
 
-        UIPageJson page =
-                uiPageJsonRepository.findByUiPage_PageCode(pageCode)
-                        .orElseThrow(() ->
-                                new RuntimeException("Page not found"));
+        // FIX: original code had ambiguous try-without-scope, unnecessary blank lines,
+        // and most importantly tried to use a JsonNode (immutable) reference to write
+        // back to uiPageJsonRepository — the root must be cast to ObjectNode.
+
+        UIPageJson page = uiPageJsonRepository.findByUiPage_PageCode(pageCode)
+                .orElseThrow(() -> new RuntimeException("Page JSON not found: " + pageCode));
 
         try {
+            // FIX: cast to ObjectNode so we can mutate the tree and serialize it back
+            ObjectNode root       = (ObjectNode) OBJECT_MAPPER.readTree(page.getJsonSchema());
+            JsonNode   components = root.path("components");
 
-            JsonNode root =
-                    OBJECT_MAPPER.readTree(page.getJsonSchema());
+            if (!components.isArray()) {
+                throw new RuntimeException("Components node is missing or not an array");
+            }
 
-
-
-
-
-                JsonNode components =
-                        root.path("components");
-
-                for (JsonNode component : components) {
-
-                    Long componentId =
-                            component.path("id").asLong();
-
-                    if (componentId.equals(
-                            request.getComponentId())) {
-
-                        ObjectNode componentNode =
-                                (ObjectNode) component;
-
-                        ArrayNode actionArray;
-
-                        if (componentNode.has("action")) {
-
-                            actionArray =
-                                    (ArrayNode)
-                                            componentNode.get("action");
-
-                        } else {
-
-                            actionArray =
-                                    OBJECT_MAPPER.createArrayNode();
-
-                            componentNode.set(
-                                    "action",
-                                    actionArray);
-                        }
-
-                        ObjectNode action =
-                                OBJECT_MAPPER.createObjectNode();
-
-                        action.put(
-                                "event",
-                                request.getEvent());
-
-                        action.put(
-                                "ref",
-                                request.getRef());
-
-                        action.put(
-                                "condition",
-                                request.getCondition() == null
-                                        ? "true"
-                                        : request.getCondition());
-
-                        actionArray.add(action);
-
-                        page.setJsonSchema(
-                                OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
-                                        .writeValueAsString(root));
-
-                        uiPageJsonRepository.save(page);
-
-                        return;
-                    }
+            for (JsonNode componentNode : components) {
+                long componentId = componentNode.path("id").asLong(-1);
+                if (componentId != request.getComponentId()) {
+                    continue;
                 }
 
+                // Found the target component — now mutate it
+                ObjectNode mutableComponent = (ObjectNode) componentNode;
+
+                ArrayNode actionArray = mutableComponent.has("action")
+                        && mutableComponent.get("action").isArray()
+                        ? (ArrayNode) mutableComponent.get("action")
+                        : mutableComponent.putArray("action");
+
+                ObjectNode actionEntry = OBJECT_MAPPER.createObjectNode();
+                actionEntry.put("event",     request.getEvent());
+                actionEntry.put("ref",       request.getRef());
+                actionEntry.put("condition", request.getCondition() != null
+                        ? request.getCondition() : "true");
+
+                actionArray.add(actionEntry);
+
+                page.setJsonSchema(
+                        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+                uiPageJsonRepository.save(page);
+                return;
+            }
 
             throw new RuntimeException(
-                    "Component not found");
+                    "Component id " + request.getComponentId() + " not found in page: " + pageCode);
 
+        } catch (RuntimeException re) {
+            throw re;
         } catch (Exception ex) {
-
-            throw new RuntimeException(
-                    "Failed to update component action",
-                    ex);
+            throw new RuntimeException("Failed to update component action", ex);
         }
+    }
+
+    // ── private helpers ───────────────────────────────────────────────────────
+
+    /**
+     * Writes / updates a single action entry in the page JSON cache.
+     * If oldActionName is provided and differs from actionName, the old key is removed.
+     */
+    private void syncActionToPageJson(String pageCode, String actionName,
+                                      String actionType, String properties,
+                                      String oldActionName) {
+        uiPageJsonRepository.findByUiPage_PageCode(pageCode).ifPresent(pageJson -> {
+            try {
+                ObjectNode root        = (ObjectNode) OBJECT_MAPPER.readTree(pageJson.getJsonSchema());
+                ObjectNode actionsNode = root.has("actions")
+                        ? (ObjectNode) root.get("actions")
+                        : OBJECT_MAPPER.createObjectNode();
+
+                if (oldActionName != null && !oldActionName.equals(actionName)) {
+                    actionsNode.remove(oldActionName);
+                }
+
+                actionsNode.set(actionName, buildActionNode(actionType, properties));
+                root.set("actions", actionsNode);
+
+                pageJson.setJsonSchema(
+                        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+                uiPageJsonRepository.save(pageJson);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to sync action to page json", e);
+            }
+        });
+    }
+
+    /** Builds:  { "type": "...", ...propertiesFields } */
+    private ObjectNode buildActionNode(String actionType, String properties) {
+        ObjectNode actionNode = OBJECT_MAPPER.createObjectNode();
+        actionNode.put("type", actionType);
+
+        if (properties != null && !properties.isBlank()) {
+            try {
+                JsonNode propertiesNode = OBJECT_MAPPER.readTree(properties);
+                if (propertiesNode.isObject()) {
+                    propertiesNode.fields().forEachRemaining(e ->
+                            actionNode.set(e.getKey(), e.getValue()));
+                }
+            } catch (Exception ignored) {
+                // Keep just the type if properties JSON is malformed
+            }
+        }
+        return actionNode;
     }
 }

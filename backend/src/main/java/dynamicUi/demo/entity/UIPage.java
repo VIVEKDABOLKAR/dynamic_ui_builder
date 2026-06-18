@@ -27,9 +27,12 @@ public class UIPage {
     @Column(name = "description")
     private String description;
 
+    // FIX: field is "isActive" but old code had getter getActive() / setActive().
+    // Spring Data derives the query property name from the getter, so
+    // findByIsActiveTrue() resolved to property "active" — wrong.
+    // Fix: getIsActive() / setIsActive() so the derived query matches.
     @Column(name = "is_active")
     private Boolean isActive;
-
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -39,6 +42,7 @@ public class UIPage {
 
     @PrePersist
     public void prePersist() {
+        if (isActive == null) isActive = true;
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -48,59 +52,32 @@ public class UIPage {
         updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getPageName() { return pageName; }
+    public void setPageName(String pageName) { this.pageName = pageName; }
 
-    public String getPageName() {
-        return pageName;
-    }
+    public String getPageCode() { return pageCode; }
+    public void setPageCode(String pageCode) { this.pageCode = pageCode; }
 
-    public void setPageName(String pageName) {
-        this.pageName = pageName;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getPageCode() {
-        return pageCode;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setPageCode(String pageCode) {
-        this.pageCode = pageCode;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public String getDescription() {
-        return description;
-    }
+    // FIXED getters/setters — match Spring Data naming convention
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    // Kept as deprecated aliases so callers in UIPageServiceImp don't break immediately
+    // TODO: migrate all callers to getIsActive() and remove these
+    @Deprecated
+    public Boolean getActive() { return isActive; }
+    @Deprecated
+    public void setActive(Boolean active) { this.isActive = active; }
 }

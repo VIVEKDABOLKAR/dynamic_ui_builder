@@ -26,53 +26,52 @@ import dynamicUi.demo.repoistory.UiComponentRepository;
 public class UIPageJsonServiceImp implements UIPageJsonService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    private final UIPageJsonRepository      uiPageJsonRepository;
-    private final UiComponentRepository     uiComponentRepository;
+    private final UIPageJsonRepository uiPageJsonRepository;
+    private final UiComponentRepository uiComponentRepository;
     private final UIEntityMappingRepository uiEntityMappingRepository;
-    private final UIPageRepository          uiPageRepository;
+    private  final UIPageRepository uiPageRepository;
 
     public UIPageJsonServiceImp(
             UIPageJsonRepository uiPageJsonRepository,
             UiComponentRepository uiComponentRepository,
-            UIEntityMappingRepository uiEntityMappingRepository,
-            UIPageRepository uiPageRepository) {
-        this.uiPageJsonRepository      = uiPageJsonRepository;
-        this.uiComponentRepository     = uiComponentRepository;
+            UIEntityMappingRepository uiEntityMappingRepository, UIPageRepository uiPageRepository
+    ) {
+        this.uiPageJsonRepository = uiPageJsonRepository;
+        this.uiComponentRepository = uiComponentRepository;
         this.uiEntityMappingRepository = uiEntityMappingRepository;
-        this.uiPageRepository          = uiPageRepository;
+        this.uiPageRepository = uiPageRepository;
     }
 
     @Override
     public UIPageJson getByPageCode(String pageCode) {
-        UIPage page = uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page not found: " + pageCode));
 
-        // Uses getIsActive() — fixed in UIPage.java
+        UIPage page = uiPageRepository.findByPageCode(pageCode)
+                .orElseThrow(() ->
+                        new RuntimeException("Page not found"));
+
         if (!Boolean.TRUE.equals(page.getIsActive())) {
-            throw new RuntimeException("Page is inactive: " + pageCode);
+            throw new RuntimeException("Page is inactive");
         }
 
         return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page schema not found: " + pageCode));
+                .orElseThrow(() ->
+                        new RuntimeException("Page schema not found"));
     }
-
     @Override
     public void syncPageJson(String pageCode) {
         ObjectNode root = parseOrCreateRoot(pageCode, null);
-        List<UIComponent> components =
-                uiComponentRepository.findByUiPage_PageCodeAndIsActiveTrueOrderBySequenceNo(pageCode);
+        List<UIComponent> components = uiComponentRepository.findByUiPage_PageCodeAndIsActiveTrueOrderBySequenceNo(pageCode);
 
-        Map<Long, ObjectNode> nodeById       = new HashMap<>();
-        ArrayNode             rootComponents = OBJECT_MAPPER.createArrayNode();
+        Map<Long, ObjectNode> nodeById = new HashMap<>();
+        ArrayNode rootComponents = OBJECT_MAPPER.createArrayNode();
 
         for (UIComponent component : components) {
             nodeById.put(component.getId(), toComponentNode(component));
         }
 
         for (UIComponent component : components) {
-            ObjectNode node     = nodeById.get(component.getId());
-            Long       parentId = component.getParentComponentId();
+            ObjectNode node = nodeById.get(component.getId());
+            Long parentId = component.getParentComponentId();
 
             if (parentId == null || !nodeById.containsKey(parentId)) {
                 rootComponents.add(node);
@@ -87,13 +86,12 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         }
 
         root.set("components", rootComponents);
-        savePageJson(pageCode, root);
+        savePageJson(pageCode, root, null);
     }
 
     private ObjectNode parseOrCreateRoot(String pageCode, String pageName) {
         UIPageJson pageJson = uiPageJsonRepository.findByUiPage_PageCode(pageCode).orElse(null);
         String schema = pageJson != null ? pageJson.getJsonSchema() : null;
-
         if (schema != null && !schema.isBlank()) {
             try {
                 JsonNode parsed = OBJECT_MAPPER.readTree(schema);
@@ -134,25 +132,36 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
 
     private ObjectNode toComponentNode(UIComponent component) {
         ObjectNode componentNode = OBJECT_MAPPER.createObjectNode();
-        componentNode.put("id",       component.getId());
-        componentNode.put("name",     component.getComponentName());
-        componentNode.put("type",     normalizeComponentType(component.getComponentType()));
+        componentNode.put("id", component.getId());
+        componentNode.put("name", component.getComponentName());
+        componentNode.put("type", normalizeComponentType(component.getComponentType()));
         componentNode.put("sequence", component.getSequenceNo());
 
         ObjectNode propertiesNode = OBJECT_MAPPER.createObjectNode();
-        if (component.getLabelName()   != null) propertiesNode.put("label",       component.getLabelName());
-        if (component.getPlaceholder() != null) propertiesNode.put("placeholder", component.getPlaceholder());
-        if (component.getIsVisible()   != null) propertiesNode.put("visible",     component.getIsVisible());
-        if (component.getIsDisabled()  != null) propertiesNode.put("disabled",    component.getIsDisabled());
-        if (component.getIsRequired()  != null) propertiesNode.put("required",    component.getIsRequired());
-
-        if ("button".equalsIgnoreCase(component.getComponentType())
-                && !propertiesNode.has("text") && component.getLabelName() != null) {
-            propertiesNode.put("text", component.getLabelName());
+        if (component.getLabelName() != null) {
+            propertiesNode.put("label", component.getLabelName());
+        }
+        if (component.getPlaceholder() != null) {
+            propertiesNode.put("placeholder", component.getPlaceholder());
+        }
+        if (component.getIsVisible() != null) {
+            propertiesNode.put("visible", component.getIsVisible());
+        }
+        if (component.getIsDisabled() != null) {
+            propertiesNode.put("disabled", component.getIsDisabled());
+        }
+        if (component.getIsRequired() != null) {
+            propertiesNode.put("required", component.getIsRequired());
         }
 
-        if ("select".equalsIgnoreCase(component.getComponentType())
-                || "radio".equalsIgnoreCase(component.getComponentType())) {
+        if ("button".equalsIgnoreCase(component.getComponentType())) {
+            if (!propertiesNode.has("text") && component.getLabelName() != null) {
+                propertiesNode.put("text", component.getLabelName());
+            }
+        }
+
+        if (("select".equalsIgnoreCase(component.getComponentType()) || "radio".equalsIgnoreCase(component.getComponentType()))) {
+            // Store only lookup schema; frontend will fetch labels/values dynamically from the API at render time
             ObjectNode lookupNode = OBJECT_MAPPER.createObjectNode();
             lookupNode.put("apiUrl", "/api/ui/lookups/component/" + component.getId());
             lookupNode.put("method", "GET");
@@ -163,67 +172,91 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
                 .ifPresent(mapping -> componentNode.set("mapping", toMappingNode(mapping)));
 
         componentNode.set("properties", propertiesNode);
+
+
         return componentNode;
     }
 
     private ObjectNode toMappingNode(UIEntityMapping mapping) {
         ObjectNode mappingNode = OBJECT_MAPPER.createObjectNode();
         String mappingType = mapping.getMappingType();
-        if (mappingType == null || mappingType.isBlank()) mappingType = "ENTITY";
+        if (mappingType == null || mappingType.isBlank()) {
+            mappingType = "ENTITY";
+        }
         mappingNode.put("type", mappingType);
 
         if ("API".equalsIgnoreCase(mappingType)) {
-            if (mapping.getSource()       != null) mappingNode.put("source",       mapping.getSource());
-            if (mapping.getResponsePath() != null) mappingNode.put("responsePath", mapping.getResponsePath());
+            if (mapping.getSource() != null && !mapping.getSource().isBlank()) {
+                mappingNode.put("source", mapping.getSource());
+            }
+            if (mapping.getResponsePath() != null && !mapping.getResponsePath().isBlank()) {
+                mappingNode.put("responsePath", mapping.getResponsePath());
+            }
             return mappingNode;
         }
 
-        if (mapping.getTableName() != null && mapping.getColumnName() != null) {
-            mappingNode.put("source", mapping.getTableName() + '.' + mapping.getColumnName());
-        } else if (mapping.getAttributeName() != null) {
+        if (mapping.getAttributeName() != null && !mapping.getAttributeName().isBlank()) {
             mappingNode.put("source", mapping.getAttributeName());
-        } else if (mapping.getColumnName() != null) {
+        } else if (mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
             mappingNode.put("source", mapping.getColumnName());
+        } else if (mapping.getTableName() != null && !mapping.getTableName().isBlank()) {
+            mappingNode.put("source", mapping.getTableName());
         }
 
-        if (mapping.getColumnName()  != null) mappingNode.put("target",       mapping.getColumnName());
-        if (mapping.getTableName()   != null) mappingNode.put("expression",   mapping.getTableName());
-        if (mapping.getDisplayName() != null) mappingNode.put("defaultValue", mapping.getDisplayName());
+        if (mapping.getTableName() != null && !mapping.getTableName().isBlank()
+                && mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
+            mappingNode.put("source", mapping.getTableName() + '.' + mapping.getColumnName());
+        }
+
+        if (mapping.getColumnName() != null && !mapping.getColumnName().isBlank()) {
+            mappingNode.put("target", mapping.getColumnName());
+        }
+
+        if (mapping.getTableName() != null && !mapping.getTableName().isBlank()) {
+            mappingNode.put("expression", mapping.getTableName());
+        }
+
+        if (mapping.getDisplayName() != null && !mapping.getDisplayName().isBlank()) {
+            mappingNode.put("defaultValue", mapping.getDisplayName());
+        }
 
         ArrayNode dependencies = OBJECT_MAPPER.createArrayNode();
-        if (Boolean.TRUE.equals(mapping.getIsRequired()))   dependencies.add("required");
-        if (Boolean.TRUE.equals(mapping.getIsFilterable())) dependencies.add("filterable");
-        if (!dependencies.isEmpty()) mappingNode.set("dependencies", dependencies);
+        if (Boolean.TRUE.equals(mapping.getIsRequired())) {
+            dependencies.add("required");
+        }
+        if (Boolean.TRUE.equals(mapping.getIsFilterable())) {
+            dependencies.add("filterable");
+        }
+        if (!dependencies.isEmpty()) {
+            mappingNode.set("dependencies", dependencies);
+        }
 
         return mappingNode;
     }
 
     private String normalizeComponentType(String componentType) {
-        if (componentType == null) return null;
-        return "dropdown".equalsIgnoreCase(componentType) ? "select" : componentType;
+        if (componentType == null) {
+            return null;
+        }
+        if ("dropdown".equalsIgnoreCase(componentType)) {
+            return "select";
+        }
+        return componentType;
     }
 
-    /**
-     * FIX: Original savePageJson() created a detached UIPage with only pageCode set
-     * (no id). Passing it to uiPageJsonRepository.save() caused
-     * TransientPropertyValueException / FK violation because Hibernate had no
-     * managed entity to reference.
-     *
-     * Fix: always load the managed UIPage from the repository before creating a
-     * new UIPageJson record.
-     */
-    private void savePageJson(String pageCode, ObjectNode root) {
+    private void savePageJson(String pageCode, ObjectNode root, UIPage uiPage) {
         UIPageJson pageJson = uiPageJsonRepository.findByUiPage_PageCode(pageCode)
                 .orElseGet(() -> {
-                    // Load managed UIPage — never create a detached one
-                    UIPage managedPage = uiPageRepository.findByPageCode(pageCode)
-                            .orElseThrow(() -> new RuntimeException(
-                                    "Cannot sync page JSON — page not found: " + pageCode));
-                    UIPageJson newJson = new UIPageJson();
-                    newJson.setUiPage(managedPage);
-                    return newJson;
+                    UIPageJson newPageJson = new UIPageJson();
+                    if (uiPage != null) {
+                        newPageJson.setUiPage(uiPage);
+                    } else {
+                        UIPage placeholderPage = new UIPage();
+                        placeholderPage.setPageCode(pageCode);
+                        newPageJson.setUiPage(placeholderPage);
+                    }
+                    return newPageJson;
                 });
-
         pageJson.setJsonSchema(root.toString());
         uiPageJsonRepository.save(pageJson);
     }
