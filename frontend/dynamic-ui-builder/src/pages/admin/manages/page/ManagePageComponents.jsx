@@ -139,7 +139,7 @@ export default function ManagePageComponents() {
       componentType: row.componentType || AVAILABLE_COMPONENTS[0].type,
       labelName: row.labelName || parsedProperties.label || '',
       placeholder: row.placeholder || parsedProperties.placeholder || '',
-      width: parsedProperties.width || '',
+      width: parsedProperties.width || '200px',
       sequenceNo: row.sequenceNo || 1,
       isChildComponent: !!(row.parentComponentId || parsedProperties.parentComponentId),
       parentComponentId: row.parentComponentId

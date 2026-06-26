@@ -20,6 +20,7 @@ export const Card = ({
   style = {},
   children,
 }: CardProps) => {
+  console.log("Style Of Card :- ", style)
   return (
     <MuiCard
       sx={{
