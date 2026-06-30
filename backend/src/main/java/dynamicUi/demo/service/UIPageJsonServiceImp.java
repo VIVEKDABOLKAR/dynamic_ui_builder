@@ -138,6 +138,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         componentNode.put("name",     component.getComponentName());
         componentNode.put("type",     normalizeComponentType(component.getComponentType()));
         componentNode.put("sequence", component.getSequenceNo());
+        componentNode.put("prop", component.getProperties());
 
         ObjectNode propertiesNode = OBJECT_MAPPER.createObjectNode();
         if (component.getLabelName()   != null) propertiesNode.put("label",       component.getLabelName());

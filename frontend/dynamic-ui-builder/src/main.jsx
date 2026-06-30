@@ -11,12 +11,15 @@ import App from './App.jsx'
 import Provider from './Provider.jsx'
 import { Toaster } from 'react-hot-toast'
 import { ToastContainer } from 'react-toastify'
+import { StyledEngineProvider } from '@mui/material'
 const modules = [AllCommunityModule];
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Provider>
-      <ToastContainer
+    <StyledEngineProvider injectFirst>
+
+      <Provider>
+        <ToastContainer
           position="top-right"
           autoClose={5000}
           hideProgressBar={false}
@@ -26,6 +29,7 @@ createRoot(document.getElementById('root')).render(
           theme="dark"
         />
         <App />
-    </Provider>
+      </Provider>
+    </StyledEngineProvider>
   </StrictMode>,
 )

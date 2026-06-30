@@ -30,7 +30,7 @@ export function convertDefaultFieldSchema(
       required: properties.required ?? false,
       defaultValue: properties.defaultValue,
       options: properties.options || [],
-      style: properties.style || {},
+      style: component.prop,
       action: component.action,
       mapping: component.mapping || undefined,
       lookup: component.lookup || undefined,

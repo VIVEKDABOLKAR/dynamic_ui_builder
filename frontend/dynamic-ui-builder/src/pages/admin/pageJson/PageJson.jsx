@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { getAllPages } from '../../../api/adminPageApi'
 import { getUiPageByCode } from '../../../api/uiPageApi'
+import { useNavigate } from 'react-router-dom'
 
 /* ─── tiny helpers ─────────────────────────────────────────────── */
 function prettyJson(raw) {
@@ -56,6 +57,8 @@ export default function PageJson() {
   const [viewMode, setViewMode] = useState('pretty')
   const preRef = useRef(null)
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setLoadingPages(true)
     getAllPages()
@@ -83,6 +86,10 @@ export default function PageJson() {
     copyToClipboard(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handlePreview = () => {
+    navigate(`/ui_demo/${selectedPage.pageCode}`)
   }
 
   const handleDownload = () => {
@@ -141,6 +148,16 @@ export default function PageJson() {
               <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                 {selectedPage.pageCode}
               </span>
+
+              {/* Preview button*/}
+              <button
+                onClick={handlePreview}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"
+              >
+                ⎘ Preview
+              </button>
+
+              {/* Copy button*/}
               <button
                 onClick={handleCopy}
                 className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"

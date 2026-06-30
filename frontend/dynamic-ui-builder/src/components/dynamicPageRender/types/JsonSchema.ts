@@ -86,6 +86,7 @@ export interface ComponentSchema {
   mapping?: MappingSchema;
   lookup?: LookupSchema;
   action?: ActionSchema[];
+  prop?: string;
 }
 
 

@@ -25,9 +25,34 @@ export const useResolvedActions  = (action: []) => {
 
 export const useComponentProps = (props: any) => {
   const handlers = useResolvedActions(props.action);
+  let style;
+  if(props.style){
+    style = convertToImportantClassName(JSON.parse(props.style ?? "{}"));
+  }
 
   return {
     ...props,
     ...handlers,
+    style
   };
 };
+
+/**
+ * Need this because MUI give there classname highest proiorti
+ * so user classname override 
+ * fix - mark classname as imortant so mui cannot override
+ * @param className 
+ * @returns 
+ */
+export function convertToImportantClassName(input?: { className?: string }): string {
+  if (!input?.className) return "";
+
+  return input.className
+    .split(" ")
+    .filter(Boolean)
+    .map((cls) => {
+      if (cls.startsWith("!")) return cls;
+      return `!${cls}`;
+    })
+    .join(" ");
+}

@@ -200,6 +200,11 @@ export default function ManagePageComponents() {
       valueFormatter: (p) => (p.value ? 'Yes' : 'No'),
     },
     {
+      field: 'properties',
+      headerName: 'Prop',
+      minWidth: 150,
+    },
+    {
       headerName: 'Actions',
       field: 'actions',
       pinned: 'right',

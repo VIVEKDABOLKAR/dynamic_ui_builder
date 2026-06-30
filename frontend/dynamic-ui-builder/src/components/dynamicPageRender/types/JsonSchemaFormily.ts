@@ -62,6 +62,8 @@ export interface FormilyFieldSchema {
 
     default?: any;
 
+    prop?: {};
+
     // UI Rendering
     "x-component"?: string;
     "x-component-props"?: Record<string, any> 

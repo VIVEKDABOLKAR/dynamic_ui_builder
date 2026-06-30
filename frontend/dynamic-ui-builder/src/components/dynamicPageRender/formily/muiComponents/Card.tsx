@@ -4,29 +4,33 @@ import MuiCard from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import { useComponentProps } from "../utils";
 
 interface CardProps {
   title?: string;
   description?: string;
   width?: string;
-  style?: React.CSSProperties;
+  prop?: string;
   children?: React.ReactNode;
 }
 
-export const Card = ({
-  title,
-  description,
-  width = "100%",
-  style = {},
-  children,
-}: CardProps) => {
-  console.log("Style Of Card :- ", style)
+export const Card = (incomingProps: any) => {
+  const {
+    title,
+    description,
+    width = "100%",
+    style,
+    children,
+  } = useComponentProps(incomingProps);
+
+
+  console.log("Style Of Card :- ", style)//here style is !bg-red-500
   return (
     <MuiCard
+    className={style}
       sx={{
         width,
         marginBottom: 3,
-        ...style,
       }}
     >
       <CardContent>

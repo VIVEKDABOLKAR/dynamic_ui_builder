@@ -39,7 +39,6 @@ export function convertCard(
       title: p.title || p.label,
       description: p.description,
       width: p.width,
-      style: p.style,
     },
 
     properties,
