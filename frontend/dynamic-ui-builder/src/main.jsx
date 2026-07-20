@@ -12,6 +12,7 @@ import Provider from './Provider.jsx'
 import { Toaster } from 'react-hot-toast'
 import { ToastContainer } from 'react-toastify'
 import { StyledEngineProvider } from '@mui/material'
+import TailwindSafelist from './tailwind-safelist.js'
 const modules = [AllCommunityModule];
 
 createRoot(document.getElementById('root')).render(

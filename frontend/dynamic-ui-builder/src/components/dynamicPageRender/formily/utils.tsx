@@ -26,7 +26,10 @@ export const useResolvedActions  = (action: []) => {
 export const useComponentProps = (props: any) => {
   const handlers = useResolvedActions(props.action);
   let style;
-  if(props.style){
+  console.log()
+  if (typeof(props.style) == "object"){
+    style = style;
+  } else if (props.style) {
     style = convertToImportantClassName(JSON.parse(props.style ?? "{}"));
   }
 

@@ -117,7 +117,7 @@ export default function ManagePage() {
                         to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
                         className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-400"
                     >
-                        Add Component
+                        Edit Component
                     </Link>
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/action`}

@@ -16,9 +16,13 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import UI_layout from './pages/ui/UI_layout'
 import Signup from './pages/auth/Signup'
 import ViewerHome from './pages/ui/ViewerHome'
+import TailwindSafelist from "./tailwind-safelist";
+
+
 export default function App() {
   return (
-    <Routes>
+    <>      
+      <Routes>
 
       {/* Public */}
       <Route path="/" element={<Landing />} />
@@ -53,5 +57,7 @@ export default function App() {
       </Route>
 
     </Routes>
+    </>
+    
   )
 }

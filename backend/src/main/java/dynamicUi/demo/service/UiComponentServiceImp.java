@@ -8,6 +8,7 @@ import dynamicUi.demo.repoistory.*;
 import dynamicUi.demo.service.inter.UIPageJsonService;
 import dynamicUi.demo.service.inter.UiComponentService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -119,6 +120,7 @@ public class UiComponentServiceImp implements UiComponentService {
     }
 
     @Override
+    @Transactional
     public UIComponentDTO updateComponent(Long id, UIComponentDTO dto, UIEntityMappingDTO mappingDTO) {
 
         UIComponent component = uiComponentRepository.findById(id)
@@ -170,6 +172,7 @@ public class UiComponentServiceImp implements UiComponentService {
     }
 
     @Override
+    @Transactional
     public void deleteComponent(Long id) {
         UIComponent component = uiComponentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Component not found"));

@@ -1,9 +1,10 @@
-import React, { useEffect, useState,useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllUiPages } from '../../api/uiPageApi';
 import { getUsername, logout } from '../../api/authApi';
 import usePageUpdates from '../../hooks/usePageUpdates';
 import { toast } from 'react-toastify';
+import { getAllPages } from '../../api/adminPageApi';
 export default function ViewerHome() {
   const navigate = useNavigate()
   const [pages, setPages] = useState([])
@@ -18,16 +19,16 @@ export default function ViewerHome() {
       setPages((prev) => [
         ...prev,
         {
-          pageCode:    update.pageCode,
-          pageName:    update.pageName,
+          pageCode: update.pageCode,
+          pageName: update.pageName,
           description: update.description || '',
-          updatedAt:   update.updatedAt,
-          isActive:    true,
+          updatedAt: update.updatedAt,
+          isActive: true,
         },
       ])
-       toast.info(`"${update.pageName}" was updated`)
+      toast.info(`"${update.pageName}" was updated`)
     }
-  }, [])  
+  }, [])
 
 
   const username = getUsername()
@@ -35,7 +36,7 @@ export default function ViewerHome() {
   useEffect(() => {
     const fetchPages = async () => {
       try {
-        const data = await getAllUiPages()
+        const data = await getAllPages()
         setPages(data)
       } catch (err) {
         setError('Failed to load pages. Please try again.')
@@ -54,7 +55,7 @@ export default function ViewerHome() {
   )
 
 
-usePageUpdates(handlePageUpdate)
+  usePageUpdates(handlePageUpdate)
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -118,10 +119,18 @@ usePageUpdates(handlePageUpdate)
                   <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-300">
                     {page.pageCode}
                   </span>
-                  <span className="flex items-center gap-1.5 text-xs text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Active
-                  </span>
+                  {page.isActive ?
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Active
+                    </span>
+                    :
+                    <span className="flex items-center gap-1.5 text-xs text-red-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                      InActive
+                    </span>
+                  }
+
                 </div>
 
                 {/* Page name */}

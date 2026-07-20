@@ -119,6 +119,7 @@ export default function ActionTable({ pageCode, onEdit, refreshKey }) {
                         filter: true,
                         resizable: true,
                     }}
+                    enableCellTextSelection={true}
                 />
             )}
         </div>
