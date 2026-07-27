@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import dynamicUi.demo.constant.PageStatus;
 import dynamicUi.demo.dto.PageJsonDTO;
 import dynamicUi.demo.entity.UIComponentAction;
 import dynamicUi.demo.entity.UIPage;
@@ -64,10 +65,10 @@ public class PageAssemblerService {
                 .orElseThrow(() -> new RuntimeException(
                         "PAGE NOT FOUND :: pageCode = " + pageCode));
 
-        if (!Boolean.TRUE.equals(uiPage.getIsActive())) {
-            throw new RuntimeException(
-                    "PAGE IS INACTIVE :: pageCode = " + pageCode);
-        }
+//        if (uiPage.getStatus() != PageStatus.ACTIVE) {
+//            throw new RuntimeException(
+//                    "Page is not active :: pageCode = " + pageCode);
+//        }
 
         // 2. Load base JSON schema
         UIPageJson uiPageJson = uiPageJsonRepository.findByUiPage_PageCode(pageCode)
@@ -215,7 +216,7 @@ public class PageAssemblerService {
 
         pageNode.put("pageCode", uiPage.getPageCode());
         pageNode.put("pageName", uiPage.getPageName());
-        pageNode.put("isActive", Boolean.TRUE.equals(uiPage.getIsActive()));
+        pageNode.put("isActive", Boolean.TRUE.equals(uiPage.isActive()));
         if (uiPage.getDescription() != null) {
             pageNode.put("description", uiPage.getDescription());
         }

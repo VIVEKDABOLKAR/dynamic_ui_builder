@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dynamicUi.demo.constant.PageStatus;
 import dynamicUi.demo.repoistory.UIPageRepository;
 import dynamicUi.demo.service.inter.UIPageJsonService;
 import org.springframework.stereotype.Service;
@@ -49,8 +50,9 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
                 .orElseThrow(() -> new RuntimeException("Page not found: " + pageCode));
 
         // Uses getIsActive() — fixed in UIPage.java
-        if (!Boolean.TRUE.equals(page.getIsActive())) {
-            throw new RuntimeException("Page is inactive: " + pageCode);
+        if (page.getStatus() != PageStatus.ACTIVE) {
+            throw new RuntimeException(
+                    "Page is not active :: pageCode = " + pageCode);
         }
 
         return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
@@ -231,6 +233,6 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
 
     @Override
     public List<UIPage> getAllActivePages() {
-        return uiPageRepository.findByIsActiveTrue();
+        return uiPageRepository.findByStatusNot(PageStatus.DELETED);
     }
 }

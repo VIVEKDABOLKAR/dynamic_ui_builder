@@ -1,16 +1,20 @@
 package dynamicUi.demo.service.inter;
 
+import com.google.api.Page;
+import dynamicUi.demo.constant.PageStatus;
+import dynamicUi.demo.dto.UIPageRequestDTO;
+import dynamicUi.demo.dto.UIPageResponseDTO;
 import dynamicUi.demo.entity.UIPage;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 public interface UIPageService {
-    UIPage createPage(UIPage uiPage);
+    UIPageResponseDTO createPage(UIPageRequestDTO uiPageReq);
     UIPage getPageByCode(String pageCode);
     List<UIPage> getAllPages();
-    UIPage updatePage(String pageCode, UIPage uiPage);
-    UIPage updatePageStatus(String pageCode, boolean status);
+    UIPageResponseDTO updatePage(String pageCode, UIPageRequestDTO uiPage);
+    UIPage updatePageStatus(String pageCode, PageStatus status);
     void deletePage(String pageCode);
 
     List<UIPage> getAllPages1();

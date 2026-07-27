@@ -1,12 +1,18 @@
 package dynamicUi.demo.entity;
 
+import dynamicUi.demo.constant.PageStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ui_page")
+@Table(
+        name = "ui_page",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "page_code")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,23 +24,80 @@ public class UIPage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "page_name", nullable = false)
-    private String pageName;
+//     ==========================================
+//     Basic Information
+//     ==========================================
 
-    @Column(name = "page_code", nullable = false, unique = true)
+    @Column(name = "page_code", nullable = false, length = 100)
     private String pageCode;
 
-    @Column(name = "description")
+    @Column(name = "page_name", nullable = false, length = 150)
+    private String pageName;
+
+    @Column(name = "description", length = 500)
     private String description;
 
-    // FIX: field is "isActive" but old code had getter getActive() / setActive().
-    // Spring Data derives the query property name from the getter, so
-    // findByIsActiveTrue() resolved to property "active" — wrong.
-    // Fix: getIsActive() / setIsActive() so the derived query matches.
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "version", length = 20)
+    private String version;
 
-    @Column(name = "created_at")
+
+    // ==========================================
+    // Registry References
+    // (Store codes only)
+    // ==========================================
+
+    @Column(name = "module_code", length = 50)
+    private String moduleCode;
+
+    @Column(name = "category_code", length = 50)
+    private String categoryCode;
+
+    @Column(name = "layout_code", length = 50)
+    private String layoutCode;
+
+    // ==========================================
+    // Security
+    // ==========================================
+
+    @Column(name = "require_authentication")
+    private Boolean requireAuthentication;
+
+    @Column(name = "permission_code", length = 100)
+    private String permissionCode;
+
+    // ==========================================
+    // Route :- UIRoute
+    // ==========================================
+
+    @OneToOne(
+            mappedBy = "page",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
+    )
+    private UIRoute route;
+
+    public void setRoute(UIRoute route) {
+        this.route = route;
+
+        if (route != null) {
+            route.setPage(this);
+        }
+    }
+
+    // ==========================================
+    // Status
+    // ==========================================
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private PageStatus status;
+
+    // ==========================================
+    // Audit
+    // ==========================================
+
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -42,7 +105,16 @@ public class UIPage {
 
     @PrePersist
     public void prePersist() {
-        if (isActive == null) isActive = true;
+
+        if (status == null) {
+            status = PageStatus.DRAFT;
+        }
+
+        if (requireAuthentication == null) {
+            requireAuthentication = true;
+        }
+
+
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
@@ -52,32 +124,7 @@ public class UIPage {
         updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getPageName() { return pageName; }
-    public void setPageName(String pageName) { this.pageName = pageName; }
-
-    public String getPageCode() { return pageCode; }
-    public void setPageCode(String pageCode) { this.pageCode = pageCode; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    // FIXED getters/setters — match Spring Data naming convention
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-
-    // Kept as deprecated aliases so callers in UIPageServiceImp don't break immediately
-    // TODO: migrate all callers to getIsActive() and remove these
-    @Deprecated
-    public Boolean getActive() { return isActive; }
-    @Deprecated
-    public void setActive(Boolean active) { this.isActive = active; }
+    public boolean isActive() {
+        return status == PageStatus.ACTIVE;
+    }
 }

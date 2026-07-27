@@ -149,7 +149,7 @@ export default function ManagePage() {
                 >
                     + Add New Page
                 </Link>
-            </div>
+            </div> 
 
             <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">
