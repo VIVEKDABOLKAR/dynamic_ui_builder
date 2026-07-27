@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { getUiPageByCode } from '../../api/uiPageApi'
+import { resolveRoute } from '../../api/routeApi'
 import DynamicPageRenderEngine from '../../components/dynamicPageRender/DynamicPageRenderEngine'
 import { basicFormSchema } from '../../components/dynamicPageRender/examples/basicForm'
 import { pageForm } from '../../components/dynamicPageRender/examples/pageForm'
@@ -14,15 +15,25 @@ export default function DynamicPage() {
 
     // derive the full path after /ui/
     const rawPath = location.pathname || ''
-    const pageCode = rawPath.startsWith('/ui_demo/') ? rawPath.slice(9) : rawPath.replace(/^\//, '')
+    const pathParams = rawPath.startsWith('/ui_demo/') ? rawPath.slice(8) : rawPath.replace(/^\//, '')
 
     useEffect(() => {
         setLoading(true);
         const loadPage = async () => {
+            //load pageCode based on route path
+            let pageCode
+            try {
+                const response = await resolveRoute(pathParams)
+                pageCode = response.pageCode
+            } catch (error) {
+                console.error('Failed to Reolve route to page')
+            }
+
             if (!pageCode) {
                 setLoading(false)
                 return
             }
+
             console.log(pageCode)
 
             try {
@@ -37,7 +48,7 @@ export default function DynamicPage() {
         }
 
         loadPage()
-    }, [pageCode])
+    }, [pathParams])
 
     let parsedSchema = null
     try {

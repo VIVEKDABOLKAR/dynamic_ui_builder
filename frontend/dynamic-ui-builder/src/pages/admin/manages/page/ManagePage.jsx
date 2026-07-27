@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { Link } from 'react-router-dom'
 import { deletePage, getAllPages, updatePageStatus } from '../../../../api/adminPageApi'
+import {
+    FaEdit,
+    FaTrash,
+    FaPuzzlePiece,
+    FaBolt
+} from "react-icons/fa";
+
 
 export default function ManagePage() {
     const [rowData, setRowData] = useState([])
@@ -90,8 +97,8 @@ export default function ManagePage() {
         },
         {
             headerName: 'Action',
-            minWidth: 360,
-            maxWidth: 420,
+            minWidth: 200,
+            maxWidth: 320,
             pinned: 'right',
             lockPinned: true,
             lockPosition: true,
@@ -99,35 +106,44 @@ export default function ManagePage() {
             sortable: false,
             filter: false,
             cellRenderer: (params) => (
-                <div className="flex h-full items-center gap-2 py-1 ">
+                <div className="flex h-full items-center gap-3 py-1">
+
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
-                        className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition hover:bg-slate-700"
+                        title="Edit"
+                        className="rounded-full bg-slate-900 p-2 text-white hover:bg-slate-700"
                     >
-                        Edit
+                        <FaEdit size={16} />
                     </Link>
+
                     <button
                         type="button"
                         onClick={() => handleDeleteClick(params.data.pageCode)}
-                        className="rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-red-400"
+                        title="Delete"
+                        className="rounded-full bg-red-500 p-2 text-white hover:bg-red-400"
                     >
-                        Delete
+                        <FaTrash size={16} />
                     </button>
+
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/components`}
-                        className="rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-400"
+                        title="Edit Components"
+                        className="rounded-full bg-blue-500 p-2 text-white hover:bg-blue-400"
                     >
-                        Edit Component
+                        <FaPuzzlePiece size={16} />
                     </Link>
+
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/action`}
-                        className="rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-400"
+                        title="Add Action"
+                        className="rounded-full bg-cyan-500 p-2 text-white hover:bg-cyan-400"
                     >
-                        Add Action
+                        <FaBolt size={16} />
                     </Link>
 
                 </div>
-            ),
+            )
+
         },
     ]
 
@@ -149,7 +165,7 @@ export default function ManagePage() {
                 >
                     + Add New Page
                 </Link>
-            </div> 
+            </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-5">

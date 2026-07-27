@@ -1,6 +1,8 @@
 package dynamicUi.demo.service;
 
+import dynamicUi.demo.dto.RouteResponseDTO;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.mapper.UIRouteMapper;
 import dynamicUi.demo.repoistory.UIRouteRepository;
 import dynamicUi.demo.service.inter.UIRouteService;
 import jakarta.transaction.Transactional;
@@ -15,6 +17,21 @@ import java.util.List;
 public class UIRouteServiceImp implements UIRouteService {
 
     private final UIRouteRepository repository;
+    private final UIRouteMapper uiRouteMapper;
+
+    @Override
+    public RouteResponseDTO resolveByPath(String path) {
+
+        UIRoute route = repository.findByPath(path)
+                .orElseThrow(() -> new RuntimeException(
+                        "ROUTE NOT FOUND :: path = " + path));
+
+        if (!Boolean.TRUE.equals(route.getIsActive()))
+            throw new RuntimeException("ROUTE NOT ACTIVE :: path = " + path);
+
+        return uiRouteMapper.toResponse(route);
+    }
+
 
     @Override
     public UIRoute createRoute(UIRoute route) {

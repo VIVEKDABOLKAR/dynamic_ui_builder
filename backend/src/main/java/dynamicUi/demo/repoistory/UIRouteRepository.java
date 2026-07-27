@@ -23,4 +23,6 @@ public interface UIRouteRepository extends JpaRepository<UIRoute, Long> {
     List<UIRoute> findByIsActiveTrueOrderByMenuOrderAsc();
 
     Optional<UIRoute> findByPath(String path);
+
+    List<UIRoute> findByIsActiveTrueAndShowInMenuTrueOrderByMenuOrderAsc();
 }
