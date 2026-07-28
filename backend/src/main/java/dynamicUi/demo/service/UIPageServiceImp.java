@@ -51,36 +51,33 @@ public class UIPageServiceImp implements UIPageService {
             throw new RuntimeException("Page code already exists");
         }
 
-        if (uiPageRepository.existsByRoute_Path(uiPageReq.getRoute().getPath())) {
+        if (uiRouteRepository.existsByPath(uiPageReq.getRoute().getPath())) {
             throw new RuntimeException("Route Path already exists");
         }
 
         UIPage uiPage = uiPageMapper.toEntity(uiPageReq);
-        UIRoute uiRoute = uiRouteMapper.toEntity(uiPageReq.getRoute());
-
-        uiPage.setRoute(uiRoute);
-
-        // STEP 1 - SAVE PAGE
         UIPage uiPageSaved = uiPageRepository.save(uiPage);
 
-        createPageJson(uiPageSaved);
+        UIRoute uiRoute = uiRouteMapper.toEntity(uiPageReq.getRoute());
+        uiRoute.setPage(uiPageSaved);
+        UIRoute uiRouteSaved = uiRouteRepository.save(uiRoute);
+
+        createPageJson(uiPageSaved, uiRouteSaved);
 
         publishUpdate(uiPageSaved, "CREATED");
 
-        return uiPageMapper.toResponse(uiPageSaved)                                                                                                                                                                                                                     ;
+        return uiPageMapper.toResponse(uiPageSaved, uiRouteSaved);
     }
 
     @Override
-    public UIPage getPageByCode(String pageCode) {
+    public UIPageResponseDTO getPageByCode(String pageCode) {
 
         UIPage page = uiPageRepository.findByPageCode(pageCode)
                 .orElseThrow(() ->
                         new RuntimeException("Page not found with code: " + pageCode));
 
-        UIRoute uiRoute = page.getRoute();
-        page.setRoute(uiRoute);
-        System.out.println(page);
-        return page;
+        UIRoute route = getRouteForPageOrThrow(pageCode);
+        return uiPageMapper.toResponse(page, route);
     }
 
     @Override
@@ -94,32 +91,23 @@ public class UIPageServiceImp implements UIPageService {
 
         UIPage page = uiPageRepository.findByPageCode(pageCode)
                 .orElseThrow(() -> new RuntimeException("Page not found"));
+        UIRoute route = getRouteForPageOrThrow(pageCode);
 
-        // duplicate route validation
-        UIRoute existingRoute = uiRouteRepository.findByPath(request.getRoute().getPath())
-                .orElse(null);
-
-        if (existingRoute != null &&
-                !existingRoute.getPage().getId().equals(page.getId())) {
-
+        if (!route.getPath().equals(request.getRoute().getPath())
+                && uiRouteRepository.existsByPath(request.getRoute().getPath())) {
             throw new RuntimeException("Route already exists");
         }
 
-        if (existingRoute == null) {
-            existingRoute = new UIRoute();
-            page.setRoute(existingRoute);
-        }
-
-
         // Update page and nested route
-        uiRouteMapper.updateEntity(request.getRoute(), existingRoute);
+        uiRouteMapper.updateEntity(request.getRoute(), route);
         uiPageMapper.updateEntity(request, page);
 
-        UIPage saved = uiPageRepository.save(page);
+        UIPage savedPage = uiPageRepository.save(page);
+        UIRoute savedRoute = uiRouteRepository.save(route);
 
-        syncPageJson(saved);
+        syncPageJson(savedPage, savedRoute);
 
-        return uiPageMapper.toResponse(saved);
+        return uiPageMapper.toResponse(savedPage, savedRoute);
     }
 
     @Override
@@ -128,7 +116,7 @@ public class UIPageServiceImp implements UIPageService {
                 .orElseThrow(() -> new RuntimeException("Page not found with code: " + pageCode));
         page.setStatus(PageStatus.DELETED);
         uiPageRepository.save(page);
-        syncPageJson(page);
+        syncPageJson(page, getRouteForPageOrThrow(pageCode));
     }
 
     @Override
@@ -137,6 +125,7 @@ public class UIPageServiceImp implements UIPageService {
     }
 
     @Override
+    @Transactional
     public UIPage updatePageStatus(
             String pageCode,
             PageStatus status) {
@@ -151,16 +140,19 @@ public class UIPageServiceImp implements UIPageService {
 
         UIPage saved = uiPageRepository.save(page);
 
-        syncPageJson(saved);
+        syncPageJson(saved, getRouteForPageOrThrow(pageCode));
 
         return saved;
     }
 
 
     /// Helper Functions
-    private ObjectNode buildPageNode(UIPage page) {
+    private UIRoute getRouteForPageOrThrow(String pageCode) {
+        return uiRouteRepository.findByPage_PageCode(pageCode)
+                .orElseThrow(() -> new RuntimeException("Route not found for page: " + pageCode));
+    }
 
-        UIRoute route = page.getRoute();
+    private ObjectNode buildPageNode(UIPage page, UIRoute route) {
 
         ObjectNode pageNode = jsonMapper.createObjectNode();
 
@@ -193,22 +185,22 @@ public class UIPageServiceImp implements UIPageService {
         return pageNode;
     }
 
-    private void syncPageJson(UIPage page) {
+    private void syncPageJson(UIPage page, UIRoute route) {
 
         UIPageJson pageJson = uiPageJsonRepository
                 .findByUiPage_PageCode(page.getPageCode())
                 .orElseThrow();
 
-        pageJson.setJsonSchema(buildPageJson(page));
+        pageJson.setJsonSchema(buildPageJson(page, route));
 
         uiPageJsonRepository.save(pageJson);
     }
 
-    private String buildPageJson(UIPage page) {
+    private String buildPageJson(UIPage page, UIRoute route) {
 
         ObjectNode root = jsonMapper.createObjectNode();
 
-        root.set("page", buildPageNode(page));
+        root.set("page", buildPageNode(page, route));
 
         root.set("components", jsonMapper.createArrayNode());
 
@@ -221,13 +213,13 @@ public class UIPageServiceImp implements UIPageService {
         }
     }
 
-    private void createPageJson(UIPage page) {
+    private void createPageJson(UIPage page, UIRoute route) {
 
         UIPageJson json = new UIPageJson();
 
         json.setUiPage(page);
 
-        json.setJsonSchema(buildPageJson(page));
+        json.setJsonSchema(buildPageJson(page, route));
 
         uiPageJsonRepository.save(json);
     }

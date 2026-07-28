@@ -37,6 +37,14 @@ public class UILookupServiceImp implements UILookupService {
                 .orElse(List.of());
     }
 
+    @Override
+    public List<UILookupDTO> getLookupsByType(String lookupType) {
+        return uiLookupRepository.findByLookupTypeAndIsActiveTrueOrderBySequenceNoAsc(lookupType).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+
     private UILookupDTO mapToDto(UILookup lookup) {
         return UILookupDTO.builder()
                 .id(lookup.getId())
@@ -47,4 +55,6 @@ public class UILookupServiceImp implements UILookupService {
                 .isActive(lookup.getIsActive())
                 .build();
     }
+
+
 }

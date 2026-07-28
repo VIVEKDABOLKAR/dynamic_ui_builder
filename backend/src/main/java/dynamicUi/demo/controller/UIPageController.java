@@ -38,7 +38,7 @@ public class UIPageController {
     }
 
     @GetMapping("/{pageCode}")
-    public UIPage getPageByCode(
+    public UIPageResponseDTO getPageByCode(
             @PathVariable String pageCode
     ) {
         return uiPageService.getPageByCode(pageCode);

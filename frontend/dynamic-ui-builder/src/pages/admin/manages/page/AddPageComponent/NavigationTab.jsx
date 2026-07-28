@@ -1,4 +1,12 @@
 import React from 'react'
+import useLookup from '../../../../../hooks/useLookup'
+
+function withCurrentValue(options, currentValue) {
+    if (!currentValue || options.some((o) => o.value === currentValue)) {
+        return options
+    }
+    return [{ value: currentValue, label: currentValue }, ...options]
+}
 
 export default function NavigationTab({ pageForm }) {
 
@@ -7,6 +15,8 @@ export default function NavigationTab({ pageForm }) {
         handleChange,
         errors
     } = pageForm;
+
+    const { options: parentMenuOptions, loading: parentMenuLoading } = useLookup('PARENT_MENU')
 
     const fieldClass = (name) =>
         `h-11 rounded-lg border px-3 text-sm text-slate-700 outline-none transition
@@ -58,13 +68,21 @@ export default function NavigationTab({ pageForm }) {
                             Parent Menu
                         </span>
 
-                        <input
+                        <select
                             name="route.parentMenu"
                             value={formData.route?.parentMenu}
                             onChange={handleChange}
                             className={fieldClass("parentMenu")}
-                            placeholder="Gate"
-                        />
+                        >
+                            <option value="">
+                                {parentMenuLoading ? "Loading menus…" : "No parent (top-level)"}
+                            </option>
+                            {withCurrentValue(parentMenuOptions, formData.route?.parentMenu).map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
 
                     </label>
 

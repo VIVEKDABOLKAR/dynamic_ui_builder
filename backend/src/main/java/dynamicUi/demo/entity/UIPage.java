@@ -1,5 +1,6 @@
 package dynamicUi.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dynamicUi.demo.constant.PageStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -65,27 +66,7 @@ public class UIPage {
     @Column(name = "permission_code", length = 100)
     private String permissionCode;
 
-    // ==========================================
-    // Route :- UIRoute
-    // ==========================================
-
-    @OneToOne(
-            mappedBy = "page",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            orphanRemoval = true
-    )
-    private UIRoute route;
-
-    public void setRoute(UIRoute route) {
-        this.route = route;
-
-        if (route != null) {
-            route.setPage(this);
-        }
-    }
-
-    // ==========================================
+    // ===================================  =======
     // Status
     // ==========================================
 
@@ -124,6 +105,7 @@ public class UIPage {
         updatedAt = LocalDateTime.now();
     }
 
+    @JsonProperty("isActive")
     public boolean isActive() {
         return status == PageStatus.ACTIVE;
     }

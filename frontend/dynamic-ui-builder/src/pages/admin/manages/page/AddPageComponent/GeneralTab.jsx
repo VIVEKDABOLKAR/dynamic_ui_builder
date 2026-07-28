@@ -1,4 +1,16 @@
 import React from 'react'
+import useLookup from '../../../../../hooks/useLookup';
+
+// If the form's current value isn't in the fetched lookup list (e.g. an
+// older record set before this lookup type existed, or lookups not seeded
+// yet), keep it selectable instead of silently blanking the field.
+function withCurrentValue(options, currentValue) {
+    if (!currentValue || options.some((o) => o.value === currentValue)) {
+        return options
+    }
+    return [{ value: currentValue, label: currentValue }, ...options]
+}
+
 
 export default function GeneralTab({ pageForm }) {
 
@@ -8,6 +20,10 @@ export default function GeneralTab({ pageForm }) {
         errors,
         isEdit
     } = pageForm;
+
+    const { options: moduleOptions, loading: moduleLoading } = useLookup('MODULE_CODE')
+    const { options: categoryOptions, loading: categoryLoading } = useLookup('CATEGORY_CODE')
+    const { options: layoutOptions, loading: layoutLoading } = useLookup('LAYOUT_CODE')
 
     const fieldClass = (name) =>
         `h-11 rounded-lg border px-3 text-sm text-slate-700 outline-none transition
@@ -164,8 +180,14 @@ export default function GeneralTab({ pageForm }) {
                             onChange={handleChange}
                             className={fieldClass("moduleCode")}
                         >
-                            <option value="">Select Module</option>
-                            <option value="YMS">YMS</option>
+                            <option value="">
+                                {moduleLoading ? "Loading modules…" : "Select Module"}
+                            </option>
+                            {withCurrentValue(moduleOptions, formData.moduleCode).map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
 
                     </label>
@@ -182,8 +204,14 @@ export default function GeneralTab({ pageForm }) {
                             onChange={handleChange}
                             className={fieldClass("categoryCode")}
                         >
-                            <option value="">Select Category</option>
-                            <option value="GATE">Gate</option>
+                            <option value="">
+                                {categoryLoading ? "Loading categories…" : "Select Category"}
+                            </option>
+                            {withCurrentValue(categoryOptions, formData.categoryCode).map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
 
                     </label>
@@ -200,11 +228,18 @@ export default function GeneralTab({ pageForm }) {
                             onChange={handleChange}
                             className={fieldClass("layoutCode")}
                         >
-                            <option value="">Standard Layout</option>
-                            <option value="Layout1">Layout 1</option>
+                            <option value="">
+                                {layoutLoading ? "Loading layouts…" : "Standard Layout"}
+                            </option>
+                            {withCurrentValue(layoutOptions, formData.layoutCode).map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
                         </select>
 
                     </label>
+
 
                 </div>
 

@@ -10,4 +10,12 @@ public interface UILookupRepository extends JpaRepository<UILookup, Long> {
     List<UILookup> findByUiLookupMaster_Id(Long lookupMasterId);
 
     void deleteByUiLookupMaster_Id(Long lookupMasterId);
+
+    /**
+     * Generic type-scoped lookups (e.g. "MODULE_CODE", "PARENT_MENU") —
+     * independent of the component-scoped master/detail lookups above,
+     * which back dynamic form dropdowns tied to a specific UIComponent.
+     */
+    List<UILookup> findByLookupTypeAndIsActiveTrueOrderBySequenceNoAsc(String lookupType);
+
 }

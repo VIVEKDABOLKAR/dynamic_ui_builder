@@ -11,14 +11,12 @@ import dynamicUi.demo.entity.UIPage;
 
 @Repository
 public interface UIPageRepository  extends JpaRepository<UIPage, Long> {
+
     boolean existsByPageCode(String pageCode);
 
     Optional<UIPage> findByPageCode(String pageCode);
 
     List<UIPage> findAll();
-
-    boolean existsByRoute_Path(String path);
-
 
     List<UIPage> findByStatus(PageStatus status);
 

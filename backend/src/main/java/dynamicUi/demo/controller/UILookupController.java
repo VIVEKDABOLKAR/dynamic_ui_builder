@@ -27,4 +27,13 @@ public class UILookupController {
         return uiLookupService.getLookupsByComponent(componentId);
     }
 
+    /**
+     * Generic type-scoped lookups for admin dropdowns, e.g.
+     * GET /api/ui/lookups/type/MODULE_CODE, /type/PARENT_MENU
+     */
+    @GetMapping("/type/{lookupType}")
+    public List<UILookupDTO> getLookupValuesByType(@PathVariable String lookupType) {
+        return uiLookupService.getLookupsByType(lookupType);
+    }
+
 }

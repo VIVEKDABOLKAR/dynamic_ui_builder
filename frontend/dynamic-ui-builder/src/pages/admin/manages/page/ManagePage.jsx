@@ -94,6 +94,13 @@ export default function ManagePage() {
         {
             field: 'createdAt',
             minWidth: 180,
+            valueFormatter: (params) =>
+                params.value
+                    ? new Date(params.value).toLocaleString(undefined, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                    })
+                    : '-',
         },
         {
             headerName: 'Action',

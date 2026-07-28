@@ -7,4 +7,5 @@ import java.util.List;
 public interface UILookupService {
     List<UILookupDTO> getLookupsByMaster(Long lookupMasterId);
     List<UILookupDTO> getLookupsByComponent(Long componentId);
+    List<UILookupDTO> getLookupsByType(String lookupType);
 }

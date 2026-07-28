@@ -31,16 +31,13 @@ export default function UI_layout() {
   }
 
   const currentFacility = facilities.find((f) => f.id === currentFacilityId) || null
-  const navigate = useNavigate();
 
-  const handleSidebarChange = () => {
-    navigate(-1)
-  }
+
 
   return (
     <>
-    // h-screen + flex-col: navbar takes its natural height, the row below
-    // takes everything that's left, so the sidebar can be h-full inside it.
+    {/* // h-screen + flex-col: navbar takes its natural height, the row below
+    // takes everything that's left, so the sidebar can be h-full inside it. */}
     <div className="flex h-screen flex-col overflow-hidden">
       <DynamicNavbar
         facilityId={currentFacilityId}
@@ -54,13 +51,7 @@ export default function UI_layout() {
         <DynamicSideBar />
       
       <main className="flex-1 overflow-y-auto bg-white">
-        <Outlet context={{ currentFacility, currentFacilityId }} />
-      
-   
-    
-
-    
-
+        {/* <Outlet context={{ currentFacility, currentFacilityId }} /> */}
         
           <Outlet />
         </main>

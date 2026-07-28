@@ -77,7 +77,7 @@ function NavGroup({ node, depth }) {
 function NavLeaf({ node, depth }) {
     return (
         <NavLink
-            to={"ui_demo/" + node.path}
+            to={"/ui_demo/" + node.path}
             style={{ paddingLeft: `${16 + depth * 16}px` }}
             className={({ isActive }) =>
                 `

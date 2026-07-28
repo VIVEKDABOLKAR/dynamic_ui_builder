@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ui/**").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/components/**").hasRole("ADMIN")
+                        .requestMatchers("/api/facilities/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(loginRateLimitFilter, UsernamePasswordAuthenticationFilter.class)
