@@ -1,14 +1,29 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { signup } from '../../api/authApi'
+import { getFacilities } from '../../api/facilityApi'
 
 export default function Signup() {
     const navigate = useNavigate()
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [facilities, setFacilities] = useState([])
+    const [selectedFacilityIds, setSelectedFacilityIds] = useState([])
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        getFacilities()
+            .then((data) => setFacilities(data || []))
+            .catch(() => setFacilities([]))
+    }, [])
+
+    const toggleFacility = (id) => {
+        setSelectedFacilityIds((prev) =>
+            prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+        )
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -16,13 +31,11 @@ export default function Signup() {
         setLoading(true)
 
         try {
-            await signup(username, password)
-
-            // redirect to login page after successful signup
+            await signup(username, password, selectedFacilityIds)
             navigate('/login')
         } catch (err) {
             setError(
-                err.response?.status === 409
+                err.response?.status === 409 || err.response?.status === 400
                     ? 'Username already exists.'
                     : 'Unable to create account. Please try again.'
             )
@@ -43,7 +56,7 @@ export default function Signup() {
                 </h1>
 
                 <p className="text-sm text-slate-400 mb-6">
-                    Sign up to get started.
+                    Sign up to get started. Facility access requires admin approval.
                 </p>
 
                 {error && (
@@ -54,9 +67,7 @@ export default function Signup() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm text-slate-400 mb-1">
-                            Username
-                        </label>
+                        <label className="block text-sm text-slate-400 mb-1">Username</label>
                         <input
                             type="text"
                             value={username}
@@ -68,9 +79,7 @@ export default function Signup() {
                     </div>
 
                     <div>
-                        <label className="block text-sm text-slate-400 mb-1">
-                            Password
-                        </label>
+                        <label className="block text-sm text-slate-400 mb-1">Password</label>
                         <input
                             type="password"
                             value={password}
@@ -80,6 +89,28 @@ export default function Signup() {
                             className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400"
                             placeholder="Create a password"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm text-slate-400 mb-2">
+                            Facilities you need access to
+                        </label>
+                        <div className="space-y-2 max-h-40 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 p-3">
+                            {facilities.length === 0 && (
+                                <p className="text-xs text-slate-500">No facilities available.</p>
+                            )}
+                            {facilities.map((f) => (
+                                <label key={f.id} className="flex items-center gap-2 text-sm text-slate-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedFacilityIds.includes(f.id)}
+                                        onChange={() => toggleFacility(f.id)}
+                                        className="h-4 w-4 rounded border-slate-600 text-cyan-400 focus:ring-cyan-400"
+                                    />
+                                    {f.name}
+                                </label>
+                            ))}
+                        </div>
                     </div>
 
                     <button
@@ -93,10 +124,7 @@ export default function Signup() {
 
                 <p className="mt-6 text-center text-sm text-slate-400">
                     Already have an account?{' '}
-                    <Link
-                        to="/login"
-                        className="font-medium text-cyan-400 hover:text-cyan-300"
-                    >
+                    <Link to="/login" className="font-medium text-cyan-400 hover:text-cyan-300">
                         Sign in
                     </Link>
                 </p>

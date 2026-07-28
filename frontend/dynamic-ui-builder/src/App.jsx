@@ -17,47 +17,47 @@ import UI_layout from './pages/ui/UI_layout'
 import Signup from './pages/auth/Signup'
 import ViewerHome from './pages/ui/ViewerHome'
 import TailwindSafelist from "./tailwind-safelist";
-
+import Navbar from './components/admin/Navbar'
+import NavbarConfig from './pages/admin/globalUi/NavbarConfig'
+import FacilityAccessApproval from '../src/pages/admin/globalUi/FacilityAccessApproval'
 
 export default function App() {
   return (
-    <>      
+    <>
       <Routes>
 
-      {/* Public */}
-      <Route path="/" element={<Landing />} />
+        {/* Public */}
+        <Route path="/" element={<Landing />} />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-      {/* Admin — ROLE_ADMIN only */}
-      <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
-        <Route path="/admin_panel" element={<AdminLayout />}>
-          <Route path="overview" element={<AdminOverview />} />
-          <Route path="manage_page" element={<ManagePage />} />
-          <Route path="manage_page/add" element={<AddNewPage />} />
-          <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
-          <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
-          <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
-          <Route path="page_json" element={<PageJson />} />
+        {/* Admin — ROLE_ADMIN only */}
+        <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
+          <Route path="/admin_panel" element={<AdminLayout />}>
+            <Route path="overview" element={<AdminOverview />} />
+            <Route path="manage_page" element={<ManagePage />} />
+            <Route path="manage_page/add" element={<AddNewPage />} />
+            <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
+            <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
+            <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
+            <Route path="page_json" element={<PageJson />} />
+            <Route path="global-ui/navbar" element={<NavbarConfig />} />
+            <Route path="facility-access" element={<FacilityAccessApproval />} />
+          </Route>
         </Route>
-      </Route>
 
-      {/* UI pages — any authenticated user */}
-      {/* UI pages — ROLE_VIEWER (any authenticated user) */}
-      <Route element={<ProtectedRoute />}>   {/* ← remove requiredRole="ROLE_ADMIN" */}
+        {/* UI pages — any authenticated user */}
+        {/* UI pages — ROLE_VIEWER (any authenticated user) */}
+        <Route element={<ProtectedRoute />}>   {/* ← remove requiredRole="ROLE_ADMIN" */}
+            <Route path="/ui/*" element={<UI_layout />} />
+        </Route>
+
         <Route element={<UI_layout />}>
-          <Route path="/ui" element={<ViewerHome />} />
-          <Route path="/ui/*" element={<DynamicPageRendering />} />
+          <Route path="/ui_demo/*" element={<DynamicPage />} />
         </Route>
-      </Route>
 
-      <Route element={<UI_layout />}>
-        <Route path="/ui_demo/*" element={<DynamicPage />} />
-      </Route>
-
-    </Routes>
+      </Routes>
     </>
-    
   )
 }

@@ -1,10 +1,15 @@
 package dynamicUi.demo.security;
 
+import dynamicUi.demo.entity.AccessStatus;
+import dynamicUi.demo.entity.UserFacilityAccess;
+import dynamicUi.demo.repoistory.UserFacilityAccessRepository;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -14,15 +19,18 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
+    private final UserFacilityAccessRepository accessRepo;
 
     public AuthController(AppUserRepository userRepo,
                           PasswordEncoder encoder,
                           AuthenticationManager authManager,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          UserFacilityAccessRepository accessRepo) {
         this.userRepo    = userRepo;
         this.encoder     = encoder;
         this.authManager = authManager;
         this.jwtUtil     = jwtUtil;
+        this.accessRepo  = accessRepo;
     }
 
     @PostMapping("/register")
@@ -33,12 +41,26 @@ public class AuthController {
 
         AppUser user = AppUser.builder()
                 .username(req.username())
-                .password(encoder.encode(req.password()))  // BCrypt hash stored here
+                .password(encoder.encode(req.password()))
                 .role(req.role() != null ? req.role() : Role.ROLE_VIEWER)
                 .build();
 
         userRepo.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered");
+
+        // Create a PENDING access request for each selected facility
+        if (req.facilityIds() != null) {
+            for (String facilityId : req.facilityIds()) {
+                UserFacilityAccess access = UserFacilityAccess.builder()
+                        .user(user)
+                        .facilityId(facilityId)
+                        .status(AccessStatus.PENDING)
+                        .build();
+                accessRepo.save(access);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("User registered. Facility access is pending admin approval.");
     }
 
     @PostMapping("/login")
@@ -56,6 +78,6 @@ public class AuthController {
     }
 
     public record LoginRequest(String username, String password) {}
-    public record RegisterRequest(String username, String password, Role role) {}
+    public record RegisterRequest(String username, String password, Role role, List<String> facilityIds) {}
     public record TokenResponse(String token, String role) {}
 }
