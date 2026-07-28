@@ -10,3 +10,9 @@ export const resolveRoute = async (path) => {
     console.log(response.data);
     return response.data;
 }
+
+export const resolveNavigation = async (path) => {
+    const response = (await apiClient.get("/api/ui/routes/navigation"));
+    console.log(response.data);
+    return response.data;
+}

@@ -2,6 +2,7 @@ package dynamicUi.demo.controller;
 
 import dynamicUi.demo.dto.NavigationNodeDTO;
 import dynamicUi.demo.dto.RouteResponseDTO;
+import dynamicUi.demo.service.NavigationBuilderService;
 import dynamicUi.demo.service.inter.UIRouteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UIRouteResolverController {
 
-    private final UIRouteService          uiRouteService;
+    private final UIRouteService uiRouteService;
+    private final NavigationBuilderService navigationBuilderService;
+
 
     /**
      * Phase 1 — GET /api/ui/routes/resolve?path=/gate-checkin
@@ -34,4 +37,15 @@ public class UIRouteResolverController {
         return ResponseEntity.ok(uiRouteService.resolveByPath(path));
     }
 
+    /**
+     * Phase 2 — GET /api/ui/routes/navigation
+     *
+     * UIRoute Table → Navigation Builder → Sidebar.
+     * Returns the sidebar tree already grouped (by parentMenu) and ordered
+     * (by menuOrder) — the frontend just renders it.
+     */
+    @GetMapping("/navigation")
+    public ResponseEntity<List<NavigationNodeDTO>> navigation() {
+        return ResponseEntity.ok(navigationBuilderService.buildSidebar());
+    }
 }
