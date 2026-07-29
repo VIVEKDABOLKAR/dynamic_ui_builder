@@ -5,6 +5,9 @@ const items = [
   { icon: '◰', label: 'Overview', to: '/admin_panel/overview' },
   { icon: '▤', label: 'Manage Pages', to: '/admin_panel/manage_page' },
   { icon: '⌘', label: 'Page JSON', to: '/admin_panel/page_json' },
+  {icon: '~',label:'Global Navbar Config',to:'/admin_panel/global-ui/navbar'},
+  { icon: '!',label:'Approvals for Facilities', to:'/admin_panel/facility-access'}
+  
 ]
 
 export default function Sidebar({ sidebarOpen, handleSidebarChange }) {

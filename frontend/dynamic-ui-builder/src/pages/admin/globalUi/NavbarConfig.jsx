@@ -221,7 +221,7 @@ export default function NavbarConfig() {
                 disabled={styleSaving}
                 className="flex items-center gap-2 rounded-lg bg-blue-800 px-4 py-2 text-sm font-medium text-white hover:bg-blue-900 disabled:opacity-60"
               >
-                💾 {styleSaving ? 'Saving…' : 'Save Styling'}
+                💾 {styleSaving ? 'Saving…' : 'Save Style'}
               </button>
             </div>
           </SectionCard>
@@ -275,7 +275,7 @@ export default function NavbarConfig() {
             )}
           </SectionCard>
         </div>
-
+            
         {/* ---- LIVE PREVIEW (combines both) ---- */}
         <div
           className="mb-4 flex h-fit items-center justify-between rounded-lg px-4"

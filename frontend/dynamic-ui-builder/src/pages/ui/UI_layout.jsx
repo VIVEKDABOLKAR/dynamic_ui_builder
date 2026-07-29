@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom'
 import DynamicNavbar from '../admin/globalUi/DynamicNavbar';
 import { getAccessibleFacilities } from '../../api/facilityApi'
 import DynamicSideBar from '../../components/dynamicPageRender/layout/DynamicSideBar';
-
+// import { useNavigate } from 'react-router-dom';
 export default function UI_layout() {
   const [facilities, setFacilities] = useState([])
   const [currentFacilityId, setCurrentFacilityId] = useState(null)
@@ -31,16 +31,16 @@ export default function UI_layout() {
   }
 
   const currentFacility = facilities.find((f) => f.id === currentFacilityId) || null
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const handleSidebarChange = () => {
-    navigate(-1)
-  }
+  // const handleSidebarChange = () => {
+  //   navigate(-1)
+  // }
 
   return (
     <>
-    // h-screen + flex-col: navbar takes its natural height, the row below
-    // takes everything that's left, so the sidebar can be h-full inside it.
+    {/* // h-screen + flex-col: navbar takes its natural height, the row below
+    // takes everything that's left, so the sidebar can be h-full inside it. */}
     <div className="flex h-screen flex-col overflow-hidden">
       <DynamicNavbar
         facilityId={currentFacilityId}
@@ -55,14 +55,6 @@ export default function UI_layout() {
       
       <main className="flex-1 overflow-y-auto bg-white">
         <Outlet context={{ currentFacility, currentFacilityId }} />
-      
-   
-    
-
-    
-
-        
-          <Outlet />
         </main>
       </div>
     </div>
