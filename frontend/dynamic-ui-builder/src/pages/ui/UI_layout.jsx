@@ -36,27 +36,25 @@ export default function UI_layout() {
 
   return (
     <>
-    {/* // h-screen + flex-col: navbar takes its natural height, the row below
+      {/* // h-screen + flex-col: navbar takes its natural height, the row below
     // takes everything that's left, so the sidebar can be h-full inside it. */}
-    <div className="flex h-screen flex-col overflow-hidden">
-      <DynamicNavbar
-        facilityId={currentFacilityId}
-        facilityName={currentFacility?.name}
-        accessibleFacilities={facilities}
-        onFacilityChange={setCurrentFacilityId}
-      />
+      <div className="flex h-screen flex-col overflow-hidden">
+        <DynamicNavbar
+          facilityId={currentFacilityId}
+          facilityName={currentFacility?.name}
+          accessibleFacilities={facilities}
+          onFacilityChange={setCurrentFacilityId}
+        />
         {/* flex-1 + overflow-hidden = a bounded row; sidebar and main content
           scroll independently instead of pushing the whole page down. */}
-      <div className="flex flex-1 min-h-0">
-        <DynamicSideBar />
-      
-      <main className="flex-1 overflow-y-auto bg-white">
-        {/* <Outlet context={{ currentFacility, currentFacilityId }} /> */}
-        
-          <Outlet />
-        </main>
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          <DynamicSideBar />
+
+          <main className="flex-1 min-h-0 overflow-y-auto bg-white">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
     </>
   )
 }

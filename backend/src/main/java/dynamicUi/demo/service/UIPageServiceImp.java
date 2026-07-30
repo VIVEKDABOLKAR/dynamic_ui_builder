@@ -191,21 +191,28 @@ public class UIPageServiceImp implements UIPageService {
                 .findByUiPage_PageCode(page.getPageCode())
                 .orElseThrow();
 
-        pageJson.setJsonSchema(buildPageJson(page, route));
+        pageJson.setJsonSchema(buildPageJson(page, route, pageJson));
 
         uiPageJsonRepository.save(pageJson);
     }
 
-    private String buildPageJson(UIPage page, UIRoute route) {
+    private String buildPageJson(UIPage page, UIRoute route, UIPageJson pageJson) {
 
-        ObjectNode root = jsonMapper.createObjectNode();
-
-        root.set("page", buildPageNode(page, route));
-
-        root.set("components", jsonMapper.createArrayNode());
+        ObjectNode root;
 
         try {
-            return jsonMapper
+        if (pageJson != null) {
+
+            root = (ObjectNode) jsonMapper.readTree(pageJson.getJsonSchema());
+        } else {
+
+            root = jsonMapper.createObjectNode();
+            root.set("components", jsonMapper.createArrayNode());
+        }
+
+        root.set("page", buildPageNode(page, route));
+            
+        return jsonMapper
                     .writerWithDefaultPrettyPrinter()
                     .writeValueAsString(root);
         } catch (Exception e) {
@@ -219,7 +226,7 @@ public class UIPageServiceImp implements UIPageService {
 
         json.setUiPage(page);
 
-        json.setJsonSchema(buildPageJson(page, route));
+        json.setJsonSchema(buildPageJson(page, route, null));
 
         uiPageJsonRepository.save(json);
     }

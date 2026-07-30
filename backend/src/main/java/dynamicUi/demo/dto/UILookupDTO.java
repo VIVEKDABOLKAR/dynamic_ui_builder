@@ -10,9 +10,16 @@ import lombok.*;
 public class UILookupDTO {
 
     private Long id;
+
     private String lookupType;
+
     private String lookupValue;
+
     private String displayValue;
+
     private Integer sequenceNo;
+
     private Boolean isActive;
+
+    private Long lookupMasterId;
 }

@@ -5,6 +5,7 @@ const items = [
   { icon: '◰', label: 'Overview', to: '/admin_panel/overview' },
   { icon: '▤', label: 'Manage Pages', to: '/admin_panel/manage_page' },
   { icon: '⌘', label: 'Page JSON', to: '/admin_panel/page_json' },
+  { icon: '⌬', label: 'Lookup Managment', to: '/admin_panel/lookup_managment' },
 ]
 
 export default function Sidebar({ sidebarOpen, handleSidebarChange }) {

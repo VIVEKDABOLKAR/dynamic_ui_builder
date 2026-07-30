@@ -20,6 +20,7 @@ import TailwindSafelist from "./tailwind-safelist";
 import Navbar from './components/admin/Navbar'
 import NavbarConfig from './pages/admin/globalUi/NavbarConfig'
 import FacilityAccessApproval from '../src/pages/admin/globalUi/FacilityAccessApproval'
+import LookupManagement from './pages/admin/manages/lookup/LookupManagement'
 
 export default function App() {
   return (
@@ -36,12 +37,17 @@ export default function App() {
         <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
           <Route path="/admin_panel" element={<AdminLayout />}>
             <Route path="overview" element={<AdminOverview />} />
+
             <Route path="manage_page" element={<ManagePage />} />
             <Route path="manage_page/add" element={<AddNewPage />} />
             <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
             <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
             <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
+            
             <Route path="page_json" element={<PageJson />} />
+
+            <Route path="lookup_managment" element={<LookupManagement />} />
+
             <Route path="global-ui/navbar" element={<NavbarConfig />} />
             <Route path="facility-access" element={<FacilityAccessApproval />} />
           </Route>

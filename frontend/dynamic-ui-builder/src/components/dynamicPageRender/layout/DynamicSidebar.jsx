@@ -124,11 +124,13 @@ export default function DynamicSideBar() {
     const [tree, setTree] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    let i = 0;
 
     useEffect(() => {
         const fetchSidebarDetails = async () => {
             try {
                 const response = await resolveNavigation()
+                console.log(response)
                 setTree(response ?? [])
             } catch (err) {
                 console.error('failed to load sidebar details', err)
@@ -142,8 +144,8 @@ export default function DynamicSideBar() {
     }, [])
 
     return (
-        <aside className="w-72 h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-r border-slate-800 shadow-2xl">
-            <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+        <aside className="h-full min-h-0 w-72 flex flex-col bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-r border-slate-800">
+            <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-5 space-y-1">
                 {loading && (
                     <p className="px-3 py-2 text-sm text-slate-500">Loading navigation…</p>
                 )}
@@ -159,6 +161,7 @@ export default function DynamicSideBar() {
                 {!loading && !error && tree.map((node) => (
                     <NavNode key={node.routeCode ?? node.label} node={node} depth={0} />
                 ))}
+
             </nav>
         </aside>
     )

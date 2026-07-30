@@ -36,4 +36,26 @@ public class UILookupController {
         return uiLookupService.getLookupsByType(lookupType);
     }
 
+    //CRUD operation
+    @GetMapping("/{id}")
+    public UILookupDTO getLookupById(@PathVariable Long id) {
+        return uiLookupService.getLookupById(id);
+    }
+
+    @PostMapping
+    public UILookupDTO createLookup(@RequestBody UILookupDTO dto) {
+        return uiLookupService.createLookup(dto);
+    }
+
+    @PutMapping("/{id}")
+    public UILookupDTO updateLookup(@PathVariable Long id,
+                                    @RequestBody UILookupDTO dto) {
+        return uiLookupService.updateLookup(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteLookup(@PathVariable Long id) {
+        uiLookupService.deleteLookup(id);
+    }
+
 }
