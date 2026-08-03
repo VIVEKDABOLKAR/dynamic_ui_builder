@@ -211,7 +211,7 @@ public class UIPageServiceImp implements UIPageService {
         }
 
         root.set("page", buildPageNode(page, route));
-            
+
         return jsonMapper
                     .writerWithDefaultPrettyPrinter()
                     .writeValueAsString(root);

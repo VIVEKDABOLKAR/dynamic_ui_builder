@@ -16,8 +16,10 @@ export const signup = async (username, password, facilityIds) => {
 
 export const login = async (username, password) => {
   const { data } = await axios.post(`${BASE}/login`, { username, password })
+  console.log(data)
   localStorage.setItem('token', data.token)
   localStorage.setItem('role', data.role)
+  localStorage.setItem('facilityId', data.facilityId)
   localStorage.setItem('username', username)
   return data
 }
@@ -26,11 +28,14 @@ export const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('role')
   localStorage.removeItem('username')
+  localStorage.removeItem('facilityId')
 }
 
 export const getRole = () => localStorage.getItem('role')
 
 export const getUsername = () => localStorage.getItem('username')
+
+export const getFacilityId = () => localStorage.getItem('facilityId')
 
 export const isLoggedIn = () => {
   const token = localStorage.getItem('token')

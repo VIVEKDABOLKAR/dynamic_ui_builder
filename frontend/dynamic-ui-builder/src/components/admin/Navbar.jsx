@@ -1,6 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout, getUsername } from '../../api/authApi'
+import Profile from './Profile'
+import FacilityListComponent from '../../pages/admin/globalUi/FacilityListComponent'
 
 export default function Navbar({ sidebarOpen, handleSidebarChange }) {
   const navigate = useNavigate()
@@ -14,14 +16,14 @@ export default function Navbar({ sidebarOpen, handleSidebarChange }) {
   console.log("sidbar open const ", sidebarOpen)
   return (
     <header className="flex items-center justify-between border-b border-slate-200 bg-blue-100 px-4 py-4 sm:px-6">
-    
+
       <div className='flex flex-row gap-3 items-center'>
-        {!sidebarOpen && 
+        {!sidebarOpen &&
           <button
             onClick={handleSidebarChange}
             className="rounded p-2 hover:bg-slate-200"
           >
-            {sidebarOpen===undefined ? '❮' : '☰'}
+            {sidebarOpen === undefined ? '❮' : '☰'}
           </button>
         }
 
@@ -32,16 +34,9 @@ export default function Navbar({ sidebarOpen, handleSidebarChange }) {
       </div>
 
       <div className="flex items-center gap-3">
+        <FacilityListComponent />
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-          {initial}
-        </div>
-        <button
-          onClick={handleLogout}
-          className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100"
-        >
-          Logout
-        </button>
+        <Profile />
       </div>
 
     </header>

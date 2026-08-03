@@ -23,14 +23,26 @@ public class JwtUtil {
 
     // ── Generate ──────────────────────────────────────────────────────────────
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, String role, String facilityId) {
         return Jwts.builder()
                 .subject(username)
                 .claim("role", role)
+                .claim("facilityId", facilityId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
+    }
+
+    public String generateToken(String oldToken, String newFacilityId) {
+
+        Claims claims = parseClaims(oldToken);
+
+        return generateToken(
+                claims.getSubject(),
+                claims.get("role", String.class),
+                newFacilityId
+        );
     }
 
     // ── Extract ───────────────────────────────────────────────────────────────
@@ -45,6 +57,10 @@ public class JwtUtil {
 
     public Date extractExpiration(String token) {
         return parseClaims(token).getExpiration();
+    }
+
+    public String extractFacilityId(String token) {
+        return parseClaims(token).get("facilityId", String.class);
     }
 
     // ── Validate ──────────────────────────────────────────────────────────────

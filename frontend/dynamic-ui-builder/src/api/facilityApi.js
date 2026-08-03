@@ -8,9 +8,9 @@ export const getFacilities = async () => {
 
 export const getAccessibleFacilities = async () => {
   const response = await apiClient.get('/api/facilities/accessible')
+  console.log(response)
   return response.data
 }
-
 
 export const getPendingFacilityRequests = async () => {
   const response = await apiClient.get('/api/admin/facility-access/pending')
@@ -23,4 +23,12 @@ export const approveFacilityRequest = async (id) => {
 
 export const rejectFacilityRequest = async (id) => {
   await apiClient.post(`/api/admin/facility-access/${id}/reject`)
+}
+
+export const changeFacilityRequest = async (id) => {
+  const response = await apiClient.post(`/api/facilities/change-facility?facilityId=${encodeURIComponent(id)}`);
+  const {data} = response;
+  localStorage.setItem('token', data.token)
+  localStorage.setItem('facilityId', data.facilityId)
+  return data;
 }

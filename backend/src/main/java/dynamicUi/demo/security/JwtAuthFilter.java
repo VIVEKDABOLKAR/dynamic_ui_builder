@@ -64,6 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // 4. Valid token — extract claims and set authentication
         String username = jwtUtil.extractUsername(token);
         String role     = jwtUtil.extractRole(token);
+        String facilityId = jwtUtil.extractFacilityId(token);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -71,6 +72,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         null,
                         List.of(new SimpleGrantedAuthority(role))
                 );
+
+
+        request.setAttribute("selectedFacilityId", facilityId);
 
         // Attach request details (IP, session) for Spring's audit trail
         authentication.setDetails(

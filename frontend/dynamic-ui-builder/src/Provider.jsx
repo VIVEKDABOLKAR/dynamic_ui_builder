@@ -7,6 +7,7 @@ import { BrowserRouter, Outlet } from 'react-router-dom'
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { FacilityProvider } from './context/FacilityV2Context';
 
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -15,9 +16,10 @@ export default function Provider({ children }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <BrowserRouter>
-                {children}
+                <FacilityProvider>
+                    {children}
+                </FacilityProvider>
             </ BrowserRouter >
         </LocalizationProvider>
-
     )
 }

@@ -1,8 +1,11 @@
 package dynamicUi.demo.security;
 
 import dynamicUi.demo.entity.AccessStatus;
+import dynamicUi.demo.entity.Facility;
 import dynamicUi.demo.entity.UserFacilityAccess;
 import dynamicUi.demo.repoistory.UserFacilityAccessRepository;
+import dynamicUi.demo.service.FacilityService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
@@ -10,8 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -20,18 +26,8 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtUtil jwtUtil;
     private final UserFacilityAccessRepository accessRepo;
+    private final FacilityService facilityService;
 
-    public AuthController(AppUserRepository userRepo,
-                          PasswordEncoder encoder,
-                          AuthenticationManager authManager,
-                          JwtUtil jwtUtil,
-                          UserFacilityAccessRepository accessRepo) {
-        this.userRepo    = userRepo;
-        this.encoder     = encoder;
-        this.authManager = authManager;
-        this.jwtUtil     = jwtUtil;
-        this.accessRepo  = accessRepo;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
@@ -73,11 +69,29 @@ public class AuthController {
         }
 
         AppUser user = userRepo.findByUsername(req.username()).orElseThrow(() -> new RuntimeException("User not found"));
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
-        return ResponseEntity.ok(new TokenResponse(token, user.getRole().name()));
+
+        List<Facility> allowedFacility = facilityService.findAccessibleFacilities(user.getUsername());
+        Set<String> allowedFacilityIds = allowedFacility.stream()
+                .map(Facility::getId)
+                .collect(Collectors.toSet());
+
+
+        String selectedFacilityId;
+        if (req.facilityId() != null) {
+            if (!allowedFacilityIds.contains(req.facilityId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("User does not have approved access to facility: " + req.facilityId());
+            }
+            selectedFacilityId = req.facilityId();
+        } else {
+            selectedFacilityId = allowedFacility.isEmpty() ? null : allowedFacility.getFirst().getId();
+        }
+
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name(), selectedFacilityId);
+        return ResponseEntity.ok(new TokenResponse(token, user.getRole().name(), selectedFacilityId,  allowedFacilityIds.stream().toList()));
     }
 
-    public record LoginRequest(String username, String password) {}
+    public record LoginRequest(String username, String password, String facilityId) {}
     public record RegisterRequest(String username, String password, Role role, List<String> facilityIds) {}
-    public record TokenResponse(String token, String role) {}
+    public record TokenResponse(String token, String role, String facilityId, List<String> availableFacilityIds) {}
 }

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import apiClient from '../../../api/apiClient'
 import { getNavbarStyle, getNavbarComponents } from '../../../api/globalUiApi'
+import Profile from '../../../components/admin/Profile'
+import FacilityListComponent from './FacilityListComponent'
+import { useFacility } from '../../../context/FacilityV2Context'
 
 const DEFAULT_STYLE = {
   backgroundColor: '#1E3A8A',
@@ -8,25 +11,11 @@ const DEFAULT_STYLE = {
   height: '64px',
 }
 
+
 function LogoComponent({ imageUrl, facilityName }) {
   return imageUrl
     ? <img src={imageUrl} alt={facilityName} className="h-8 w-8 rounded-md object-contain" />
     : <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/15 text-xs font-bold">YMS</span>
-}
-
-function FacilityListComponent({ selectedFacilityId, onSelect, accessibleFacilities }) {
-  const facilities = accessibleFacilities || []
-  return (
-    <select
-      value={selectedFacilityId || ''}
-      onChange={(e) => onSelect(e.target.value)}
-      className="rounded-md bg-white/15 px-2 py-1 text-sm font-medium outline-none"
-    >
-      {facilities.map((f) => (
-        <option key={f.id} value={f.id} className="text-slate-900">{f.name}</option>
-      ))}
-    </select>
-  )
 }
 
 function ProfileComponent() {
@@ -37,28 +26,55 @@ function ProfileComponent() {
   )
 }
 
-export default function DynamicNavbar({ facilityId, facilityName, accessibleFacilities, onFacilityChange }) {
+export default function DynamicNavbar() {
+  const {
+    facilities,
+    selectedFacility,
+    changeFacility,
+  } = useFacility();
+
   const [style, setStyle] = useState(null)
   const [components, setComponents] = useState(null)
 
   // Style: fetched once, never changes with facility
   useEffect(() => {
     let mounted = true
+
     getNavbarStyle()
       .then((data) => mounted && setStyle(data))
       .catch(() => mounted && setStyle(null))
     return () => { mounted = false }
-  }, [])
+  }, [selectedFacility])
 
-  // Components: re-fetched every time facilityId changes
+
+  // Reload whenever facility changes
   useEffect(() => {
-    if (!facilityId) return
-    let mounted = true
-    getNavbarComponents(facilityId)
-      .then((data) => mounted && setComponents(data))
-      .catch(() => mounted && setComponents(null))
-    return () => { mounted = false }
-  }, [facilityId])
+    if (!selectedFacility.id) return;
+
+    let mounted = true;
+
+    const loadComponents = async () => {
+      try {
+        const data = await getNavbarComponents(selectedFacility.id);
+
+        if (mounted) {
+          setComponents(data);
+        }
+      } catch (err) {
+        console.error("Failed to load navbar components", err);
+
+        if (mounted) {
+          setComponents(null);
+        }
+      }
+    };
+
+    loadComponents();
+
+    return () => {
+      mounted = false;
+    };
+  }, [selectedFacility.id]);
 
   const finalStyle = style || DEFAULT_STYLE
   const showLogo = components?.showLogo ?? true
@@ -75,17 +91,13 @@ export default function DynamicNavbar({ facilityId, facilityName, accessibleFaci
       }}
     >
       <div className="flex items-center gap-2">
-        {showLogo && <LogoComponent imageUrl={components?.logoUrl} facilityName={facilityName} />}
+        {showLogo && <LogoComponent imageUrl={components?.logoUrl} facilityName={facilities.name} />}
       </div>
       <div className="flex items-center gap-3">
         {showFacilities && (
-          <FacilityListComponent
-            selectedFacilityId={facilityId}
-            onSelect={onFacilityChange}
-            accessibleFacilities={accessibleFacilities}
-          />
+          <FacilityListComponent />
         )}
-        {showProfile && <ProfileComponent />}
+        {showProfile && <Profile />}
       </div>
     </nav>
   )
