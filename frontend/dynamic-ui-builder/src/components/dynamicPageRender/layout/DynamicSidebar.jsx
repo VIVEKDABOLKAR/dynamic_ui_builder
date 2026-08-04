@@ -129,6 +129,8 @@ export default function DynamicSideBar() {
         const fetchSidebarDetails = async () => {
             try {
                 const response = await resolveNavigation()
+                console.log(response);
+                
                 setTree(response ?? [])
             } catch (err) {
                 console.error('failed to load sidebar details', err)

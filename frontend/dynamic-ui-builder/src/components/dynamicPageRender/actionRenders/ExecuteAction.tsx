@@ -1,20 +1,9 @@
-import axios from "axios";
+import apiClient from "../../../api/apiClient";
 import { ActionRegistry, DynamicPageSchema } from "../types/JsonSchema";
 import { buildEntityPayload } from "../../dataMappingEngine/utils/buildEntityPayload";
 import { useContext } from "react";
 import { PageSchemaContext } from "../context/PageSchemaContext";
 import { FormilyPageSchema } from "../types/JsonSchemaFormily";
-
-const resolveUrl = (url: string | undefined) => {
-    if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-        return url;
-    }
-    if (url.startsWith("/api")) {
-        return `http://localhost:8080${url}`;
-    }
-    return url;
-};
 
 export interface ActionContext {
     navigate?: (path: string) => void;
@@ -29,7 +18,7 @@ export default async function ExecuteAction(
     ctx: ActionContext
 ) {
     const actRegistry = pageSchema?.["x-actions"];
-    if(!actRegistry) {
+    if (!actRegistry) {
         console.warn(`Action Registry not found`);
         return;
     }
@@ -40,46 +29,42 @@ export default async function ExecuteAction(
         console.warn(`Action ${ref} not found`);
         return;
     }
-    console.log(action)
 
     switch (action.type) {
 
         case "SUBMIT_FORM": {
-            console.log(buildEntityPayload(ctx.formData, pageSchema));
-            console.log(ctx.formData);
+            try {
+                const response = await apiClient({
+                    method: action.api?.method || "POST",
+                    url: action.api?.url,
+                    data: ctx.formData,
+                });
 
-            const response = await axios({
-                method: action.api?.method || "POST",
-                url: resolveUrl(action.api?.url),
-                data: ctx.formData,
-            });
-
-            console.log("Success", response.data);
-
+                console.log("Success", response.data);
+                ctx.showToast?.("Saved successfully", "success");
+            } catch (err) {
+                console.error("Submit failed", err);
+                ctx.showToast?.("Failed to save. Please try again.", "error");
+            }
             break;
         }
 
         case "FETCH_DATA": {
-
-            const response = await axios({
+            const response = await apiClient({
                 method: action.api?.method || "GET",
                 url: action.api?.url
             });
 
             console.log(response.data);
-
             break;
         }
 
         case "NAVIGATE": {
-            console.log("Navigate to", action.navigate?.path);
             ctx.navigate?.(action.navigate?.path || "/");
             break;
         }
 
         case "SHOW_TOAST": {
-
-            console.log(action.toast?.message);
             ctx.showToast?.(action.toast?.message || "");
             break;
         }
@@ -88,4 +73,3 @@ export default async function ExecuteAction(
             console.warn("Unsupported action type");
     }
 }
-
