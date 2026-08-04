@@ -9,6 +9,8 @@ public interface UIRouteService {
 
     RouteResponseDTO resolveByPath(String path);
 
+    RouteResponseDTO resolveByPathAndFacility(String path, String selectedFacilityId);
+
     UIRoute createRoute(UIRoute route);
 
     UIRoute updateRoute(String routeCode, UIRoute route);

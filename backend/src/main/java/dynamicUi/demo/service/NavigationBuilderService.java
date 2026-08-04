@@ -1,7 +1,9 @@
 package dynamicUi.demo.service;
 
+import dynamicUi.demo.constant.FacilityId;
 import dynamicUi.demo.dto.NavigationNodeDTO;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +38,14 @@ import java.util.stream.Collectors;
 public class NavigationBuilderService {
 
     private final UIRouteRepository uiRouteRepository;
+    private final FacilityRouteAccessRepository facilityRouteAccessRepository;
 
-    public List<NavigationNodeDTO> buildSidebar() {
+    public List<NavigationNodeDTO> buildSidebar(String facilityId) {
 
-        List<UIRoute> routes =
-                uiRouteRepository.findByIsActiveTrueAndShowInMenuTrueOrderByMenuOrderAsc();
+//        List<UIRoute> routes =
+//                uiRouteRepository.findByIsActiveTrueAndShowInMenuTrueOrderByMenuOrderAsc();
+
+        List<UIRoute> routes = fetchRoutesForFacility(facilityId);
 
         // Split into top-level leaves vs. routes that belong to a named group
         List<UIRoute> topLevel = new ArrayList<>();
@@ -111,5 +116,27 @@ public class NavigationBuilderService {
                 .menuOrder(route.getMenuOrder())
                 .children(List.of())
                 .build();
+    }
+
+    private List<UIRoute> fetchRoutesForFacility(String facilityId) {
+        if (facilityId == null || facilityId.isBlank() ) {
+            return List.of();
+        }
+
+        if(FacilityId.GLOBAL.name().equals(facilityId)) {
+            //later we can define global navigation template
+            return List.of();
+        }
+
+        if (!facilityRouteAccessRepository.existsByFacilityId(facilityId)) {
+            return List.of();
+        }
+
+        List<Long> grantedRouteIds = facilityRouteAccessRepository.findRouteIdsByFacilityId(facilityId);
+        if (grantedRouteIds.isEmpty()) {
+            return List.of();
+        }
+
+        return uiRouteRepository.findByIsActiveTrueAndShowInMenuTrueAndIdInOrderByMenuOrderAsc(grantedRouteIds);
     }
 }

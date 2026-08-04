@@ -6,6 +6,7 @@ import { resolveRoute } from '../../api/routeApi'
 import DynamicPageRenderEngine from '../../components/dynamicPageRender/DynamicPageRenderEngine'
 import { basicFormSchema } from '../../components/dynamicPageRender/examples/basicForm'
 import { pageForm } from '../../components/dynamicPageRender/examples/pageForm'
+import { useFacility } from '../../context/FacilityV2Context'
 
 export default function DynamicPage() {
     //can use * in path insted of location 
@@ -13,11 +14,15 @@ export default function DynamicPage() {
     const [pageJson, setPageJson] = useState(null)
     const [loading, setLoading] = useState(false);
 
+    const { selectedFacility } = useFacility();
+
     // derive the full path after /ui/
     const rawPath = location.pathname || ''
     const pathParams = rawPath.startsWith('/ui_demo/') ? rawPath.slice(8) : rawPath.replace(/^\//, '')
 
     useEffect(() => {
+        if (!selectedFacility?.id) return;
+
         setLoading(true);
         const loadPage = async () => {
             //load pageCode based on route path
@@ -30,6 +35,7 @@ export default function DynamicPage() {
             }
 
             if (!pageCode) {
+                setPageJson("")
                 setLoading(false)
                 return
             }
@@ -48,7 +54,7 @@ export default function DynamicPage() {
         }
 
         loadPage()
-    }, [pathParams])
+    }, [pathParams, selectedFacility?.id])
 
     let parsedSchema = null
     try {

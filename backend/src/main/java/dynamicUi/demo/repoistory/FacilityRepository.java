@@ -17,4 +17,6 @@ public interface FacilityRepository extends JpaRepository<Facility, String> {
         WHERE ufa.user.username = :username AND ufa.status = 'APPROVED'
         """)
     List<Facility> findAccessibleFacilitiesByUsername(@Param("username") String username);
+
+
 }

@@ -1,7 +1,9 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.dto.NavigationNodeDTO;
 import dynamicUi.demo.dto.RouteResponseDTO;
+import dynamicUi.demo.security.JwtUtil;
 import dynamicUi.demo.service.NavigationBuilderService;
 import dynamicUi.demo.service.inter.UIRouteService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class UIRouteResolverController {
 
     private final UIRouteService uiRouteService;
     private final NavigationBuilderService navigationBuilderService;
+    private final JwtUtil jwtUtil;
 
 
     /**
@@ -33,8 +36,11 @@ public class UIRouteResolverController {
      * from the response to fetch the assembled page JSON and render it.
      */
     @GetMapping("/resolve")
-    public ResponseEntity<RouteResponseDTO> resolve(@RequestParam String path) {
-        return ResponseEntity.ok(uiRouteService.resolveByPath(path));
+    public ResponseEntity<RouteResponseDTO> resolve(
+            @RequestParam String path,
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return ResponseEntity.ok(uiRouteService.resolveByPathAndFacility(path, selectedFacilityId));
     }
 
     /**
@@ -45,7 +51,9 @@ public class UIRouteResolverController {
      * (by menuOrder) — the frontend just renders it.
      */
     @GetMapping("/navigation")
-    public ResponseEntity<List<NavigationNodeDTO>> navigation() {
-        return ResponseEntity.ok(navigationBuilderService.buildSidebar());
+    public ResponseEntity<List<NavigationNodeDTO>> navigation(
+            @RequestAttribute(value = "selectedFacilityId", required = false) String selectedFacilityId
+    ) {
+        return ResponseEntity.ok(navigationBuilderService.buildSidebar(selectedFacilityId));
     }
 }

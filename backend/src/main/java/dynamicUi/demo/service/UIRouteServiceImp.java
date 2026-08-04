@@ -3,11 +3,14 @@ package dynamicUi.demo.service;
 import dynamicUi.demo.dto.RouteResponseDTO;
 import dynamicUi.demo.entity.UIRoute;
 import dynamicUi.demo.mapper.UIRouteMapper;
+import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
 import dynamicUi.demo.service.inter.UIRouteService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -18,13 +21,37 @@ public class UIRouteServiceImp implements UIRouteService {
 
     private final UIRouteRepository repository;
     private final UIRouteMapper uiRouteMapper;
+    private final FacilityRouteAccessRepository facilityRouteAccessRepository;
 
     @Override
     public RouteResponseDTO resolveByPath(String path) {
-
+        //get route object
         UIRoute route = repository.findByPath(path)
                 .orElseThrow(() -> new RuntimeException(
                         "ROUTE NOT FOUND :: path = " + path));
+
+        if (!Boolean.TRUE.equals(route.getIsActive()))
+            throw new RuntimeException("ROUTE NOT ACTIVE :: path = " + path);
+
+        return uiRouteMapper.toResponse(route);
+    }
+
+    @Override
+    public RouteResponseDTO resolveByPathAndFacility(String path, String selectedFacilityId) {
+
+        //get route object
+        UIRoute route = repository.findByPath(path)
+                .orElseThrow(() -> new RuntimeException(
+                        "ROUTE NOT FOUND :: path = " + path));
+
+        //validate selectedFacilityId and RouteId is exists
+        if(!facilityRouteAccessRepository.existsByFacilityIdAndRouteId(selectedFacilityId, route.getId())) {
+            //throws forbidden exception
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You do not have access to this route."
+            );
+        }
 
         if (!Boolean.TRUE.equals(route.getIsActive()))
             throw new RuntimeException("ROUTE NOT ACTIVE :: path = " + path);

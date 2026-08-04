@@ -26,7 +26,7 @@ function ProfileComponent() {
   )
 }
 
-export default function DynamicNavbar() {
+export default function   DynamicNavbar() {
   const {
     facilities,
     selectedFacility,
@@ -44,18 +44,18 @@ export default function DynamicNavbar() {
       .then((data) => mounted && setStyle(data))
       .catch(() => mounted && setStyle(null))
     return () => { mounted = false }
-  }, [selectedFacility])
+  }, [])
 
 
   // Reload whenever facility changes
   useEffect(() => {
-    if (!selectedFacility.id) return;
+    if (!selectedFacility?.id) return;
 
     let mounted = true;
 
     const loadComponents = async () => {
       try {
-        const data = await getNavbarComponents(selectedFacility.id);
+        const data = await getNavbarComponents(selectedFacility?.id);
 
         if (mounted) {
           setComponents(data);
@@ -74,7 +74,7 @@ export default function DynamicNavbar() {
     return () => {
       mounted = false;
     };
-  }, [selectedFacility.id]);
+  }, [selectedFacility?.id]);
 
   const finalStyle = style || DEFAULT_STYLE
   const showLogo = components?.showLogo ?? true

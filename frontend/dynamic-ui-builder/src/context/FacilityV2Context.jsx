@@ -58,6 +58,8 @@ export function FacilityProvider({ children }) {
             setSelectedFacility(selectedFacility);
 
             localStorage.setItem("facilityId", selectedFacility?.id);
+
+            
         } catch (err) {
             console.error(err);
         }

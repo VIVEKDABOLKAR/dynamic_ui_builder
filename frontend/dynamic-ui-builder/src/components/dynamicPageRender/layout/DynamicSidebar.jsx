@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import * as FaIcons from "react-icons/fa";
 import { FaChevronDown, FaRegCircle } from "react-icons/fa";
 import { resolveNavigation } from '../../../api/routeApi'
+import { useFacility } from '../../../context/FacilityV2Context';
 
 // icon field from the backend is a free-text string (e.g. "Page1_icon").
 // Try to resolve it against a real lucide-react icon name; fall back to a
@@ -124,10 +125,15 @@ export default function DynamicSideBar() {
     const [tree, setTree] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const { selectedFacility, loading: facilityLoading } = useFacility()
     let i = 0;
 
     useEffect(() => {
+        if (facilityLoading) return
+
         const fetchSidebarDetails = async () => {
+            setLoading(true)
+            setError(null)
             try {
                 const response = await resolveNavigation()
                 console.log(response)
@@ -141,7 +147,7 @@ export default function DynamicSideBar() {
         }
 
         fetchSidebarDetails()
-    }, [])
+    }, [facilityLoading, selectedFacility])
 
     return (
         <aside className="h-full min-h-0 w-72 flex flex-col bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-r border-slate-800">
