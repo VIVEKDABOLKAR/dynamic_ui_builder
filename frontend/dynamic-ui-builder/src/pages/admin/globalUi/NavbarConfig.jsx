@@ -115,6 +115,7 @@ export default function NavbarConfig() {
       await saveNavbarStyle(style)
       toast.success('Styling saved — applies to all facilities')
     } catch (e) {
+      console.log(e)
       toast.error('Failed to save styling')
     } finally {
       setStyleSaving(false)

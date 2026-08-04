@@ -23,10 +23,10 @@ public class TruckInspectorController {
 
     }
 
-    @GetMapping("/{jobOrderId}")
-    public TruckInspection getByJobOrder(@PathVariable Long jobOrderId){
-            return service.findByJobOrder_Id(jobOrderId).
-    }
+//    @GetMapping("/{jobOrderId}")
+//    public TruckInspection getByJobOrder(@PathVariable Long jobOrderId){
+//            return service.findByJobOrder_Id(jobOrderId)
+//    }
 
     public record TruckInspectionRequest(
             Long jobOrderId,

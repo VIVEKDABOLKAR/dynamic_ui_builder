@@ -6,8 +6,7 @@ const items = [
   { icon: '▤', label: 'Manage Pages', to: '/admin_panel/manage_page' },
   { icon: '⌘', label: 'Page JSON', to: '/admin_panel/page_json' },
   {icon: '~',label:'Global Navbar Config',to:'/admin_panel/global-ui/navbar'},
-  { icon: '!',label:'Approvals for Facilities', to:'/admin_panel/facility-access'}
-
+  { icon: '!',label:'Approvals for Facilities', to:'/admin_panel/facility-access'},
   { icon: '⌬', label: 'Lookup Managment', to: '/admin_panel/lookup_managment' },
 ]
 
