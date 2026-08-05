@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.JobOrder;
 import dynamicUi.demo.entity.JobStep;
 import dynamicUi.demo.service.JobOrderService;
@@ -16,13 +17,18 @@ public class JobOrderController {
     private final JobOrderService service;
 
     @PostMapping
-    public JobOrder create(@RequestBody JobOrder jobOrder) {
-        return service.create(jobOrder);
+    public JobOrder create(
+            @RequestBody JobOrder jobOrder,
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+            ) {
+        return service.create(jobOrder, selectedFacilityId);
     }
 
     @GetMapping
-    public List<JobOrder> listByFacility(@RequestParam String facilityId) {
-        return service.findByFacility(facilityId);
+    public List<JobOrder> listByFacility(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return service.findByFacility(selectedFacilityId);
     }
 
     @GetMapping("/{jobOrderNumber}")

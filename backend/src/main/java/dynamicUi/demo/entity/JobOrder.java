@@ -23,7 +23,7 @@ public class JobOrder {
     @Column(name = "job_order_number", unique = true)
     private String jobOrderNumber; // e.g. "JO-2026-000123"
 
-    @Column(name = "facility_id", nullable = false)
+    @Column(name = "facility_id", nullable = true)
     private String facilityId;
 
     @Column(name = "customer_name")

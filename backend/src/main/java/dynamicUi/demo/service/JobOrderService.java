@@ -21,9 +21,10 @@ public class JobOrderService {
     private static final WorkflowStepType[] DEFAULT_WORKFLOW = WorkflowStepType.values();
 
     @Transactional
-    public JobOrder create(JobOrder jobOrder) {
+    public JobOrder create(JobOrder jobOrder, String facilityId) {
         jobOrder.setStatus(JobOrderStatus.CREATED);
         jobOrder.setCurrentStep(DEFAULT_WORKFLOW[0]); // GATE_CHECK_IN
+        jobOrder.setFacilityId(facilityId);
 
         JobOrder saved = jobOrderRepository.save(jobOrder); // save first to get generated id
 
