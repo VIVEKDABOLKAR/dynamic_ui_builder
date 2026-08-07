@@ -29,7 +29,7 @@ public class JobOrder {
     @Column(name = "customer_name")
     private String customerName;
 
-    @Column(name = "truck_number")
+    @Column(name = "truck_number", nullable = false)
     private String truckNumber;
 
     @Column(name = "driver_name")
@@ -38,7 +38,7 @@ public class JobOrder {
     @Column(name = "container_number")
     private String containerNumber;
 
-    @Column(name = "appointment_time")
+    @Column(name = "appointment_time", nullable = false)
     private LocalDateTime appointmentTime;
 
     @Enumerated(EnumType.STRING)

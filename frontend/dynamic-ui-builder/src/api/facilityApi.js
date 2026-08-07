@@ -1,5 +1,6 @@
 // src/api/facilityApi.js
 import apiClient from './apiClient' // plain client, NOT adminClient — end users need this too
+import adminClient from './adminClient' // admin-only client, prefixes /api/admin — ROLE_ADMIN required
 
 export const getFacilities = async () => {
   const response = await apiClient.get('/api/facilities')
@@ -31,4 +32,22 @@ export const changeFacilityRequest = async (id) => {
   localStorage.setItem('token', data.token)
   localStorage.setItem('facilityId', data.facilityId)
   return data;
+}
+
+//---------------------------
+// Admin CRUD — /api/admin/facilities (ROLE_ADMIN only)
+//---------------------------
+
+export const createFacility = async (payload) => {
+  const response = await adminClient.post('/facilities', payload)
+  return response.data
+}
+
+export const updateFacility = async (id, payload) => {
+  const response = await adminClient.put(`/facilities/${encodeURIComponent(id)}`, payload)
+  return response.data
+}
+
+export const deleteFacility = async (id) => {
+  await adminClient.delete(`/facilities/${encodeURIComponent(id)}`)
 }

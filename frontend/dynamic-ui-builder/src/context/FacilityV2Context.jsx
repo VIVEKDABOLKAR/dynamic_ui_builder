@@ -18,7 +18,7 @@ export function FacilityProvider({ children }) {
             setLoading(true);
             
             const data = await getAccessibleFacilities();
-            console.log(data)
+            console.log(selectedFacility)
 
             setFacilities(data || []);
 

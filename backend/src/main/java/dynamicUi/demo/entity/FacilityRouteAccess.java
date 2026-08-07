@@ -6,15 +6,22 @@ import lombok.*;
 /**
  * Grants a facility visibility into a specific ui_route.
  *
- * Presence of a row = granted. There is no "disabled" flag on purpose —
- * revoking access means deleting the row.
+ * `active` controls the grant: true = granted, false = revoked. Rows are
+ * never deleted on revoke — this keeps a stable (facility_id, route_id)
+ * identity so re-granting later is just a flip back to true, and keeps
+ * a record of "this facility has been configured before" even after
+ * everything on it gets revoked (see the fail-open note below).
  *
- * If a facility has ZERO rows here at all, it's treated as "not yet
- * configured" and navigation falls back to showing everything (fail-open).
- * Once a facility has at least one row, only the routes listed for it show.
+ * If a facility has ZERO rows here at all (not even inactive ones), it's
+ * treated as "not yet configured" and navigation falls back to showing
+ * everything (fail-open). Once a facility has at least one row (active or
+ * not), only its active routes show.
  *
  * GLOBAL (and facilityId == null, e.g. no facility selected yet) is never
- * filtered — that's handled in NavigationBuilderService, not here.
+ * filtered here — that's handled in NavigationBuilderService. There is no
+ * "GLOBAL" row in this table; the admin's "Global" option in Route Access
+ * Management is a bulk write across every real facility, not a facility
+ * of its own.
  */
 @Entity
 @Table(
@@ -39,4 +46,8 @@ public class FacilityRouteAccess {
 
     @Column(name = "route_id", nullable = false)
     private Long routeId;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 }

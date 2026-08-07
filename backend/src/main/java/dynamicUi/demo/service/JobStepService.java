@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,15 +17,20 @@ public class JobStepService {
 
     private final JobStepRepository jobStepRepository;
     private final JobOrderRepository jobOrderRepository;
-
-    private static final WorkflowStepType[] WORKFLOW = WorkflowStepType.values();
+    private final WorkflowConfigurationService workflowConfigurationService;
 
     /**
      * Marks the given step COMPLETED for a job order, then advances
      * currentStep to the next PENDING step (or marks the JobOrder
      * COMPLETED if this was the last step).
+     *
+     * The workflow order is read from the live admin configuration on
+     * every call rather than a fixed array, since it may have changed
+     * since this Job Order was created — but note the JobStep rows
+     * themselves were snapshotted at creation time (see JobOrderService),
+     * so an in-flight job always finishes the workflow it started with as
+     * long as those steps stay in the configuration.
      */
-
     @Transactional
     public void completeStep(Long jobOrderId, WorkflowStepType step) {
         JobStep jobStep = jobStepRepository.findByJobOrder_IdAndStep(jobOrderId, step)
@@ -36,15 +42,16 @@ public class JobStepService {
 
         JobOrder jobOrder = jobOrderRepository.findById(jobOrderId).orElseThrow();
 
-        int currentIndex = indexOf(step);
+        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveStepsOrdered(jobOrder.getFacilityId());
+        int currentIndex = indexOf(workflow, step);
         int nextIndex = currentIndex + 1;
 
-        if (nextIndex >= WORKFLOW.length) {
+        if (currentIndex < 0 || nextIndex >= workflow.size()) {
             jobOrder.setStatus(JobOrderStatus.COMPLETED);
             jobOrder.setCurrentStep(null);
         }
         else {
-            WorkflowStepType nextStep = WORKFLOW[nextIndex];
+            WorkflowStepType nextStep = workflow.get(nextIndex);
             jobOrder.setCurrentStep(nextStep);
             jobOrder.setStatus(JobOrderStatus.IN_PROGRESS);
 
@@ -58,10 +65,7 @@ public class JobStepService {
         jobOrderRepository.save(jobOrder);
     }
 
-    private int indexOf(WorkflowStepType step) {
-        for (int i = 0; i < WORKFLOW.length; i++) {
-            if (WORKFLOW[i] == step) return i;
-        }
-        throw new IllegalArgumentException("Unknown step: " + step);
+    private int indexOf(List<WorkflowStepType> workflow, WorkflowStepType step) {
+        return workflow.indexOf(step);
     }
 }

@@ -16,14 +16,16 @@ public class JobOrderService {
 
     private final JobOrderRepository jobOrderRepository;
     private final JobStepRepository jobStepRepository;
-
-    // Fixed default workflow — matches WorkflowStepType enum order
-    private static final WorkflowStepType[] DEFAULT_WORKFLOW = WorkflowStepType.values();
+    private final WorkflowConfigurationService workflowConfigurationService;
 
     @Transactional
     public JobOrder create(JobOrder jobOrder, String facilityId) {
+        // Live, admin-configured workflow — no longer a fixed enum array.
+        // Throws (409) if nothing is configured/active.
+        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveStepsOrdered(facilityId);
+
         jobOrder.setStatus(JobOrderStatus.CREATED);
-        jobOrder.setCurrentStep(DEFAULT_WORKFLOW[0]); // GATE_CHECK_IN
+        jobOrder.setCurrentStep(workflow.getFirst());
         jobOrder.setFacilityId(facilityId);
 
         JobOrder saved = jobOrderRepository.save(jobOrder); // save first to get generated id
@@ -33,10 +35,10 @@ public class JobOrderService {
         jobOrderRepository.save(saved);
 
         // Auto-generate JobStep rows for the whole workflow
-        for (int i = 0; i < DEFAULT_WORKFLOW.length; i++) {
+        for (int i = 0; i < workflow.size(); i++) {
             JobStep step = JobStep.builder()
                     .jobOrder(saved)
-                    .step(DEFAULT_WORKFLOW[i])
+                    .step(workflow.get(i))
                     .sequenceNo(i + 1)
                     .status(i == 0 ? JobStepStatus.IN_PROGRESS : JobStepStatus.PENDING)
                     .build();

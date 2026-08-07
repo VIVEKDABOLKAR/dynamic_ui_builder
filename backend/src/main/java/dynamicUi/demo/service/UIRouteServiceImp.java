@@ -45,7 +45,7 @@ public class UIRouteServiceImp implements UIRouteService {
                         "ROUTE NOT FOUND :: path = " + path));
 
         //validate selectedFacilityId and RouteId is exists
-        if(!facilityRouteAccessRepository.existsByFacilityIdAndRouteId(selectedFacilityId, route.getId())) {
+        if(!facilityRouteAccessRepository.existsByFacilityIdAndRouteIdAndActiveTrue(selectedFacilityId, route.getId())) {
             //throws forbidden exception
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,

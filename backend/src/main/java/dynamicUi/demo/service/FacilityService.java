@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Set;
@@ -44,6 +45,58 @@ public class FacilityService {
 
         //generator new token
         return null;
+    }
+
+    //---------------------------
+    // Admin CRUD
+    //---------------------------
+
+    public Facility createFacility(Facility facility) {
+        if (facility.getId() == null || facility.getId().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facility ID is required.");
+        }
+        if (facility.getName() == null || facility.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facility name is required.");
+        }
+
+        String normalizedId = facility.getId().trim().toUpperCase();
+
+        if (facilityRepository.existsById(normalizedId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A facility with ID '" + normalizedId + "' already exists.");
+        }
+
+        facility.setId(normalizedId);
+        facility.setName(facility.getName().trim());
+
+        return facilityRepository.save(facility);
+    }
+
+    public Facility updateFacility(String id, Facility payload) {
+        Facility existing = facilityRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility '" + id + "' not found."));
+
+        if (payload.getName() == null || payload.getName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facility name is required.");
+        }
+
+        existing.setName(payload.getName().trim());
+
+        return facilityRepository.save(existing);
+    }
+
+    public void deleteFacility(String id) {
+        if (!facilityRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility '" + id + "' not found.");
+        }
+
+        try {
+            facilityRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Facility '" + id + "' cannot be deleted because it is referenced by other records (routes, access requests, etc)."
+            );
+        }
     }
 
     private boolean existsAccessibleFacility(String facilityId) {

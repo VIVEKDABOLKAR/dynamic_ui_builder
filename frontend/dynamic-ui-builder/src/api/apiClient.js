@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
@@ -28,6 +29,29 @@ apiClient.interceptors.response.use(
     }
     return Promise.reject(error)
   }
-)
+);
+
+apiClient.interceptors.response.use(
+  (response) => {
+    
+    // Show success toast only if backend sends a message
+    if (response.data?.message) {
+      toast.success("toast test message");
+    }
+
+    return response;
+  },
+  
+  (error) => {
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Something went wrong";
+
+    toast.error(message);
+
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient

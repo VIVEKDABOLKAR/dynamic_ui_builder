@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FacilityRouteAccessRepository extends JpaRepository<FacilityRouteAccess, Long> {
 
@@ -14,6 +15,12 @@ public interface FacilityRouteAccessRepository extends JpaRepository<FacilityRou
 
     boolean existsByFacilityId(String facilityId);
 
-    boolean existsByFacilityIdAndRouteId(String facilityId, Long routeId);
 
+    boolean existsByFacilityIdAndRouteIdAndActiveTrue(String facilityId, Long routeId);
+
+    Optional<FacilityRouteAccess> findByFacilityIdAndRouteId(String facilityId, Long routeId);
+
+    List<FacilityRouteAccess> findByFacilityId(String facilityId);
+
+    List<FacilityRouteAccess> findByFacilityIdAndActiveTrue(String facilityId);
 }

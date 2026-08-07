@@ -21,6 +21,10 @@ import Navbar from './components/admin/Navbar'
 import NavbarConfig from './pages/admin/globalUi/NavbarConfig'
 import FacilityAccessApproval from '../src/pages/admin/globalUi/FacilityAccessApproval'
 import LookupManagement from './pages/admin/manages/lookup/LookupManagement'
+import ManageFacilities from './pages/admin/manages/facility/ManageFacilities'
+import ManageWorkflow from './pages/admin/workflow/ManageWorkflow'
+import Test from './pages/admin/Drag&Drop/test'
+import ManageRouteAccess from './pages/admin/manages/facility/routeAccess/ManageRouteAccess'
 
 export default function App() {
   return (
@@ -37,6 +41,7 @@ export default function App() {
         <Route element={<ProtectedRoute requiredRole="ROLE_ADMIN" />}>
           <Route path="/admin_panel" element={<AdminLayout />}>
             <Route path="overview" element={<AdminOverview />} />
+            <Route path="test" element={<Test />} />
 
             <Route path="manage_page" element={<ManagePage />} />
             <Route path="manage_page/add" element={<AddNewPage />} />
@@ -50,6 +55,12 @@ export default function App() {
 
             <Route path="global-ui/navbar" element={<NavbarConfig />} />
             <Route path="facility-access" element={<FacilityAccessApproval />} />
+            
+            <Route path="manage-facilities" element={<ManageFacilities />} />           
+            <Route path="route-access" element={<ManageRouteAccess />} />
+         
+            <Route path="workflow-configuration" element={<ManageWorkflow />} />
+         
           </Route>
         </Route>
 
