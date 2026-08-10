@@ -132,7 +132,7 @@ public class NavigationBuilderService {
             return List.of();
         }
 
-        List<Long> grantedRouteIds = facilityRouteAccessRepository.findRouteIdsByFacilityId(facilityId);
+        List<Long> grantedRouteIds = facilityRouteAccessRepository.findRouteIdsByFacilityIdAndActiveTrue(facilityId);
         if (grantedRouteIds.isEmpty()) {
             return List.of();
         }

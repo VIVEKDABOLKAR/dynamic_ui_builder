@@ -10,7 +10,6 @@ import {
 } from '../../../../../api/routeAccessApi'
 import { useFacility } from '../../../../../context/FacilityV2Context'
 
-const GLOBAL_SCOPE = '' // sentinel value for the "Global" dropdown option
 
 export default function ManageRouteAccess() {
   // Facility picker is driven entirely by the shared context now. Note:
@@ -20,20 +19,24 @@ export default function ManageRouteAccess() {
   // side effect. Intentional per your call — just documenting it here.
   const { facilities, selectedFacility, loading: facilityLoading, changeFacility } = useFacility()
 
-  const [isGlobalScope, setIsGlobalScope] = useState(true)
   const [routes, setRoutes] = useState([]) // [{routeId, routeCode, pageName, path, granted}]
   const [initialGranted, setInitialGranted] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   const loadAccess = async (facilityId) => {
+
+    if(facilityLoading) {
+      return;
+    }
+
     setLoading(true)
     try {
-      const data = facilityId
+      const data = facilityId !== "GLOBAL"
         ? await getFacilityRouteAccess(facilityId)
         : await getGlobalRouteAccess()
 
-        console.log(data)
+      console.log(data)
 
       const list = data.routes || []
       setRoutes(list)
@@ -48,23 +51,10 @@ export default function ManageRouteAccess() {
   // Default view is Global — we never call changeFacility on mount, only
   // when the admin explicitly picks a facility from the dropdown.
   useEffect(() => {
-    loadAccess(selectedFacility?.id ?? GLOBAL_SCOPE)
+    loadAccess(selectedFacility?.id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFacility?.id])
+  }, [selectedFacility])
 
-  const dropdownValue = isGlobalScope ? GLOBAL_SCOPE : (selectedFacility?.id ?? GLOBAL_SCOPE)
-
-  const handleScopeChange = async (value) => {
-    if (value === GLOBAL_SCOPE) {
-      setIsGlobalScope(true)
-      loadAccess(GLOBAL_SCOPE)
-      return
-    }
-
-    setIsGlobalScope(false)
-    await changeFacility(value) // switches the admin's active session facility
-    loadAccess(value)
-  }
 
   const handleToggle = (routeId) => {
     setRoutes((prev) =>
@@ -81,7 +71,7 @@ export default function ManageRouteAccess() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      if (isGlobalScope) {
+      if (selectedFacility?.id === "GLOBAL") {
         if (
           !window.confirm(
             'This applies the selected pages to every facility, overwriting each facility\'s current access. Continue?'
@@ -96,7 +86,7 @@ export default function ManageRouteAccess() {
         await updateFacilityRouteAccess(selectedFacility.id, grantedIds)
         toast.success('Route access updated')
       }
-      loadAccess(isGlobalScope ? GLOBAL_SCOPE : selectedFacility.id)
+      loadAccess(selectedFacility?.id)
     } catch (err) {
       toast.error(err?.response?.data?.message || err?.response?.data || 'Failed to save route access')
     } finally {
@@ -116,7 +106,7 @@ export default function ManageRouteAccess() {
         <p className="mt-1 text-sm text-slate-500">
           Control which application pages each facility can see and access — no code changes required.
         </p>
-{/* 
+        {/* 
         <div className="mt-4 flex items-center gap-2">
           <span className="text-sm font-medium text-slate-600">Facility:</span>
           <Select

@@ -42,7 +42,7 @@ public class JobStepService {
 
         JobOrder jobOrder = jobOrderRepository.findById(jobOrderId).orElseThrow();
 
-        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveStepsOrdered(jobOrder.getFacilityId());
+        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveEffectiveStepsOrdered(jobOrder.getFacilityId());
         int currentIndex = indexOf(workflow, step);
         int nextIndex = currentIndex + 1;
 

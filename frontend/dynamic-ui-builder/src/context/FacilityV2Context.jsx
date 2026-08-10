@@ -18,20 +18,20 @@ export function FacilityProvider({ children }) {
             setLoading(true);
             
             const data = await getAccessibleFacilities();
-            console.log(selectedFacility)
-
+            
             setFacilities(data || []);
-
+            
             if (!data?.length) {
                 setSelectedFacility(null);
                 return;
             }
-
+            
             // Restore previous selection if available
             const storedFacilityId = localStorage.getItem("facilityId");
-
+            
             const facility =
-                data.find((f) => String(f.id) === storedFacilityId) || data[0];
+            data.find((f) => String(f.id) === storedFacilityId) || data[0];
+            console.log(facility)
 
             setSelectedFacility(facility);
 

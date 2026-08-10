@@ -15,6 +15,7 @@ export const getFacilityRouteAccess = async (facilityId) => {
 
 export const updateFacilityRouteAccess = async (facilityId, routeIds) => {
   const response = await adminClient.put(`/facilities/${encodeURIComponent(facilityId)}/route-access`, { routeIds })
+  console.log(response.data)
   return response.data
 }
 

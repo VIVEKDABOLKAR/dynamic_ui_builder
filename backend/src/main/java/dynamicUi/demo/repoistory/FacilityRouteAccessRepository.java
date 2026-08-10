@@ -23,4 +23,12 @@ public interface FacilityRouteAccessRepository extends JpaRepository<FacilityRou
     List<FacilityRouteAccess> findByFacilityId(String facilityId);
 
     List<FacilityRouteAccess> findByFacilityIdAndActiveTrue(String facilityId);
+
+    @Query("""
+    SELECT fra.routeId
+    FROM FacilityRouteAccess fra
+    WHERE fra.facilityId = :facilityId
+      AND fra.active = true
+""")
+    List<Long> findRouteIdsByFacilityIdAndActiveTrue(String facilityId);
 }
