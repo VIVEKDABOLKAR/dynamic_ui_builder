@@ -1,41 +1,38 @@
 package dynamicUi.demo.controller;
 
 import dynamicUi.demo.entity.GateCheckIn;
-import dynamicUi.demo.service.GateCheckInService;
+import dynamicUi.demo.entity.WorkflowStepType;
+import dynamicUi.demo.repoistory.GateCheckInRepository;
+import dynamicUi.demo.service.WorkflowStepExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/gate-checkins")
 @RequiredArgsConstructor
 public class GateCheckInController {
 
-    private final GateCheckInService service;
+    private final GateCheckInRepository repository;
+    private final WorkflowStepExecutor executor;
 
     @PostMapping
     public GateCheckIn checkIn(@RequestBody GateCheckInRequest request) {
-        GateCheckIn gateCheckIn = GateCheckIn.builder()
+        GateCheckIn entity = GateCheckIn.builder()
                 .gateNumber(request.gateNumber())
                 .securityUser(request.securityUser())
                 .truckNumber(request.truckNumber())
                 .driverName(request.driverName())
                 .remarks(request.remarks())
+                .arrivalTime(java.time.LocalDateTime.now())
                 .build();
 
-        return service.checkIn(request.jobOrderId(), gateCheckIn);
+        return executor.execute(request.jobOrderId(), WorkflowStepType.GATE_CHECK_IN,
+                repository, entity, GateCheckIn::setJobOrder);
     }
 
     @GetMapping("/{jobOrderId}")
     public GateCheckIn getByJobOrder(@PathVariable Long jobOrderId) {
-        return service.getByJobOrder(jobOrderId);
+        return repository.findByJobOrder_Id(jobOrderId).orElseThrow();
     }
 
-    public record GateCheckInRequest(
-            Long jobOrderId,
-            String gateNumber,
-            String securityUser,
-            String truckNumber,
-            String driverName,
-            String remarks
-    ) {}
+    public record GateCheckInRequest(Long jobOrderId, String gateNumber, String securityUser, String truckNumber, String driverName, String remarks) {}
 }
