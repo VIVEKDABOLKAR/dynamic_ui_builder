@@ -48,11 +48,8 @@ export default function ManageRouteAccess() {
     }
   }
 
-  // Default view is Global — we never call changeFacility on mount, only
-  // when the admin explicitly picks a facility from the dropdown.
   useEffect(() => {
     loadAccess(selectedFacility?.id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFacility])
 
 

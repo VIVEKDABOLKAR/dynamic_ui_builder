@@ -19,7 +19,7 @@ export default function Login() {
       if (data.role === 'ROLE_ADMIN') {
         navigate('/admin_panel/overview', { replace: true })
       } else {
-        navigate('/ui', { replace: true })
+        navigate('/ui_demo', { replace: true })
       }
     } catch (err) {
       if (err.response?.status === 429) {

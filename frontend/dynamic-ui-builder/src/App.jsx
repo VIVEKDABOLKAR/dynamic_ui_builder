@@ -25,6 +25,7 @@ import ManageFacilities from './pages/admin/manages/facility/ManageFacilities'
 import ManageWorkflow from './pages/admin/workflow/ManageWorkflow'
 import Test from './pages/admin/Drag&Drop/test'
 import ManageRouteAccess from './pages/admin/manages/facility/routeAccess/ManageRouteAccess'
+import DynamicPageDefault from './pages/ui/DynamicPageDefault'
 
 export default function App() {
   return (
@@ -48,19 +49,19 @@ export default function App() {
             <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
             <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
             <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
-            
+
             <Route path="page_json" element={<PageJson />} />
 
             <Route path="lookup_managment" element={<LookupManagement />} />
 
             <Route path="global-ui/navbar" element={<NavbarConfig />} />
             <Route path="facility-access" element={<FacilityAccessApproval />} />
-            
-            <Route path="manage-facilities" element={<ManageFacilities />} />           
+
+            <Route path="manage-facilities" element={<ManageFacilities />} />
             <Route path="route-access" element={<ManageRouteAccess />} />
-         
+
             <Route path="workflow-configuration" element={<ManageWorkflow />} />
-         
+
           </Route>
         </Route>
 
@@ -68,12 +69,13 @@ export default function App() {
         {/* UI pages — ROLE_VIEWER (any authenticated user) */}
         <Route element={<ProtectedRoute />}>   {/* ← remove requiredRole="ROLE_ADMIN" */}
           <Route element={<UI_layout />}>
-          <Route path="/ui" element={<ViewerHome />} />
-          <Route path="/ui/*" element={<DynamicPageRendering />} />
-        </Route>
+            <Route path="/ui" element={<ViewerHome />} />
+            <Route path="/ui/*" element={<DynamicPageRendering />} />
+          </Route>
         </Route>
 
         <Route element={<UI_layout />}>
+          <Route path="/ui_demo" element={<DynamicPageDefault />} />
           <Route path="/ui_demo/*" element={<DynamicPage />} />
         </Route>
 
