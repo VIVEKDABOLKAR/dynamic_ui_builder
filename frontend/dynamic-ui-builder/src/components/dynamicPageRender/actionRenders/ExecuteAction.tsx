@@ -7,7 +7,7 @@ import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 
 export interface ActionContext {
     navigate?: (path: string) => void;
-    showToast?: (message: string) => void;
+    showToast?: (message: string, type?: string) => void;
     formData?: any;
 }
 
@@ -41,7 +41,7 @@ export default async function ExecuteAction(
                 });
 
                 console.log("Success", response.data);
-                ctx.showToast?.("Saved successfully", "success");
+                ctx.showToast?.("Saved successfully");
             } catch (err) {
                 console.error("Submit failed", err);
                 ctx.showToast?.("Failed to save. Please try again.", "error");

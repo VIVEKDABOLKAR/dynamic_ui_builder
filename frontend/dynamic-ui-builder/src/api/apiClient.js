@@ -33,12 +33,6 @@ apiClient.interceptors.response.use(
 
 apiClient.interceptors.response.use(
   (response) => {
-    
-    // Show success toast only if backend sends a message
-    if (response.data?.message) {
-      toast.success("toast test message");
-    }
-
     return response;
   },
   

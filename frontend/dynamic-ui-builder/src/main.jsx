@@ -22,13 +22,14 @@ createRoot(document.getElementById('root')).render(
       <Provider>
         <ToastContainer
           position="top-right"
-          autoClose={5000}
+          autoClose={2000}
           hideProgressBar={false}
           closeOnClick
           pauseOnHover
           draggable
           theme="dark"
         />
+        <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
         <App />
       </Provider>
     </StyledEngineProvider>

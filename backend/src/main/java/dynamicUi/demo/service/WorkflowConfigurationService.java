@@ -80,12 +80,13 @@ public class WorkflowConfigurationService {
 
         Integer sequence = request.getSequence();
         if (sequence == null) {
-            sequence = configRepository.findAllByOrderBySequenceAsc().stream()
+            // Scoped to this facility only — sequence restarts at 1 per
+            // facility_id, it's not a global counter across every scope.
+            sequence = configRepository.findByFacilityIdOrderBySequenceAsc(facilityId).stream()
                     .mapToInt(WorkflowConfiguration::getSequence)
                     .max()
                     .orElse(0) + 1;
         }
-
         WorkflowConfiguration config = WorkflowConfiguration.builder()
                 .workflowStep(step)
                 .sequence(sequence)
@@ -165,6 +166,41 @@ public class WorkflowConfigurationService {
 
         return steps;
     }
+
+    public List<WorkflowStepType> getActiveEffectiveStepsOrdered(String facilityId) {
+        List<WorkflowStepType> steps = configRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
+                .stream()
+                .map(c -> {
+                    try {
+                        return WorkflowStepType.valueOf(c.getWorkflowStep().getCode());
+                    } catch (IllegalArgumentException ex) {
+                        throw new ResponseStatusException(
+                                HttpStatus.INTERNAL_SERVER_ERROR,
+                                "Workflow configuration references unknown step code '" + c.getWorkflowStep().getCode() + "'."
+                        );
+                    }
+                })
+                .collect(Collectors.toList());
+
+        if (steps.isEmpty()) {
+            steps = configRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(FacilityId.GLOBAL.name())
+                    .stream()
+                    .map(c -> {
+                        try {
+                            return WorkflowStepType.valueOf(c.getWorkflowStep().getCode());
+                        } catch (IllegalArgumentException ex) {
+                            throw new ResponseStatusException(
+                                    HttpStatus.INTERNAL_SERVER_ERROR,
+                                    "Workflow configuration references unknown step code '" + c.getWorkflowStep().getCode() + "'."
+                            );
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return steps;
+    }
+
 
     private WorkflowConfigurationDTO toDTO(WorkflowConfiguration c) {
         return WorkflowConfigurationDTO.builder()

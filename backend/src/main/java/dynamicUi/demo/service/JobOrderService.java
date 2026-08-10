@@ -22,7 +22,7 @@ public class JobOrderService {
     public JobOrder create(JobOrder jobOrder, String facilityId) {
         // Live, admin-configured workflow — no longer a fixed enum array.
         // Throws (409) if nothing is configured/active.
-        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveStepsOrdered(facilityId);
+        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveEffectiveStepsOrdered(facilityId);
 
         jobOrder.setStatus(JobOrderStatus.CREATED);
         jobOrder.setCurrentStep(workflow.getFirst());
