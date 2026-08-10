@@ -6,6 +6,9 @@ import dynamicUi.demo.repoistory.GateCheckInRepository;
 import dynamicUi.demo.service.WorkflowStepExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/gate-checkins")
 @RequiredArgsConstructor
@@ -27,6 +30,11 @@ public class GateCheckInController {
 
         return executor.execute(request.jobOrderId(), WorkflowStepType.GATE_CHECK_IN,
                 repository, entity, GateCheckIn::setJobOrder);
+    }
+
+    @GetMapping()
+    public List<GateCheckIn> getAllGateCheckIn() {
+        return repository.findAll();
     }
 
     @GetMapping("/{jobOrderId}")

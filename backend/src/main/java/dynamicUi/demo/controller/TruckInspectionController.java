@@ -5,6 +5,9 @@ import dynamicUi.demo.repoistory.TruckInspectionRepository;
 import dynamicUi.demo.service.WorkflowStepExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/truck-inspections")
 @RequiredArgsConstructor
@@ -25,6 +28,12 @@ public class TruckInspectionController {
 
         return executor.execute(request.jobOrderId(), WorkflowStepType.TRUCK_INSPECTION,
                 repository, entity, TruckInspection::setJobOrder);
+    }
+
+
+    @GetMapping
+    public List<TruckInspection> getAllTruckInspection() {
+        return repository.findAll();
     }
 
     @GetMapping("/{jobOrderId}")
