@@ -1,5 +1,6 @@
 package dynamicUi.demo.security;
 
+import dynamicUi.demo.constant.Attribute;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,7 +75,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
 
 
-        request.setAttribute("selectedFacilityId", facilityId);
+        request.setAttribute(Attribute.SELECTED_FACILITY_ID, facilityId);
+        request.setAttribute(Attribute.CURRENT_USERNAME, username);
 
         // Attach request details (IP, session) for Spring's audit trail
         authentication.setDetails(

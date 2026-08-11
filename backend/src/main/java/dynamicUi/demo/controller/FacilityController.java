@@ -1,8 +1,13 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
+import dynamicUi.demo.dto.FacilityAccessRequest;
 import dynamicUi.demo.dto.JwtResponseDTO;
 import dynamicUi.demo.entity.Facility;
+import dynamicUi.demo.entity.UserFacilityAccess;
+import dynamicUi.demo.repoistory.UserFacilityAccessRepository;
 import dynamicUi.demo.service.FacilityService;
+import dynamicUi.demo.service.UserFacilityAccessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +22,26 @@ import java.util.List;
 public class FacilityController {
 
     private final FacilityService facilityService;
+    private final UserFacilityAccessService userFacilityAccessService;
 
     @GetMapping
     public List<Facility> getAllFacilities() {
         return facilityService.findAll();
+    }
+
+    @PostMapping("/request")
+    public ResponseEntity<Void> createFacilityAccessRequest(
+            @RequestAttribute(value = Attribute.CURRENT_USERNAME, required = true) String username,
+            @RequestBody FacilityAccessRequest facilityAccessRequest
+    ) {
+        UserFacilityAccess userFacilityAccess =
+                userFacilityAccessService.createAccessRequest(
+                        username,
+                        facilityAccessRequest.getFacilityId()
+                );
+
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/accessible")

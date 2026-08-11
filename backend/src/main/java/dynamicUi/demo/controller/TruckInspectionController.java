@@ -1,4 +1,5 @@
 package dynamicUi.demo.controller;
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.TruckInspection;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.TruckInspectionRepository;
@@ -32,9 +33,12 @@ public class TruckInspectionController {
 
 
     @GetMapping
-    public List<TruckInspection> getAllTruckInspection() {
-        return repository.findAll();
+    public List<TruckInspection> getAllTruckInspection(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return repository.findByJobOrderFacilityId(selectedFacilityId);
     }
+
 
     @GetMapping("/{jobOrderId}")
     public TruckInspection getByJobOrder(@PathVariable Long jobOrderId) {

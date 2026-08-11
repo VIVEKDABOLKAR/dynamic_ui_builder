@@ -18,6 +18,10 @@ export const getPendingFacilityRequests = async () => {
   return response.data
 }
 
+export const createFacilityAccessRequest = async (payload) => {
+  const response = await apiClient.post('/api/facilities/request', payload); 
+  return response.data
+}
 export const approveFacilityRequest = async (id) => {
   await apiClient.post(`/api/admin/facility-access/${id}/approve`)
 }

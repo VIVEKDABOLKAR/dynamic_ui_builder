@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.ParkingAllocation;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.ParkingAllocationRepository;
@@ -30,8 +31,10 @@ public class ParkingAllocationController {
     }
 
     @GetMapping
-    public List<ParkingAllocation> getAllParkingAllocation() {
-        return repository.findAll();
+    public List<ParkingAllocation> getAllParkingAllocation(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return repository.findByJobOrderFacilityId(selectedFacilityId);
     }
 
     @GetMapping("/{jobOrderId}")

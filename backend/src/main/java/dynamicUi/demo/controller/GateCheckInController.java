@@ -1,5 +1,6 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.GateCheckIn;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.GateCheckInRepository;
@@ -33,8 +34,10 @@ public class GateCheckInController {
     }
 
     @GetMapping()
-    public List<GateCheckIn> getAllGateCheckIn() {
-        return repository.findAll();
+    public List<GateCheckIn> getAllGateCheckIn(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return repository.findByJobOrderFacilityId(selectedFacilityId);
     }
 
     @GetMapping("/{jobOrderId}")
