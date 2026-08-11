@@ -1,14 +1,11 @@
 package dynamicUi.demo.controller;
 
-import dynamicUi.demo.constant.Attribute;
-import dynamicUi.demo.dto.FacilityAccessRequest;
+
 import dynamicUi.demo.entity.AccessStatus;
 import dynamicUi.demo.entity.UserFacilityAccess;
 import dynamicUi.demo.repoistory.UserFacilityAccessRepository;
 import dynamicUi.demo.service.UserFacilityAccessService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
