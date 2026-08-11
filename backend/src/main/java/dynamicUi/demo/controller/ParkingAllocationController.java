@@ -1,11 +1,14 @@
 package dynamicUi.demo.controller;
 
+import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.ParkingAllocation;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.ParkingAllocationRepository;
 import dynamicUi.demo.service.WorkflowStepExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/parking-allocations")
@@ -28,6 +31,13 @@ public class ParkingAllocationController {
     }
 
     @GetMapping
+    public List<ParkingAllocation> getAllParkingAllocation(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+        return repository.findByJobOrderFacilityId(selectedFacilityId);
+    }
+
+    @GetMapping("/{jobOrderId}")
     public ParkingAllocation getByJobOrder(@PathVariable Long jobOrderId) {
         return repository.findByJobOrder_Id(jobOrderId).orElseThrow();
     }
