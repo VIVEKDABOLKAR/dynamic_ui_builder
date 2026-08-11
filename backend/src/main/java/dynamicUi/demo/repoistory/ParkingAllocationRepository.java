@@ -5,6 +5,7 @@ import dynamicUi.demo.entity.TruckInspection;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.List;
 import java.util.Optional;
 
 public interface ParkingAllocationRepository extends JpaRepository<ParkingAllocation, Long> {
