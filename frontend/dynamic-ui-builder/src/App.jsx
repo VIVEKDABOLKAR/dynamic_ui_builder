@@ -26,6 +26,7 @@ import ManageWorkflow from './pages/admin/workflow/ManageWorkflow'
 import Test from './pages/admin/Drag&Drop/test'
 import ManageRouteAccess from './pages/admin/manages/facility/routeAccess/ManageRouteAccess'
 import DynamicPageDefault from './pages/ui/DynamicPageDefault'
+import ManageRolePermissions from './pages/admin/manages/security/ManageRolePermissions'
 
 export default function App() {
   return (
@@ -51,6 +52,8 @@ export default function App() {
             <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
 
             <Route path="page_json" element={<PageJson />} />
+
+            <Route path="security-configuration" element={<ManageRolePermissions />} />
 
             <Route path="lookup_managment" element={<LookupManagement />} />
 

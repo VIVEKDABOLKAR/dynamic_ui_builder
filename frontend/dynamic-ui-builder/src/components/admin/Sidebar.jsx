@@ -56,6 +56,16 @@ const items = [
     to: "/admin_panel/workflow-configuration",
   },
   {
+    icon: "⛨",
+    label: "Security",
+    children: [
+      {
+        label: "Role Permissions",
+        to: "/admin_panel/security-configuration",
+      },
+    ],
+  },
+  {
     icon: "⌬",
     label: "Lookup's",
     to: "/admin_panel/lookup_managment",

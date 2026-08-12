@@ -13,6 +13,7 @@ export default function DynamicPage() {
     const location = useLocation()
     const [pageJson, setPageJson] = useState(null)
     const [loading, setLoading] = useState(false);
+    const [accessDenied, setAccessDenied] = useState(false);
 
     const { selectedFacility } = useFacility();
 
@@ -24,6 +25,7 @@ export default function DynamicPage() {
         if (!selectedFacility?.id) return;
 
         setLoading(true);
+        setAccessDenied(false);
         const loadPage = async () => {
             //load pageCode based on route path
             let pageCode
@@ -31,7 +33,12 @@ export default function DynamicPage() {
                 const response = await resolveRoute(pathParams)
                 pageCode = response.pageCode
             } catch (error) {
-                console.error('Failed to Reolve route to page')
+                console.error('Failed to Resolve route to page')
+                if (error?.response?.status === 403) {
+                    setAccessDenied(true)
+                    setLoading(false)
+                    return
+                }
             }
 
             if (!pageCode) {
@@ -48,6 +55,11 @@ export default function DynamicPage() {
                 console.log(response);
             } catch (error) {
                 console.error('Failed to load page json', error)
+                if (error?.response?.status === 403) {
+                    setAccessDenied(true)
+                    setLoading(false)
+                    return
+                }
             } finally {
                 setLoading(false);
             }
@@ -75,8 +87,16 @@ export default function DynamicPage() {
         )
     }
 
+    if (accessDenied) {
+        return (
+            <div className="flex min-h-screen flex-col items-center justify-center gap-2">
+                <h1 className="text-lg font-semibold text-red-600">Access Denied</h1>
+                <p className="text-sm text-gray-500">Your role does not have permission to view this page.</p>
+            </div>
+        )
+    }
 
-    console.log("this schema is rendering....",parsedSchema)
+    console.log("this schema is rendering....", parsedSchema)
     return (
         <>
             <DynamicPageRenderEngine jsonSchema={parsedSchema} className="m-4 p-4" />

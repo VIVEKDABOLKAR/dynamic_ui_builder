@@ -14,6 +14,7 @@ import dynamicUi.demo.repoistory.UIComponentActionRepository;
 import dynamicUi.demo.repoistory.UIPageActionRepository;
 import dynamicUi.demo.repoistory.UIPageJsonRepository;
 import dynamicUi.demo.repoistory.UIPageRepository;
+import dynamicUi.demo.service.inter.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,7 @@ public class PageAssemblerService {
     private final UIPageRepository       uiPageRepository;
 
     private final UIComponentActionRepository uiComponentActionRepository;
+    private final AuthorizationService authorizationService;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -69,6 +71,11 @@ public class PageAssemblerService {
 //            throw new RuntimeException(
 //                    "Page is not active :: pageCode = " + pageCode);
 //        }
+
+        // 1b. Backend-enforced authorization boundary for this dynamic page.
+        //     Throws 403 if the caller's role doesn't grant the page's
+        //     permission. See AuthorizationServiceImpl for fail-open rules.
+        authorizationService.requirePagePermission(uiPage);
 
         // 2. Load base JSON schema
         UIPageJson uiPageJson = uiPageJsonRepository.findByUiPage_PageCode(pageCode)

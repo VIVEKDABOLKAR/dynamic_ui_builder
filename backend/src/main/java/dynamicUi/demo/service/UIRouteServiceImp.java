@@ -5,6 +5,7 @@ import dynamicUi.demo.entity.UIRoute;
 import dynamicUi.demo.mapper.UIRouteMapper;
 import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
+import dynamicUi.demo.service.inter.AuthorizationService;
 import dynamicUi.demo.service.inter.UIRouteService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class UIRouteServiceImp implements UIRouteService {
     private final UIRouteRepository repository;
     private final UIRouteMapper uiRouteMapper;
     private final FacilityRouteAccessRepository facilityRouteAccessRepository;
+    private final AuthorizationService authorizationService;
 
     @Override
     public RouteResponseDTO resolveByPath(String path) {
@@ -52,6 +54,11 @@ public class UIRouteServiceImp implements UIRouteService {
                     "You do not have access to this route."
             );
         }
+
+        // Page-permission boundary — same rule the actual page-fetch
+        // endpoint enforces, checked here too so the route resolver
+        // doesn't leak/allow navigation to a page the role can't open.
+        authorizationService.requirePagePermission(route.getPage());
 
         if (!Boolean.TRUE.equals(route.getIsActive()))
             throw new RuntimeException("ROUTE NOT ACTIVE :: path = " + path);
