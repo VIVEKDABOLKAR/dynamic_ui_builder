@@ -81,7 +81,7 @@ export default function DynamicPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
+            <div className="flex h-dvh items-center justify-center">
                 <h1 className="text-lg font-medium">Loading...</h1>
             </div>
         )
@@ -89,7 +89,7 @@ export default function DynamicPage() {
 
     if (accessDenied) {
         return (
-            <div className="flex min-h-screen flex-col items-center justify-center gap-2">
+            <div className="flex h-dvh flex-col items-center justify-center gap-2">
                 <h1 className="text-lg font-semibold text-red-600">Access Denied</h1>
                 <p className="text-sm text-gray-500">Your role does not have permission to view this page.</p>
             </div>

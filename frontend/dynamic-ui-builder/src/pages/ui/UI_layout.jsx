@@ -11,7 +11,7 @@ export default function UI_layout() {
     <>
       {/* // h-screen + flex-col: navbar takes its natural height, the row below
     // takes everything that's left, so the sidebar can be h-full inside it. */}
-      <div className="flex h-screen flex-col overflow-hidden">
+      <div className="flex h-dvh flex-col overflow-hidden">
         <DynamicNavbar />
 
         {/* flex-1 + overflow-hidden = a bounded row; sidebar and main content
@@ -19,7 +19,7 @@ export default function UI_layout() {
         <div className="flex flex-1 min-h-0 overflow-hidden">
           <DynamicSideBar />
 
-          <main className="flex-1 min-h-0 overflow-y-auto bg-white">
+          <main className="m-4 flex-1 min-h-0 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <Outlet />
           </main>
         </div>
