@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import * as FaIcons from "react-icons/fa";
 import {
-  FaChevronDown,
-  FaRegCircle,
+    FaChevronDown,
+    FaRegCircle,
 } from "react-icons/fa";
 import { resolveNavigation } from "../../../api/routeApi";
 import { useFacility } from "../../../context/FacilityV2Context";
@@ -12,34 +12,34 @@ import { useFacility } from "../../../context/FacilityV2Context";
 // Icon resolver
 // ---------------------------------------------------------
 function NavIcon({ name, className }) {
-  const pascal = (name || "")
-    .replace(/[_-]+/g, " ")
-    .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())
-    .replace(/\s+/g, "");
+    const pascal = (name || "")
+        .replace(/[_-]+/g, " ")
+        .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())
+        .replace(/\s+/g, "");
 
-  const Icon =
-    (name && FaIcons[`Fa${pascal}`]) || FaIcons.FaBlackberry;
+    const Icon =
+        (name && FaIcons[`Fa${pascal}`]) || FaIcons.FaBlackberry;
 
-  return <Icon className={className} />;
+    return <Icon className={className} />;
 }
 
 // ---------------------------------------------------------
 // Parent menu
 // ---------------------------------------------------------
 function NavGroup({ node, depth }) {
-  // Every parent starts CLOSED
-  const [open, setOpen] = useState(false);
+    // Every parent starts CLOSED
+    const [open, setOpen] = useState(false);
 
-  return (
-    <div className="mb-1">
-      {/* Parent button */}
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        style={{
-          paddingLeft: `${12 + depth * 14}px`,
-        }}
-        className="
+    return (
+        <div className="mb-1">
+            {/* Parent button */}
+            <button
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                style={{
+                    paddingLeft: `${12 + depth * 14}px`,
+                }}
+                className="
           group
           flex
           w-full
@@ -62,10 +62,10 @@ function NavGroup({ node, depth }) {
           focus:ring-2
           focus:ring-indigo-500/20
         "
-      >
-        {/* Icon */}
-        <span
-          className="
+            >
+                {/* Icon */}
+                <span
+                    className="
             flex
             h-8
             w-8
@@ -81,27 +81,27 @@ function NavGroup({ node, depth }) {
             group-hover:bg-indigo-50
             group-hover:text-indigo-600
           "
-        >
-          <NavIcon
-            name={node.icon}
-            className="
+                >
+                    <NavIcon
+                        name={node.icon}
+                        className="
               h-4
               w-4
               transition-transform
               duration-200
               group-hover:scale-110
             "
-          />
-        </span>
+                    />
+                </span>
 
-        {/* Label */}
-        <span className="flex-1 truncate text-left">
-          {node.label}
-        </span>
+                {/* Label */}
+                <span className="flex-1 truncate text-left">
+                    {node.label}
+                </span>
 
-        {/* Arrow */}
-        <span
-          className="
+                {/* Arrow */}
+                <span
+                    className="
             flex
             h-6
             w-6
@@ -115,62 +115,61 @@ function NavGroup({ node, depth }) {
             group-hover:bg-slate-200
             group-hover:text-slate-600
           "
-        >
-          <FaChevronDown
-            className={`
+                >
+                    <FaChevronDown
+                        className={`
               h-3
               w-3
               transition-transform
               duration-200
               ${open ? "rotate-0" : "-rotate-90"}
             `}
-          />
-        </span>
-      </button>
+                    />
+                </span>
+            </button>
 
-      {/* Children */}
-      <div
-        className={`
+            {/* Children */}
+            <div
+                className={`
           grid
           transition-all
           duration-200
           ease-in-out
 
-          ${
-            open
-              ? "grid-rows-[1fr] opacity-100"
-              : "grid-rows-[0fr] opacity-0"
-          }
+          ${open
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }
         `}
-      >
-        <div className="overflow-hidden">
-          <div className="ml-5 mt-1 space-y-0.5 border-l border-slate-200 pl-2">
-            {node.children.map((child) => (
-              <NavNode
-                key={child.routeCode ?? child.label}
-                node={child}
-                depth={depth + 1}
-              />
-            ))}
-          </div>
+            >
+                <div className="overflow-hidden">
+                    <div className="ml-5 mt-1 space-y-0.5 border-l border-slate-200 pl-2">
+                        {node.children.map((child) => (
+                            <NavNode
+                                key={child.routeCode ?? child.label}
+                                node={child}
+                                depth={depth + 1}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 // ---------------------------------------------------------
 // Leaf menu
 // ---------------------------------------------------------
 function NavLeaf({ node, depth }) {
-  return (
-    <NavLink
-      to={"/ui_demo/" + node.path}
-      style={{
-        paddingLeft: `${10 + Math.max(depth - 1, 0) * 6}px`,
-      }}
-      className={({ isActive }) =>
-        `
+    return (
+        <NavLink
+            to={"/ui_demo/" + node.path}
+            style={{
+                paddingLeft: `${10 + Math.max(depth - 1, 0) * 6}px`,
+            }}
+            className={({ isActive }) =>
+                `
         group
         relative
         flex
@@ -184,28 +183,27 @@ function NavLeaf({ node, depth }) {
         transition-all
         duration-200
 
-        ${
-          isActive
-            ? `
+        ${isActive
+                    ? `
               bg-indigo-50
               text-indigo-700
               shadow-sm
             `
-            : `
+                    : `
               text-slate-500
               hover:bg-slate-50
               hover:text-slate-900
             `
-        }
+                }
         `
-      }
-    >
-      {({ isActive }) => (
-        <>
-          {/* Active indicator */}
-          {isActive && (
-            <span
-              className="
+            }
+        >
+            {({ isActive }) => (
+                <>
+                    {/* Active indicator */}
+                    {isActive && (
+                        <span
+                            className="
                 absolute
                 left-0
                 top-1/2
@@ -215,12 +213,12 @@ function NavLeaf({ node, depth }) {
                 rounded-r-full
                 bg-indigo-600
               "
-            />
-          )}
+                        />
+                    )}
 
-          {/* Icon */}
-          <span
-            className={`
+                    {/* Icon */}
+                    <span
+                        className={`
               flex
               h-7
               w-7
@@ -231,39 +229,38 @@ function NavLeaf({ node, depth }) {
               transition-all
               duration-200
 
-              ${
-                isActive
-                  ? "bg-white text-indigo-600 shadow-sm"
-                  : `
+              ${isActive
+                                ? "bg-white text-indigo-600 shadow-sm"
+                                : `
                     bg-transparent
                     text-slate-400
                     group-hover:bg-slate-100
                     group-hover:text-indigo-600
                   `
-              }
+                            }
             `}
-          >
-            <NavIcon
-              name={node.icon}
-              className="
+                    >
+                        <NavIcon
+                            name={node.icon}
+                            className="
                 h-3.5
                 w-3.5
                 transition-transform
                 duration-200
                 group-hover:scale-110
               "
-            />
-          </span>
+                        />
+                    </span>
 
-          {/* Label */}
-          <span className="truncate">
-            {node.label}
-          </span>
+                    {/* Label */}
+                    <span className="truncate">
+                        {node.label}
+                    </span>
 
-          {/* Active dot */}
-          {isActive && (
-            <span
-              className="
+                    {/* Active dot */}
+                    {isActive && (
+                        <span
+                            className="
                 ml-auto
                 h-1.5
                 w-1.5
@@ -271,75 +268,75 @@ function NavLeaf({ node, depth }) {
                 rounded-full
                 bg-indigo-600
               "
-            />
-          )}
-        </>
-      )}
-    </NavLink>
-  );
+                        />
+                    )}
+                </>
+            )}
+        </NavLink>
+    );
 }
 
 // ---------------------------------------------------------
 // Node
 // ---------------------------------------------------------
 function NavNode({ node, depth }) {
-  const hasChildren =
-    Array.isArray(node.children) &&
-    node.children.length > 0;
+    const hasChildren =
+        Array.isArray(node.children) &&
+        node.children.length > 0;
 
-  return hasChildren ? (
-    <NavGroup node={node} depth={depth} />
-  ) : (
-    <NavLeaf node={node} depth={depth} />
-  );
+    return hasChildren ? (
+        <NavGroup node={node} depth={depth} />
+    ) : (
+        <NavLeaf node={node} depth={depth} />
+    );
 }
 
 // ---------------------------------------------------------
 // Sidebar
 // ---------------------------------------------------------
 export default function DynamicSideBar() {
-  const [tree, setTree] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [tree, setTree] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  const {
-    selectedFacility,
-    loading: facilityLoading,
-  } = useFacility();
+    const {
+        selectedFacility,
+        loading: facilityLoading,
+    } = useFacility();
 
-  useEffect(() => {
-    if (facilityLoading) return;
+    useEffect(() => {
+        if (facilityLoading) return;
 
-    const fetchSidebarDetails = async () => {
-      setLoading(true);
-      setError(null);
+        const fetchSidebarDetails = async () => {
+            setLoading(true);
+            setError(null);
 
-      try {
-        const response = await resolveNavigation();
+            try {
+                const response = await resolveNavigation();
 
-        console.log(response);
+                console.log(response);
 
-        setTree(response ?? []);
-      } catch (err) {
-        console.error(
-          "failed to load sidebar details",
-          err
-        );
+                setTree(response ?? []);
+            } catch (err) {
+                console.error(
+                    "failed to load sidebar details",
+                    err
+                );
 
-        setError("Could not load navigation.");
-      } finally {
-        setLoading(false);
-      }
-    };
+                setError("Could not load navigation.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchSidebarDetails();
-  }, [facilityLoading, selectedFacility]);
+        fetchSidebarDetails();
+    }, [facilityLoading, selectedFacility]);
 
-  return (
-    <aside
-      className="
+    return (
+        <aside
+            className="
         flex
-        h-full
+        h-dvh
         min-h-0
         w-72
         shrink-0
@@ -353,10 +350,10 @@ export default function DynamicSideBar() {
 
         shadow-[2px_0_12px_rgba(15,23,42,0.04)]
       "
-    >
-      {/* Navigation */}
-      <nav
-        className="
+        >
+            {/* Navigation */}
+            <nav
+                className="
           flex-1
           min-h-0
           overflow-y-auto
@@ -368,28 +365,28 @@ export default function DynamicSideBar() {
           scrollbar-thumb-slate-200
           hover:scrollbar-thumb-slate-300
         "
-      >
-        {/* Loading */}
-        {loading && (
-          <div className="space-y-2">
-            {[1, 2, 3, 4, 5].map((item) => (
-              <div
-                key={item}
-                className="
+            >
+                {/* Loading */}
+                {loading && (
+                    <div className="space-y-2">
+                        {[1, 2, 3, 4, 5].map((item) => (
+                            <div
+                                key={item}
+                                className="
                   h-11
                   animate-pulse
                   rounded-lg
                   bg-slate-100
                 "
-              />
-            ))}
-          </div>
-        )}
+                            />
+                        ))}
+                    </div>
+                )}
 
-        {/* Error */}
-        {!loading && error && (
-          <div
-            className="
+                {/* Error */}
+                {!loading && error && (
+                    <div
+                        className="
               rounded-lg
               border
               border-red-100
@@ -397,20 +394,20 @@ export default function DynamicSideBar() {
               px-4
               py-3
             "
-          >
-            <p className="text-xs font-medium text-red-600">
-              {error}
-            </p>
-          </div>
-        )}
+                    >
+                        <p className="text-xs font-medium text-red-600">
+                            {error}
+                        </p>
+                    </div>
+                )}
 
-        {/* Empty */}
-        {!loading &&
-          !error &&
-          tree.length === 0 && (
-            <div className="px-4 py-10 text-center">
-              <div
-                className="
+                {/* Empty */}
+                {!loading &&
+                    !error &&
+                    tree.length === 0 && (
+                        <div className="px-4 py-10 text-center">
+                            <div
+                                className="
                   mx-auto
                   mb-3
                   flex
@@ -422,34 +419,34 @@ export default function DynamicSideBar() {
                   bg-slate-100
                   text-slate-400
                 "
-              >
-                <FaRegCircle className="h-4 w-4" />
-              </div>
+                            >
+                                <FaRegCircle className="h-4 w-4" />
+                            </div>
 
-              <p className="text-xs text-slate-500">
-                No navigation items
-              </p>
-            </div>
-          )}
+                            <p className="text-xs text-slate-500">
+                                No navigation items
+                            </p>
+                        </div>
+                    )}
 
-        {/* Navigation Tree */}
-        {!loading &&
-          !error &&
-          tree.length > 0 && (
-            <div className="space-y-1">
-              {tree.map((node) => (
-                <NavNode
-                  key={
-                    node.routeCode ??
-                    node.label
-                  }
-                  node={node}
-                  depth={0}
-                />
-              ))}
-            </div>
-          )}
-      </nav>
-    </aside>
-  );
+                {/* Navigation Tree */}
+                {!loading &&
+                    !error &&
+                    tree.length > 0 && (
+                        <div className="space-y-1">
+                            {tree.map((node) => (
+                                <NavNode
+                                    key={
+                                        node.routeCode ??
+                                        node.label
+                                    }
+                                    node={node}
+                                    depth={0}
+                                />
+                            ))}
+                        </div>
+                    )}
+            </nav>
+        </aside>
+    );
 }

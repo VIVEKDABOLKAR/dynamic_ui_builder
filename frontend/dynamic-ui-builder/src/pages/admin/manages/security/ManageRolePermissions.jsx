@@ -132,7 +132,8 @@ export default function ManageRolePermissions() {
                 <li key={role.code}>
                   <button
                     onClick={() => selectRole(role.code)}
-                    className={`w-full px-4 py-3 text-left text-sm transition-colors ${role.code === selectedCode
+                    
+                    className={`w-full px-4 py-3 text-left text-sm cursor-pointer transition-colors ${role.code === selectedCode
                       ? 'bg-slate-900 text-white'
                       : 'text-slate-700 hover:bg-slate-50'
                       }`}
@@ -203,7 +204,7 @@ export default function ManageRolePermissions() {
                   <button
                     onClick={handleAddPattern}
                     disabled={!newPattern.trim()}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Add
                   </button>
@@ -221,7 +222,7 @@ export default function ManageRolePermissions() {
                 <button
                   onClick={handleSave}
                   disabled={saving || !isDirty}
-                  className="rounded-full bg-cyan-400 px-5 py-2 text-sm font-semibold hover:bg-cyan-300 disabled:opacity-50"
+                  className="rounded-full bg-cyan-400 px-5 py-2 text-sm font-semibold hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save'}
                 </button>

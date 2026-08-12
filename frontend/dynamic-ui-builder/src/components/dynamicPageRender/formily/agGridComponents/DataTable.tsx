@@ -54,7 +54,7 @@ export const DataTable = ({
             style={{
                 width: "100%",
             }}
-            className="mt-5 overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)]"
+            className="mt-5 mb-5 overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)]"
         >
             <div className="flex items-start justify-between gap-4 border-b border-slate-200/80 bg-white/70 px-5 py-4 backdrop-blur">
                 <div className="space-y-1">
