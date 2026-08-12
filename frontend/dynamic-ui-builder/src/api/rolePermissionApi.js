@@ -15,3 +15,8 @@ export const updateRolePermissions = async (code, patterns) => {
   const response = await adminClient.put(`/roles/${encodeURIComponent(code)}/permissions`, { patterns })
   return response.data
 }
+
+export const createRole = async ({ code, name, description }) => {
+  const response = await adminClient.post('/roles', { code, name, description })
+  return response.data
+}

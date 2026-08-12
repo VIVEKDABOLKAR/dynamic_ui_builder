@@ -38,7 +38,7 @@ public class AuthController {
         AppUser user = AppUser.builder()
                 .username(req.username())
                 .password(encoder.encode(req.password()))
-                .role(req.role() != null ? req.role() : Role.ROLE_VIEWER)
+                .role(req.role() != null ? req.role() : Role.ROLE_VIEWER.name())
                 .build();
 
         userRepo.save(user);
@@ -87,11 +87,11 @@ public class AuthController {
             selectedFacilityId = allowedFacility.isEmpty() ? null : allowedFacility.getFirst().getId();
         }
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name(), selectedFacilityId);
-        return ResponseEntity.ok(new TokenResponse(token, user.getRole().name(), selectedFacilityId,  allowedFacilityIds.stream().toList()));
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole(), selectedFacilityId);
+        return ResponseEntity.ok(new TokenResponse(token, user.getRole(), selectedFacilityId,  allowedFacilityIds.stream().toList()));
     }
 
     public record LoginRequest(String username, String password, String facilityId) {}
-    public record RegisterRequest(String username, String password, Role role, List<String> facilityIds) {}
+    public record RegisterRequest(String username, String password, String  role, List<String> facilityIds) {}
     public record TokenResponse(String token, String role, String facilityId, List<String> availableFacilityIds) {}
 }

@@ -138,7 +138,7 @@ export default function DynamicPageDefault() {
               marginBottom: "6px",
             }}
           >
-            Facility
+           Role
           </div>
 
           <div
@@ -147,7 +147,7 @@ export default function DynamicPageDefault() {
               color: "#64748b",
             }}
           >
-            Your current facility is shown above.
+            {localStorage.getItem("role").replaceAll('ROLE_', '')}
           </div>
         </div>
 

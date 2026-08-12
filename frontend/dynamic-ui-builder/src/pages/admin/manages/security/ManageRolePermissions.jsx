@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getRoles, updateRolePermissions } from '../../../../api/rolePermissionApi'
+import AddRoleDialog from './AddRoleDialog'
 
 /**
  * Security Configuration — lets an admin edit each role's permission
@@ -24,6 +25,7 @@ export default function ManageRolePermissions() {
   const [newPattern, setNewPattern] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [addRoleOpen, setAddRoleOpen] = useState(false)
 
   const loadRoles = async (keepSelection) => {
     setLoading(true)
@@ -97,14 +99,27 @@ export default function ManageRolePermissions() {
       <div>
         <div className="flex items-center gap-1 text-xs text-slate-400">
           <Link to="/admin_panel/overview" className="hover:text-slate-600">Admin</Link>
-          <span>&gt;</span>
+          <span>›</span>
           <span className="text-slate-500">Security Configuration</span>
         </div>
-        <h1 className="mt-2 text-2xl font-bold text-slate-900">Security Configuration</h1>
+        <div className="mt-2 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-slate-900">Security Configuration</h1>
+          <button
+            onClick={() => setAddRoleOpen(true)}
+            className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            + Add Role
+          </button>
+        </div>
         <p className="mt-1 text-sm text-slate-500">
           Control which dynamic pages each role can open using permission patterns — no code changes required.
         </p>
       </div>
+      <AddRoleDialog
+        open={addRoleOpen}
+        onClose={() => setAddRoleOpen(false)}
+        onCreated={(role) => loadRoles(role.code)}
+      />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[240px_1fr]">
         {/* Role list */}
@@ -117,11 +132,10 @@ export default function ManageRolePermissions() {
                 <li key={role.code}>
                   <button
                     onClick={() => selectRole(role.code)}
-                    className={`w-full px-4 py-3 text-left text-sm transition-colors ${
-                      role.code === selectedCode
-                        ? 'bg-slate-900 text-white'
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
+                    className={`w-full px-4 py-3 text-left text-sm transition-colors ${role.code === selectedCode
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                   >
                     <div className="font-semibold">{role.name}</div>
                     <div className={`text-xs ${role.code === selectedCode ? 'text-slate-300' : 'text-slate-400'}`}>

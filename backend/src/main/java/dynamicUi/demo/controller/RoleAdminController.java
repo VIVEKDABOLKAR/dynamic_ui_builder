@@ -1,6 +1,7 @@
 package dynamicUi.demo.controller;
 
 import dynamicUi.demo.dto.RoleAccessResponse;
+import dynamicUi.demo.dto.RoleCreateRequest;
 import dynamicUi.demo.dto.RolePermissionUpdateRequest;
 import dynamicUi.demo.service.RolePermissionAdminService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,17 @@ public class RoleAdminController {
     public RoleAccessResponse getRole(@PathVariable String code) {
         return rolePermissionAdminService.getRole(code);
     }
+
+
+    @PostMapping
+    public RoleAccessResponse createRole(@RequestBody RoleCreateRequest request) {
+        return rolePermissionAdminService.createRole(
+                request.getCode(),
+                request.getName(),
+                request.getDescription()
+        );
+    }
+
 
     @PutMapping("/{code}/permissions")
     public RoleAccessResponse updatePermissions(

@@ -19,10 +19,11 @@ import java.util.List;
  * if/when that's enforced consistently across the other /api/admin/**
  * controllers).
  *
- * Note: this only manages permission_pattern rows for EXISTING role
- * codes (seeded: ROLE_ADMIN, ROLE_VIEWER). Adding a brand-new role that
- * a user can actually be assigned requires also adding it to the
- * security.Role enum — see AppRole's class comment.
+ * Note: creating a role here only adds a row an admin can attach
+ * permission_pattern rows to. It does NOT make it assignable to a user
+ * on its own — that still requires adding the matching value to the
+ * security.Role enum, since AppUser.role is a typed enum column. See
+ * AppRole's class comment.
  */
 @Service
 @RequiredArgsConstructor
@@ -63,10 +64,46 @@ public class RolePermissionAdminService {
         return toResponse(role);
     }
 
+    @Transactional
+    public RoleAccessResponse createRole(String rawCode, String name, String description) {
+        String code = normalizeCode(rawCode);
+
+        if (appRoleRepository.existsByCode(code)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists: " + code);
+        }
+
+        AppRole role = appRoleRepository.save(
+                AppRole.builder()
+                        .code(code)
+                        .name(name != null && !name.isBlank() ? name.trim() : code)
+                        .description(description != null ? description.trim() : null)
+                        .build()
+        );
+
+        return toResponse(role);
+    }
+
     private AppRole findRoleOrThrow(String code) {
         return appRoleRepository.findByCode(code)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Role not found: " + code));
+    }
+
+    /**
+     * ROLE_ADMIN / ROLE_VIEWER convention — uppercases, replaces
+     * spaces/dashes with underscores, and prefixes "ROLE_" if missing,
+     * so a code entered as "gate operator" becomes "ROLE_GATE_OPERATOR".
+     */
+    private String normalizeCode(String rawCode) {
+        if (rawCode == null || rawCode.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role code is required");
+        }
+
+        String normalized = rawCode.trim().toUpperCase().replaceAll("[\\s-]+", "_");
+        if (!normalized.startsWith("ROLE_")) {
+            normalized = "ROLE_" + normalized;
+        }
+        return normalized;
     }
 
     private RoleAccessResponse toResponse(AppRole role) {
@@ -81,3 +118,4 @@ public class RolePermissionAdminService {
                 .build();
     }
 }
+
