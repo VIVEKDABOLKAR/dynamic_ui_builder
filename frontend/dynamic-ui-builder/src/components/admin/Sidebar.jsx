@@ -43,9 +43,9 @@ const items = [
         label: "Manage Facilities",
         to: "/admin_panel/manage-facilities",
       },
-      { 
-        icon: '🔒', 
-        label: 'Route Access', 
+      {
+        icon: '🔒',
+        label: 'Route Access',
         to: '/admin_panel/route-access'
       },
     ],
@@ -62,6 +62,11 @@ const items = [
       {
         label: "Role Permissions",
         to: "/admin_panel/security-configuration",
+      },
+      // NEW: added for User Role Management feature
+      {
+        label: "User Role Management",
+        to: "/admin_panel/user-role-management",
       },
     ],
   },
@@ -168,24 +173,11 @@ export default function Sidebar({ sidebarOpen, handleSidebarChange }) {
 
       <nav className="flex gap-1 overflow-x-auto px-3 pb-4 lg:flex-col lg:pb-4">
         {items.map((item) => (
-          <SidebarItem 
-          key={item.label}
+          <SidebarItem
+            key={item.label}
             item={item}
             pathname={location.pathname}
           />
-          // <NavLink
-          //   key={item.label}
-          //   to={item.to}
-          //   className={({ isActive }) =>
-          //     `flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition lg:whitespace-normal ${isActive
-          //       ? 'bg-slate-900 text-white shadow-sm'
-          //       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          //     }`
-          //   }
-          // >
-          //   <span className="text-base leading-none">{item.icon}</span>
-          //   {item.label}
-          // </NavLink>
         ))}
       </nav>
 
@@ -194,4 +186,4 @@ export default function Sidebar({ sidebarOpen, handleSidebarChange }) {
   )
 
 
-} 
+}
