@@ -2,4 +2,4 @@ package dynamicUi.demo.dto;
 
 import dynamicUi.demo.security.Role;
 
-public record UserRoleUpdateRequest(Role role) {}
+public record UserRoleUpdateRequest(String role) {}

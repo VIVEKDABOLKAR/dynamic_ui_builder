@@ -27,14 +27,15 @@ public class UserRoleAdminService {
     }
 
     @Transactional
-    public UserRoleResponse updateRole(Long userId, Role newRole) {
+    public UserRoleResponse updateRole(Long userId, String newRole) {
         AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
 
         // Guard: don't allow demoting the last remaining admin
-        if (user.getRole() == Role.ROLE_ADMIN && newRole != Role.ROLE_ADMIN) {
+        if (user.getRole().equals(Role.ROLE_ADMIN.name()) &&
+                !newRole.equals(Role.ROLE_ADMIN.name())) {
             long adminCount = appUserRepository.findAll().stream()
-                    .filter(u -> u.getRole() == Role.ROLE_ADMIN)
+                    .filter(u -> u.getRole().equals(Role.ROLE_ADMIN.name()))
                     .count();
             if (adminCount <= 1) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
