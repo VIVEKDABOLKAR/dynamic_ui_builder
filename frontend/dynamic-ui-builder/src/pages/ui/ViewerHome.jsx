@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getAllUiPages } from '../../api/uiPageApi';
 import { getUsername, logout } from '../../api/authApi';
 import usePageUpdates from '../../hooks/usePageUpdates';
-import { toast } from 'react-toastify';
 import { getAllPages } from '../../api/adminPageApi';
+import toast from 'react-hot-toast';
 export default function ViewerHome() {
   const navigate = useNavigate()
   const [pages, setPages] = useState([])
@@ -58,7 +58,7 @@ export default function ViewerHome() {
   usePageUpdates(handlePageUpdate)
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
+    <main className="min-h-screen bg-gray-500 rounded-2xl border text-slate-100">
 
 
       <div className="mx-auto max-w-6xl px-6 py-10">
@@ -107,12 +107,12 @@ export default function ViewerHome() {
 
         {/* Page cards */}
         {!loading && !error && filtered.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2  lg:grid-cols-3">
             {filtered.map((page) => (
               <button
                 key={page.pageCode}
                 onClick={() => navigate(`/ui_demo/${page.pageCode}`)}
-                className="group text-left rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:border-cyan-400/40 hover:bg-white/10"
+                className="group text-left rounded-2xl bg-gray-700 border border-white/10  border-r-gray-600 p-6 transition hover:border-cyan-400/40 hover:bg-white/10"
               >
                 {/* Active badge */}
                 <div className="mb-4 flex items-center justify-between">

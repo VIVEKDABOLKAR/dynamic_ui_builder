@@ -19,18 +19,22 @@ export const Card = (incomingProps: any) => {
     title,
     description,
     width = "100%",
-    style,
+    style ,
     children,
   } = useComponentProps(incomingProps);
 
-
-  console.log("Style Of Card :- ", style)//here style is !bg-red-500
-  return (
+  let jsonStyle ;
+  
+  if(typeof style === "string") {
+    jsonStyle = JSON.parse(style ?? "{}"); //here style is !bg-red-500
+  }
+    return (
     <MuiCard
-    className={style}
       sx={{
         width,
         marginBottom: 3,
+        marginTop: 3,
+        ...jsonStyle,
       }}
     >
       <CardContent>

@@ -32,6 +32,8 @@ export const Layout = ({
         alignItems,
         flexWrap: wrap,
         width,
+        marginBottom: 2,
+        marginTop: 2,
         ...style,
       }}
     >
