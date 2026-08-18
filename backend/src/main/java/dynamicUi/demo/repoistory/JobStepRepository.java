@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface JobStepRepository extends JpaRepository<JobStep, Long> {
     List<JobStep> findByJobOrder_IdOrderBySequenceNoAsc(Long jobOrderId);
     Optional<JobStep> findByJobOrder_IdAndStep(Long jobOrderId, WorkflowStepType step);
+    Optional<JobStep> findFirstByJobOrder_IdAndSequenceNoGreaterThanOrderBySequenceNoAsc(
+            Long jobOrderId,
+            Integer sequenceNo
+    );
 }

@@ -36,36 +36,30 @@ public class JobStepService {
         JobStep jobStep = jobStepRepository.findByJobOrder_IdAndStep(jobOrderId, step)
                 .orElseThrow(() -> new RuntimeException("Step not found: " + step));
 
+        //update jobStep
         jobStep.setStatus(JobStepStatus.COMPLETED);
         jobStep.setCompletedAt(LocalDateTime.now());
-        jobStepRepository.save(jobStep);
 
-        JobOrder jobOrder = jobOrderRepository.findById(jobOrderId).orElseThrow();
+        JobOrder jobOrder = jobStep.getJobOrder();
 
-        List<WorkflowStepType> workflow = workflowConfigurationService.getActiveEffectiveStepsOrdered(jobOrder.getFacilityId());
-        int currentIndex = indexOf(workflow, step);
-        int nextIndex = currentIndex + 1;
+        //update jobOrder
+        Optional<JobStep> nextStep =
+                jobStepRepository
+                        .findFirstByJobOrder_IdAndSequenceNoGreaterThanOrderBySequenceNoAsc(
+                                jobOrderId,
+                                jobStep.getSequenceNo()
+                        );
 
-        if (currentIndex < 0 || nextIndex >= workflow.size()) {
+        if (nextStep.isPresent()) {
+            JobStep next = nextStep.get();
+            next.setStatus(JobStepStatus.IN_PROGRESS);
+            jobOrder.setCurrentStep(next.getStep());
+            jobOrder.setStatus(JobOrderStatus.IN_PROGRESS);
+        } else {
             jobOrder.setStatus(JobOrderStatus.COMPLETED);
             jobOrder.setCurrentStep(null);
         }
-        else {
-            WorkflowStepType nextStep = workflow.get(nextIndex);
-            jobOrder.setCurrentStep(nextStep);
-            jobOrder.setStatus(JobOrderStatus.IN_PROGRESS);
-
-            Optional<JobStep> nextJobStep = jobStepRepository.findByJobOrder_IdAndStep(jobOrderId, nextStep);
-            nextJobStep.ifPresent(js -> {
-                js.setStatus(JobStepStatus.IN_PROGRESS);
-                jobStepRepository.save(js);
-            });
-        }
 
         jobOrderRepository.save(jobOrder);
-    }
-
-    private int indexOf(List<WorkflowStepType> workflow, WorkflowStepType step) {
-        return workflow.indexOf(step);
     }
 }
