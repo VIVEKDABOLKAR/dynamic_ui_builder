@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowConfigurationService {
 
-    private final WorkflowConfigurationRepository configRepository;
+    private final WorkflowConfigurationRepository workflowConfigurationRepository;
     private final WorkflowStepRepository workflowStepRepository;
 
     //---------------------------
@@ -29,7 +29,7 @@ public class WorkflowConfigurationService {
     //---------------------------
 
     public List<WorkflowConfigurationDTO> findAll() {
-        return configRepository.findAllByOrderBySequenceAsc()
+        return workflowConfigurationRepository.findAllByOrderBySequenceAsc()
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -47,7 +47,7 @@ public class WorkflowConfigurationService {
         }
 
         //if facility has no workflow config then return global workflow config
-        List<WorkflowConfiguration> workflowConfigurationList = configRepository.findByFacilityIdOrderBySequenceAsc(facilityId);
+        List<WorkflowConfiguration> workflowConfigurationList = workflowConfigurationRepository.findByFacilityIdOrderBySequenceAsc(facilityId);
 
         if(workflowConfigurationList.isEmpty()){
             return findForFacilityEffictive(FacilityId.GLOBAL.name());
@@ -62,7 +62,7 @@ public class WorkflowConfigurationService {
     public List<WorkflowConfigurationDTO> findForFacility(String facilityId) {
 
         //if facility has no workflow config then return global workflow config
-        List<WorkflowConfiguration> workflowConfigurationList = configRepository.findByFacilityIdOrderBySequenceAsc(facilityId);
+        List<WorkflowConfiguration> workflowConfigurationList = workflowConfigurationRepository.findByFacilityIdOrderBySequenceAsc(facilityId);
         return workflowConfigurationList
                 .stream()
                 .map(this::toDTO)
@@ -74,7 +74,7 @@ public class WorkflowConfigurationService {
         WorkflowStep step = workflowStepRepository.findById(request.getWorkflowStepId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow step not found: " + request.getWorkflowStepId()));
 
-        if (configRepository.existsByWorkflowStep_IdAndFacilityId(step.getId(), facilityId)) {
+        if (workflowConfigurationRepository.existsByWorkflowStep_IdAndFacilityId(step.getId(), facilityId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "'" + step.getName() + "' is already part of the workflow configuration.");
         }
 
@@ -82,7 +82,7 @@ public class WorkflowConfigurationService {
         if (sequence == null) {
             // Scoped to this facility only — sequence restarts at 1 per
             // facility_id, it's not a global counter across every scope.
-            sequence = configRepository.findByFacilityIdOrderBySequenceAsc(facilityId).stream()
+            sequence = workflowConfigurationRepository.findByFacilityIdOrderBySequenceAsc(facilityId).stream()
                     .mapToInt(WorkflowConfiguration::getSequence)
                     .max()
                     .orElse(0) + 1;
@@ -94,13 +94,13 @@ public class WorkflowConfigurationService {
                 .facilityId(facilityId)
                 .build();
 
-        WorkflowConfiguration saved = configRepository.save(config);
+        WorkflowConfiguration saved = workflowConfigurationRepository.save(config);
         return toDTO(saved);
     }
 
     @Transactional
     public WorkflowConfigurationDTO update(Long id, WorkflowConfigurationRequest request) {
-        WorkflowConfiguration existing = configRepository.findById(id)
+        WorkflowConfiguration existing = workflowConfigurationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow configuration not found: " + id));
 
         if (request.getSequence() != null) {
@@ -115,23 +115,23 @@ public class WorkflowConfigurationService {
 
         existing.setActive(request.isActive());
 
-        return toDTO(configRepository.save(existing));
+        return toDTO(workflowConfigurationRepository.save(existing));
     }
 
     @Transactional
     public void delete(Long id) {
-        WorkflowConfiguration existing = configRepository.findById(id)
+        WorkflowConfiguration existing = workflowConfigurationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow configuration not found: " + id));
 
         if (existing.isActive() && activeCountExcluding(id) == 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "At least one workflow step must remain active. Deactivate a different step first, or add another before removing this one.");
         }
 
-        configRepository.deleteById(id);
+        workflowConfigurationRepository.deleteById(id);
     }
 
     private long activeCountExcluding(Long id) {
-        return configRepository.findByActiveTrueOrderBySequenceAsc().stream()
+        return workflowConfigurationRepository.findByActiveTrueOrderBySequenceAsc().stream()
                 .filter(c -> !c.getId().equals(id))
                 .count();
     }
@@ -146,7 +146,7 @@ public class WorkflowConfigurationService {
      * logic is actually keyed on.
      */
     public List<WorkflowStepType> getActiveStepsOrdered(String facilityId) {
-        List<WorkflowStepType> steps = configRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
+        List<WorkflowStepType> steps = workflowConfigurationRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
                 .stream()
                 .map(c -> {
                     try {
@@ -168,7 +168,7 @@ public class WorkflowConfigurationService {
     }
 
     public List<WorkflowStepType> getActiveEffectiveStepsOrdered(String facilityId) {
-        List<WorkflowStepType> steps = configRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
+        List<WorkflowStepType> steps = workflowConfigurationRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
                 .stream()
                 .map(c -> {
                     try {
@@ -183,7 +183,7 @@ public class WorkflowConfigurationService {
                 .collect(Collectors.toList());
 
         if (steps.isEmpty()) {
-            steps = configRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(FacilityId.GLOBAL.name())
+            steps = workflowConfigurationRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(FacilityId.GLOBAL.name())
                     .stream()
                     .map(c -> {
                         try {

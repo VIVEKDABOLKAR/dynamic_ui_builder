@@ -24,6 +24,7 @@ public interface UIRouteRepository extends JpaRepository<UIRoute, Long> {
 
     Optional<UIRoute> findByPath(String path);
 
+    Optional<UIRoute> findByPage_id(Long id);
 
     List<UIRoute> findByIsActiveTrueAndShowInMenuTrueOrderByMenuOrderAsc();
 

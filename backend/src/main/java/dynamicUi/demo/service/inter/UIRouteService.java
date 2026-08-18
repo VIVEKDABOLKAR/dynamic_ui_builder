@@ -11,6 +11,8 @@ public interface UIRouteService {
 
     RouteResponseDTO resolveByPathAndFacility(String path, String selectedFacilityId);
 
+    UIRoute getPathByPage_id(Long id);
+
     UIRoute createRoute(UIRoute route);
 
     UIRoute updateRoute(String routeCode, UIRoute route);

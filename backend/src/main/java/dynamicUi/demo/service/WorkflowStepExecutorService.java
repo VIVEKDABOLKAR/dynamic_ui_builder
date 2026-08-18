@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 
 @Service
 @RequiredArgsConstructor
-public class WorkflowStepExecutor {
+public class WorkflowStepExecutorService {
 
     private final JobOrderRepository jobOrderRepository;
     private final JobStepService jobStepService;

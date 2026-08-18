@@ -51,7 +51,7 @@ public class UIRouteServiceImp implements UIRouteService {
             //throws forbidden exception
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "You do not have access to this route."
+                    "You Facility do not have access to this route."
             );
         }
 
@@ -64,6 +64,12 @@ public class UIRouteServiceImp implements UIRouteService {
             throw new RuntimeException("ROUTE NOT ACTIVE :: path = " + path);
 
         return uiRouteMapper.toResponse(route);
+    }
+
+    @Override
+    public UIRoute getPathByPage_id(Long id) {
+        return repository.findByPage_id(id)
+                .orElseThrow(() -> new RuntimeException("path does not exist for page id :- " + id));
     }
 
 

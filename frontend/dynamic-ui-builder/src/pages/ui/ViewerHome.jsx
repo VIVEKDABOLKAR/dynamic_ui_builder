@@ -5,6 +5,7 @@ import { getUsername, logout } from '../../api/authApi';
 import usePageUpdates from '../../hooks/usePageUpdates';
 import { getAllPages } from '../../api/adminPageApi';
 import toast from 'react-hot-toast';
+import { getPathUsingUIRoute } from '../../api/routeApi';
 export default function ViewerHome() {
   const navigate = useNavigate()
   const [pages, setPages] = useState([])
@@ -53,6 +54,13 @@ export default function ViewerHome() {
     p.pageCode.toLowerCase().includes(search.toLowerCase()) ||
     (p.description || '').toLowerCase().includes(search.toLowerCase())
   )
+
+  const handleClick = async (page_id) => {
+    //fetch path using page_id or page_code
+    const data = await getPathUsingUIRoute(page_id);
+    // navigate to route.path
+    navigate(`/ui_demo/${data.path}`)
+  }
 
 
   usePageUpdates(handlePageUpdate)
@@ -111,7 +119,7 @@ export default function ViewerHome() {
             {filtered.map((page) => (
               <button
                 key={page.pageCode}
-                onClick={() => navigate(`/ui_demo/${page.pageCode}`)}
+                onClick={() => handleClick(page.id)}
                 className="group text-left rounded-2xl bg-gray-700 border border-white/10  border-r-gray-600 p-6 transition hover:border-cyan-400/40 hover:bg-white/10"
               >
                 {/* Active badge */}

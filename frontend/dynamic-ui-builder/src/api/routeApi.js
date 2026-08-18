@@ -16,3 +16,9 @@ export const resolveNavigation = async (path) => {
     console.log(response.data);
     return response.data;
 }
+
+export const getPathUsingUIRoute = async (page_id) => {
+    const response = await apiClient.get(`/api/ui/routes/path?pageid=${page_id}`)
+    console.log(response);
+    return response.data;
+}
