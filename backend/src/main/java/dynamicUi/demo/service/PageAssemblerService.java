@@ -67,10 +67,10 @@ public class PageAssemblerService {
                 .orElseThrow(() -> new RuntimeException(
                         "PAGE NOT FOUND :: pageCode = " + pageCode));
 
-//        if (uiPage.getStatus() != PageStatus.ACTIVE) {
-//            throw new RuntimeException(
-//                    "Page is not active :: pageCode = " + pageCode);
-//        }
+        if (!(uiPage.getStatus() != PageStatus.INACTIVE && uiPage.getStatus() != PageStatus.DRAFT)) {
+            throw new RuntimeException(
+                    "Page is not active :: pageCode = " + pageCode);
+        }
 
         // 1b. Backend-enforced authorization boundary for this dynamic page.
         //     Throws 403 if the caller's role doesn't grant the page's

@@ -168,7 +168,8 @@ public class WorkflowConfigurationService {
     }
 
     public List<WorkflowStepType> getActiveEffectiveStepsOrdered(String facilityId) {
-        List<WorkflowStepType> steps = workflowConfigurationRepository.findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
+        List<WorkflowStepType> steps = workflowConfigurationRepository
+                .findByFacilityIdAndActiveTrueOrderBySequenceAsc(facilityId)
                 .stream()
                 .map(c -> {
                     try {
