@@ -1,4 +1,4 @@
-package dynamicUi.demo.controller;
+package dynamicUi.demo.constant;
 
 import dynamicUi.demo.dto.UserRoleResponse;
 import dynamicUi.demo.dto.UserRoleUpdateRequest;

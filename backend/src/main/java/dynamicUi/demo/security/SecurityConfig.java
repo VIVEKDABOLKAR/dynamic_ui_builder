@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test").permitAll()
                         .requestMatchers("/api/ui/**").authenticated()
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/facilities/**").permitAll()
                         .requestMatchers("/api/job-orders/**").authenticated()
                         .requestMatchers("/api/gate-checkins/**").authenticated()

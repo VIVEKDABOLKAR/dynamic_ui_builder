@@ -41,7 +41,7 @@ public class WorkflowConfigurationAdminController {
     ) {
         return workflowConfigurationService.findForFacility(selectedFacilityId);
     }
-
+ 
     @PostMapping
     public ResponseEntity<WorkflowConfigurationDTO> create(
             @RequestBody WorkflowConfigurationRequest request,
