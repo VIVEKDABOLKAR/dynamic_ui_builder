@@ -4,7 +4,7 @@ import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.DockAssignment;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.DockAssignmentRepository;
-import dynamicUi.demo.service.WorkflowStepExecutor;
+import dynamicUi.demo.service.WorkflowStepExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class DockAssignmentController {
 
     private final DockAssignmentRepository repository;
-    private final WorkflowStepExecutor executor;
+    private final WorkflowStepExecutorService executor;
 
     @PostMapping
     public DockAssignment assign(@RequestBody DockAssignmentRequest request){

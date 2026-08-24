@@ -4,7 +4,7 @@ import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.GateCheckOut;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.GateCheckOutRepository;
-import dynamicUi.demo.service.WorkflowStepExecutor;
+import dynamicUi.demo.service.WorkflowStepExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class GateCheckOutController {
 
     private final GateCheckOutRepository repository;
-    private final WorkflowStepExecutor executor;
+    private final WorkflowStepExecutorService executor;
 
     @PostMapping
     public GateCheckOut checkOut(@RequestBody GateCheckOutRequest request) {

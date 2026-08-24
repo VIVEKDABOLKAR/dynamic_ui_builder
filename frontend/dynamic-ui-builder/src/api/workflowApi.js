@@ -28,10 +28,10 @@ export const deleteWorkflowStep = async (id) => {
 // Workflow Configuration (order + active steps)
 //---------------------------
 
-export const getWorkflowConfigurations = async () => {
-  const response = await adminClient.get('/workflow-configurations')
-  return response.data
-}
+// export const getWorkflowConfigurations = async () => {
+//   const response = await adminClient.get('/workflow-configurations')
+//   return response.data
+// }
 
 export const getWorkflowConfigurationsList = async () => {
   const response = await adminClient.get('/workflow-configurations/list')

@@ -16,7 +16,7 @@ export default function UI_layout() {
 
         {/* flex-1 + overflow-hidden = a bounded row; sidebar and main content
           scroll independently instead of pushing the whole page down. */}
-        <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-1 h-dvh overflow-hidden">
           <DynamicSideBar />
 
           <main className="m-4 flex-1 min-h-0 overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

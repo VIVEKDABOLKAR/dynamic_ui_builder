@@ -3,6 +3,7 @@ package dynamicUi.demo.controller;
 import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.dto.NavigationNodeDTO;
 import dynamicUi.demo.dto.RouteResponseDTO;
+import dynamicUi.demo.entity.UIRoute;
 import dynamicUi.demo.security.JwtUtil;
 import dynamicUi.demo.service.NavigationBuilderService;
 import dynamicUi.demo.service.inter.UIRouteService;
@@ -55,5 +56,16 @@ public class UIRouteResolverController {
             @RequestAttribute(value = "selectedFacilityId", required = false) String selectedFacilityId
     ) {
         return ResponseEntity.ok(navigationBuilderService.buildSidebar(selectedFacilityId));
+    }
+
+    /**
+    * get ui_route path using page_id (mainly used for viewer home page navigation)
+    */
+    @GetMapping("/path")
+    public ResponseEntity<UIRoute> getPathByPage_id(@RequestParam Long pageid) {
+        return ResponseEntity.ok()
+                .body(
+                        uiRouteService.getPathByPage_id(pageid)
+                );
     }
 }

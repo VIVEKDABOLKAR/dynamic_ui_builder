@@ -32,7 +32,8 @@ public class UserRoleAdminService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
 
         // Guard: don't allow demoting the last remaining admin
-        if (user.getRole().equals(Role.ROLE_ADMIN.name()) && !newRole.equals(Role.ROLE_ADMIN.name())) {
+        if (user.getRole().equals(Role.ROLE_ADMIN.name()) &&
+                !newRole.equals(Role.ROLE_ADMIN.name())) {
             long adminCount = appUserRepository.findAll().stream()
                     .filter(u -> u.getRole().equals(Role.ROLE_ADMIN.name()))
                     .count();

@@ -91,7 +91,7 @@ export default function DynamicPage() {
         return (
             <div className="flex h-dvh flex-col items-center justify-center gap-2">
                 <h1 className="text-lg font-semibold text-red-600">Access Denied</h1>
-                <p className="text-sm text-gray-500">Your role does not have permission to view this page.</p>
+                <p className="text-sm text-gray-500">Your role or facility does not have permission to view this page.</p>
             </div>
         )
     }

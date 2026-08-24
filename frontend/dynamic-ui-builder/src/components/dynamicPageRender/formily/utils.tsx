@@ -5,12 +5,12 @@ import { usePageSchema } from "../context/PageSchemaContext";
 import { resolveComponentActions } from "../actionRenders/ActionDispacther";
 import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 
-export const useResolvedActions  = (action: []) => {
+export const useResolvedActions = (action: []) => {
   const form = useForm();
   const pageSchema = usePageSchema();
   const ctx = useActionContext(form?.values);
 
-   return useMemo(() => {
+  return useMemo(() => {
     if (!action?.length) {
       return {};
     }
@@ -25,12 +25,11 @@ export const useResolvedActions  = (action: []) => {
 
 export const useComponentProps = (props: any) => {
   const handlers = useResolvedActions(props.action);
-  let style;
-  console.log()
-  if (typeof(props.style) == "object"){
-    style = style;
-  } else if (props.style) {
-    style = convertToImportantClassName(JSON.parse(props.style ?? "{}"));
+  let style = props.style ?? {};
+  if (props.style && typeof props.style === "string") {
+    const parsedStyle = JSON.parse(props.style);
+    style = parsedStyle?.className || {};
+    // style = convertToImportantClassName(JSON.parse(props.style ?? "{}"));
   }
 
   return {

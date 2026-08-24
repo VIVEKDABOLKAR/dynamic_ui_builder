@@ -88,7 +88,7 @@ public class WorkflowStepService {
                     .collect(Collectors.joining(", "));
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Unknown step code '" + code + "'. Must be one of: " + allowed
+                    "Unknown step code :- " + code
             );
         }
     }

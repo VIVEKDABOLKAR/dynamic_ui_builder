@@ -4,7 +4,7 @@ import dynamicUi.demo.constant.Attribute;
 import dynamicUi.demo.entity.ParkingAllocation;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.ParkingAllocationRepository;
-import dynamicUi.demo.service.WorkflowStepExecutor;
+import dynamicUi.demo.service.WorkflowStepExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class ParkingAllocationController {
 
     private final ParkingAllocationRepository repository;
-    private final WorkflowStepExecutor executor;
+    private final WorkflowStepExecutorService executor;
 
     @PostMapping
     public ParkingAllocation allocate(@RequestBody ParkingAllocationRequest request) {

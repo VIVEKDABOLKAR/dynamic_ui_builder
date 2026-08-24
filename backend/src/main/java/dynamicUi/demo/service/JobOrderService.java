@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class JobOrderService {
     @Transactional
     public JobOrder create(JobOrder jobOrder, String facilityId) {
         // Live, admin-configured workflow — no longer a fixed enum array.
-        // Throws (409) if nothing is configured/active.
+        // Throws (HttpStatus.INTERNAL_SERVER_ERROR - 500) if nothing is configured/active.
         List<WorkflowStepType> workflow = workflowConfigurationService.getActiveEffectiveStepsOrdered(facilityId);
 
         jobOrder.setStatus(JobOrderStatus.CREATED);
@@ -34,16 +36,19 @@ public class JobOrderService {
         saved.setJobOrderNumber(number);
         jobOrderRepository.save(saved);
 
-        // Auto-generate JobStep rows for the whole workflow
-        for (int i = 0; i < workflow.size(); i++) {
-            JobStep step = JobStep.builder()
-                    .jobOrder(saved)
-                    .step(workflow.get(i))
-                    .sequenceNo(i + 1)
-                    .status(i == 0 ? JobStepStatus.IN_PROGRESS : JobStepStatus.PENDING)
-                    .build();
-            jobStepRepository.save(step);
-        }
+        // Build all JobStep entities in memory first.
+        List<JobStep> jobSteps = IntStream.range(0, workflow.size())
+                .mapToObj(i -> JobStep.builder()
+                        .jobOrder(saved)
+                        .step(workflow.get(i))
+                        .sequenceNo(i + 1)
+                        .status(i == 0
+                                ? JobStepStatus.IN_PROGRESS
+                                : JobStepStatus.PENDING)
+                        .build())
+                .toList();
+
+        jobStepRepository.saveAll(jobSteps);
 
         return saved;
     }
@@ -62,7 +67,8 @@ public class JobOrderService {
     }
 
     public JobOrder cancel(Long id) {
-        JobOrder jobOrder = jobOrderRepository.findById(id).orElseThrow();
+        JobOrder jobOrder = jobOrderRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("job order-id not found"));
         jobOrder.setStatus(JobOrderStatus.CANCELLED);
         return jobOrderRepository.save(jobOrder);
     }

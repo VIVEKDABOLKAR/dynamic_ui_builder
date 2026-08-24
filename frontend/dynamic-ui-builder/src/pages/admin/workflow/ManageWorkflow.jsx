@@ -8,7 +8,6 @@ import {
   createWorkflowStep,
   updateWorkflowStep,
   deleteWorkflowStep,
-  getWorkflowConfigurations,
   createWorkflowConfiguration,
   updateWorkflowConfiguration,
   deleteWorkflowConfiguration,
