@@ -6,7 +6,8 @@ import {
     FaEdit,
     FaTrash,
     FaPuzzlePiece,
-    FaBolt
+    FaBolt,
+    FaHistory
 } from "react-icons/fa";
 
 
@@ -104,8 +105,8 @@ export default function ManagePage() {
         },
         {
             headerName: 'Action',
-            minWidth: 200,
-            maxWidth: 320,
+            minWidth: 240,
+            maxWidth: 380,
             pinned: 'right',
             lockPinned: true,
             lockPosition: true,
@@ -146,6 +147,14 @@ export default function ManagePage() {
                         className="rounded-full bg-cyan-500 p-2 text-white hover:bg-cyan-400"
                     >
                         <FaBolt size={16} />
+                    </Link>
+
+                    <Link
+                        to={`/admin_panel/manage_page/${params.data.pageCode}/versions`}
+                        title="Version History"
+                        className="rounded-full bg-amber-500 p-2 text-white hover:bg-amber-400"
+                    >
+                        <FaHistory size={16} />
                     </Link>
 
                 </div>

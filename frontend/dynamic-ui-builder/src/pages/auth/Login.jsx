@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../../api/authApi'
+import { useFacility } from '../../context/FacilityV2Context'
 
 
 export default function Login() {
@@ -9,13 +10,18 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const { reloadFacilities } = useFacility()
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const data = await login(username, password)
+      const data = await login(username, password);
+
+      reloadFacilities()
+
       if (data.role === 'ROLE_ADMIN') {
         navigate('/admin_panel/overview', { replace: true })
       } else {

@@ -125,11 +125,9 @@ export default function AdminOverview() {
     setTotalActions(count);
   }
 
+  
+  
   const activePages = pages.filter((p) => p.isActive)
-
-  const recentPages = [...pages]
-    .sort((a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0))
-    .slice(0, 5)
 
   return (
     <>
@@ -163,18 +161,10 @@ export default function AdminOverview() {
             <QuickLink to="/admin_panel/manage_page/add" icon="➕" title="New Page" desc="Configure a new page from scratch" />
             <QuickLink to="/admin_panel/page_json" icon="{ }" title="Page JSON" desc="Inspect the generated JSON schema per page" />
             <QuickLink to="/ui" icon="🖥️" title="Preview UI" desc="See the dynamic rendering engine in action" />
-            <QuickLink to="/admin_panel/manage_page" icon="🕒" title="Page Versions" desc="View & restore version history per page" />
-            <QuickLink to="/admin_panel/workflow-configuration" icon="🔀" title="Workflow" desc="Configure DB-driven workflow steps" />
-            <QuickLink to="/admin_panel/user-role-management" icon="👥" title="User Roles" desc="Assign roles to registered users" />
-            <QuickLink to="/admin_panel/security-configuration" icon="🔐" title="Role Permissions" desc="Manage role → permission patterns" />
-            <QuickLink to="/admin_panel/manage-facilities" icon="🏭" title="Facilities" desc="Create and manage facilities" />
-            <QuickLink to="/admin_panel/route-access" icon="🚦" title="Route Access" desc="Control which routes each facility can see" />
-            <QuickLink to="/admin_panel/global-ui/navbar" icon="🎨" title="Navbar Config" desc="Customize global navbar style & links" />
-            <QuickLink to="/admin_panel/lookup_managment" icon="📚" title="Lookup Management" desc="Manage shared lookup/reference data" />
           </div>
         </div>
 
-        <div className="slide-up-4 grid gap-6 lg:grid-cols-[1fr_300px]">
+        {/* <div className="slide-up-4 grid gap-6 lg:grid-cols-[1fr_300px]">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Recent Pages</h2>
@@ -228,7 +218,7 @@ export default function AdminOverview() {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   )

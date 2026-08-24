@@ -8,7 +8,9 @@ import dynamicUi.demo.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,8 +64,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {
-            authManager.authenticate(
+            Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+
+            // Make the authenticated user available to the rest of this request
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }

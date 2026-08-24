@@ -28,6 +28,7 @@ import ManageRouteAccess from './pages/admin/manages/facility/routeAccess/Manage
 import DynamicPageDefault from './pages/ui/DynamicPageDefault'
 import ManageRolePermissions from './pages/admin/manages/security/ManageRolePermissions'
 import ManageUserRoles from './pages/admin/manages/security/ManageUserRoles'
+import PageVersionHistory from './pages/admin/manages/page/version/PageVersionHistory'
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="manage_page/:pageCode/edit" element={<AddNewPage />} />
             <Route path="manage_page/:pageCode/components" element={<ManagePageComponents />} />
             <Route path="manage_page/:pageCode/action" element={<ManagePageAction />} />
+            <Route path="manage_page/:pageCode/versions" element={<PageVersionHistory />} />
 
             <Route path="page_json" element={<PageJson />} />
 
