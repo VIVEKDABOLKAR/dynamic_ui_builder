@@ -2,37 +2,11 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import ActionTable from './ActionTable';
 import { createPageAction, updatePageAction } from '../../../../../api/actionsPageApi';
+import { AVAILABLE_ACTIONS, DEFAULT_FORM_DATA } from './constants';
+import { NavigateFields } from './fields/NavigateFields';
+import { ActionFields } from './ActionFields';
 
-const AVAILABLE_ACTIONS = [
-  { type: "SUBMIT_FORM", label: "Submit Form", icon: "📤" },
-  { type: "FETCH_DATA", label: "Fetch Data", icon: "📥" },
-  { type: "NAVIGATE", label: "Navigate", icon: "🧭" },
-  { type: "SHOW_TOAST", label: "Show Toast", icon: "🔔" },
-  { type: "SET_FIELD_VALUE", label: "Set Field Value", icon: "✏️" },
-  { type: "RESET_FORM", label: "Reset Form", icon: "🔄" },
-  { type: "EMIT_EVENT", label: "Emit Event", icon: "EVT" },
-  { type: "CHAIN", label: "Chain Actions", icon: "⛓️" },
-];
-
-const defaultFormData = (pageCode) => ({
-  uiPagecode: pageCode,
-  actionName: "",
-  actionType: "SUBMIT_FORM",
-  path: "",
-  navigateParams: "",
-  navigateReplace: false,
-  url: "",
-  method: "GET",
-  responsePath: "",
-  targetField: "",
-  toastMessage: "",
-  toastType: "success",
-  fieldName: "",
-  fieldValue: "",
-  eventName: "",
-  eventPayload: "",
-  chainActions: ""
-});
+const defaultFormData = DEFAULT_FORM_DATA
 
 export default function ManagePageAction() {
   const { pageCode } = useParams();
@@ -74,10 +48,12 @@ export default function ManagePageAction() {
           },
         };
       }
+      
       case "FETCH_DATA": {
         const api = {
           url: formData.url,
           method: formData.method,
+          params: formData.params,
           ...(formData.responsePath ? { responsePath: formData.responsePath } : {}),
         };
 
@@ -206,9 +182,8 @@ export default function ManagePageAction() {
                 onClick={() => handleSelect(item)}
                 role="button"
                 tabIndex={0}
-                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${
-                  selectedAction === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
-                }`}
+                className={`rounded-2xl border p-4 bg-slate-50 hover:shadow-md transition-colors cursor-pointer ${selectedAction === item.type ? 'border-cyan-400 bg-cyan-50' : 'border-slate-200'
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-500 text-xl text-white shadow-sm">
@@ -259,188 +234,12 @@ export default function ManagePageAction() {
                 </select>
               </div>
 
-              {formData.actionType === "NAVIGATE" && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Path</label>
-                    <input
-                      name="path"
-                      value={formData.path}
-                      onChange={handleChange}
-                      placeholder="/ui/users"
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Query Params JSON</label>
-                    <textarea
-                      name="navigateParams"
-                      value={formData.navigateParams}
-                      onChange={handleChange}
-                      placeholder={'{ "id": "$form.userId" }'}
-                      className="min-h-24 rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <input
-                      type="checkbox"
-                      name="navigateReplace"
-                      checked={formData.navigateReplace}
-                      onChange={handleChange}
-                    />
-                    Replace current history entry
-                  </label>
-                </>
-              )}
+              <ActionFields
+                actionType={formData.actionType}
+                formData={formData}
+                onChange={handleChange}
+              />
 
-              {(formData.actionType === "FETCH_DATA" || formData.actionType === "SUBMIT_FORM") && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">API URL</label>
-                    <input
-                      name="url"
-                      value={formData.url}
-                      onChange={handleChange}
-                      placeholder="/api/users"
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Method</label>
-                    <select
-                      name="method"
-                      value={formData.method}
-                      onChange={handleChange}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    >
-                      <option>GET</option>
-                      <option>POST</option>
-                      <option>PUT</option>
-                      <option>DELETE</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
-              {formData.actionType === "FETCH_DATA" && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Response Path</label>
-                    <input
-                      name="responsePath"
-                      value={formData.responsePath}
-                      onChange={handleChange}
-                      placeholder="data.items"
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Target Field</label>
-                    <input
-                      name="targetField"
-                      value={formData.targetField}
-                      onChange={handleChange}
-                      placeholder="users"
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                </>
-              )}
-
-              {formData.actionType === "SHOW_TOAST" && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Message</label>
-                    <input
-                      name="toastMessage"
-                      value={formData.toastMessage}
-                      onChange={handleChange}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Type</label>
-                    <select
-                      name="toastType"
-                      value={formData.toastType}
-                      onChange={handleChange}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    >
-                      <option value="success">Success</option>
-                      <option value="error">Error</option>
-                      <option value="warning">Warning</option>
-                      <option value="info">Info</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
-              {formData.actionType === "SET_FIELD_VALUE" && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Field Name</label>
-                    <input
-                      name="fieldName"
-                      value={formData.fieldName}
-                      onChange={handleChange}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Field Value</label>
-                    <input
-                      name="fieldValue"
-                      value={formData.fieldValue}
-                      onChange={handleChange}
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                </>
-              )}
-
-              {formData.actionType === "EMIT_EVENT" && (
-                <>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Event Name</label>
-                    <input
-                      name="eventName"
-                      value={formData.eventName}
-                      onChange={handleChange}
-                      placeholder="user:selected"
-                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-sm font-medium text-slate-700">Payload JSON</label>
-                    <textarea
-                      name="eventPayload"
-                      value={formData.eventPayload}
-                      onChange={handleChange}
-                      placeholder={'{ "id": "$form.userId" }'}
-                      className="min-h-24 rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                    />
-                  </div>
-                </>
-              )}
-
-              {formData.actionType === "RESET_FORM" && (
-                <p className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
-                  This action resets the current rendered form to its initial values.
-                </p>
-              )}
-
-              {formData.actionType === "CHAIN" && (
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700">Action Names (comma-separated)</label>
-                  <input
-                    name="chainActions"
-                    value={formData.chainActions}
-                    onChange={handleChange}
-                    placeholder="saveUser, showSuccess, navigateHome"
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                  />
-                </div>
-              )}
 
               <div className="flex gap-2">
                 <button
