@@ -8,7 +8,7 @@ import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 export const useResolvedActions = (action: []) => {
   const form = useForm();
   const pageSchema = usePageSchema();
-  const ctx = useActionContext(form?.values);
+  const ctx = useActionContext(form?.values, form);
 
   return useMemo(() => {
     if (!action?.length) {

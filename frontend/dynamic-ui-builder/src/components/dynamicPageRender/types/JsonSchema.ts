@@ -119,7 +119,9 @@ export interface ActionConfig {
   api?: ApiConfig;
   navigate?: NavigateConfig;
   setField?: SetFieldConfig; //can use to toggel field as well
-    toast?: ToastConfig;
+  toast?: ToastConfig;
+  event?: EventConfig;
+  emit?: EventConfig;
   chain?: string[];          // list of other actionNames to run in sequence
   onSuccess?: string;        // actionName to run on success
   onError?: string;          // actionName to run on error
@@ -130,6 +132,7 @@ export type ActionType =
   | "FETCH_DATA"
   | "NAVIGATE"
   | "SET_FIELD_VALUE"
+  | "EMIT_EVENT"
   | "SHOW_TOAST"
   | "TOGGLE_VISIBLE"
   | "RESET_FORM"
@@ -139,16 +142,24 @@ export type ActionType =
   export interface NavigateConfig {
   path: string;              // e.g. "/ui/employee-list"
   params?: Record<string, string>; // field refs: { id: "$form.employeeId" }
+  replace?: boolean;
 }
 
 export interface SetFieldConfig {
   field: string;             // target field name
+  fieldName?: string;        // backwards compatible with older admin payloads
   value: any;                // static value or "$response.fieldName"
 }
 
 export interface ToastConfig {
   message: string;
   severity: "success" | "error" | "info" | "warning";
+  type?: "success" | "error" | "info" | "warning";
+}
+
+export interface EventConfig {
+  name: string;
+  payload?: any;
 }
 // ============================================
 // COMPONENT PROPERTIES

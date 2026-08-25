@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import ActionTable from './ActionTable';
 import { createPageAction, updatePageAction } from '../../../../../api/actionsPageApi';
@@ -10,7 +10,8 @@ const AVAILABLE_ACTIONS = [
   { type: "SHOW_TOAST", label: "Show Toast", icon: "🔔" },
   { type: "SET_FIELD_VALUE", label: "Set Field Value", icon: "✏️" },
   { type: "RESET_FORM", label: "Reset Form", icon: "🔄" },
-  { type: "CHAIN", label: "Chain Actions", icon: "⛓️" }
+  { type: "EMIT_EVENT", label: "Emit Event", icon: "EVT" },
+  { type: "CHAIN", label: "Chain Actions", icon: "⛓️" },
 ];
 
 const defaultFormData = (pageCode) => ({
@@ -18,12 +19,18 @@ const defaultFormData = (pageCode) => ({
   actionName: "",
   actionType: "SUBMIT_FORM",
   path: "",
+  navigateParams: "",
+  navigateReplace: false,
   url: "",
   method: "GET",
+  responsePath: "",
+  targetField: "",
   toastMessage: "",
   toastType: "success",
   fieldName: "",
   fieldValue: "",
+  eventName: "",
+  eventPayload: "",
   chainActions: ""
 });
 
@@ -41,20 +48,61 @@ export default function ManagePageAction() {
   };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setFormData((prev) => ({ ...prev, [e.target.name]: value }));
+  };
+
+  const parseJson = (value) => {
+    if (!value?.trim()) return undefined;
+
+    try {
+      return JSON.parse(value);
+    } catch {
+      return undefined;
+    }
   };
 
   const buildConfig = () => {
     switch (formData.actionType) {
-      case "NAVIGATE":
-        return { navigate: { path: formData.path } };
-      case "FETCH_DATA":
+      case "NAVIGATE": {
+        const params = parseJson(formData.navigateParams);
+        return {
+          navigate: {
+            path: formData.path,
+            ...(params ? { params } : {}),
+            ...(formData.navigateReplace ? { replace: true } : {}),
+          },
+        };
+      }
+      case "FETCH_DATA": {
+        const api = {
+          url: formData.url,
+          method: formData.method,
+          ...(formData.responsePath ? { responsePath: formData.responsePath } : {}),
+        };
+
+        return {
+          api,
+          ...(formData.targetField ? { setField: { field: formData.targetField, value: "$response" } } : {}),
+        };
+      }
       case "SUBMIT_FORM":
         return { api: { url: formData.url, method: formData.method } };
       case "SHOW_TOAST":
-        return { toast: { message: formData.toastMessage, type: formData.toastType } };
+        return { toast: { message: formData.toastMessage, severity: formData.toastType } };
       case "SET_FIELD_VALUE":
-        return { setField: { fieldName: formData.fieldName, value: formData.fieldValue } };
+        return { setField: { field: formData.fieldName, value: formData.fieldValue } };
+      case "RESET_FORM":
+        return {};
+      case "EMIT_EVENT": {
+        const payload = parseJson(formData.eventPayload);
+        return {
+          event: {
+            name: formData.eventName,
+            ...(formData.eventPayload ? { payload: payload ?? formData.eventPayload } : {}),
+          },
+        };
+      }
       case "CHAIN":
         return {
           chain: formData.chainActions
@@ -101,6 +149,7 @@ export default function ManagePageAction() {
   const handleEdit = (action) => {
     let props = {};
     try { props = JSON.parse(action.properties || '{}'); } catch { /* empty */ }
+    const eventConfig = props?.event || props?.emit || {};
 
     setEditingId(action.id);
     setSelectedAction(action.actionType);
@@ -110,12 +159,18 @@ export default function ManagePageAction() {
       actionName: action.actionName || '',
       actionType: action.actionType || 'SUBMIT_FORM',
       path: props?.navigate?.path || '',
+      navigateParams: props?.navigate?.params ? JSON.stringify(props.navigate.params, null, 2) : '',
+      navigateReplace: Boolean(props?.navigate?.replace),
       url: props?.api?.url || '',
       method: props?.api?.method || 'GET',
+      responsePath: props?.api?.responsePath || '',
+      targetField: props?.setField?.field || props?.setField?.fieldName || '',
       toastMessage: props?.toast?.message || '',
-      toastType: props?.toast?.type || 'success',
-      fieldName: props?.setField?.fieldName || '',
+      toastType: props?.toast?.severity || props?.toast?.type || 'success',
+      fieldName: props?.setField?.field || props?.setField?.fieldName || '',
       fieldValue: props?.setField?.value || '',
+      eventName: eventConfig?.name || props?.eventName || '',
+      eventPayload: eventConfig?.payload ? JSON.stringify(eventConfig.payload, null, 2) : '',
       chainActions: Array.isArray(props?.chain) ? props.chain.join(', ') : '',
     });
 
@@ -205,16 +260,37 @@ export default function ManagePageAction() {
               </div>
 
               {formData.actionType === "NAVIGATE" && (
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-slate-700">Path</label>
-                  <input
-                    name="path"
-                    value={formData.path}
-                    onChange={handleChange}
-                    placeholder="/home"
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
-                  />
-                </div>
+                <>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Path</label>
+                    <input
+                      name="path"
+                      value={formData.path}
+                      onChange={handleChange}
+                      placeholder="/ui/users"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Query Params JSON</label>
+                    <textarea
+                      name="navigateParams"
+                      value={formData.navigateParams}
+                      onChange={handleChange}
+                      placeholder={'{ "id": "$form.userId" }'}
+                      className="min-h-24 rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
+                  </div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      name="navigateReplace"
+                      checked={formData.navigateReplace}
+                      onChange={handleChange}
+                    />
+                    Replace current history entry
+                  </label>
+                </>
               )}
 
               {(formData.actionType === "FETCH_DATA" || formData.actionType === "SUBMIT_FORM") && (
@@ -242,6 +318,31 @@ export default function ManagePageAction() {
                       <option>PUT</option>
                       <option>DELETE</option>
                     </select>
+                  </div>
+                </>
+              )}
+
+              {formData.actionType === "FETCH_DATA" && (
+                <>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Response Path</label>
+                    <input
+                      name="responsePath"
+                      value={formData.responsePath}
+                      onChange={handleChange}
+                      placeholder="data.items"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Target Field</label>
+                    <input
+                      name="targetField"
+                      value={formData.targetField}
+                      onChange={handleChange}
+                      placeholder="users"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
                   </div>
                 </>
               )}
@@ -295,6 +396,37 @@ export default function ManagePageAction() {
                     />
                   </div>
                 </>
+              )}
+
+              {formData.actionType === "EMIT_EVENT" && (
+                <>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Event Name</label>
+                    <input
+                      name="eventName"
+                      value={formData.eventName}
+                      onChange={handleChange}
+                      placeholder="user:selected"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-slate-700">Payload JSON</label>
+                    <textarea
+                      name="eventPayload"
+                      value={formData.eventPayload}
+                      onChange={handleChange}
+                      placeholder={'{ "id": "$form.userId" }'}
+                      className="min-h-24 rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.actionType === "RESET_FORM" && (
+                <p className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
+                  This action resets the current rendered form to its initial values.
+                </p>
               )}
 
               {formData.actionType === "CHAIN" && (
