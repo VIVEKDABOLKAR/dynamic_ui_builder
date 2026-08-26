@@ -1,6 +1,7 @@
 package dynamicUi.demo.repoistory;
 
 import dynamicUi.demo.entity.JobStep;
+import dynamicUi.demo.entity.JobStepStatus;
 import dynamicUi.demo.entity.WorkflowStepType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,5 @@ public interface JobStepRepository extends JpaRepository<JobStep, Long> {
             Long jobOrderId,
             Integer sequenceNo
     );
+    List<JobStep> findByJobOrder_FacilityIdAndStatusAndStep(String facilityId, JobStepStatus status, WorkflowStepType workflowStepType);
 }

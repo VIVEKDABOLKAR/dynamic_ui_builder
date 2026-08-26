@@ -40,57 +40,27 @@ function NavGroup({ node, depth }) {
                     paddingLeft: `${12 + depth * 14}px`,
                 }}
                 className="
-          group
-          flex
-          w-full
-          items-center
-          gap-3
-          rounded-lg
-          px-3
-          py-2.5
-          text-left
-          text-sm
-          font-medium
-          text-slate-600
-          transition-all
-          duration-200
-
-          hover:bg-slate-100
-          hover:text-slate-900
-
-          focus:outline-none
-          focus:ring-2
-          focus:ring-indigo-500/20
-        "
+                group flex w-full items-center gap-3 rounded-lg px-3 py-2.5
+                text-left text-sm font-medium text-slate-600
+                transition-all duration-200
+                hover:bg-slate-100 hover:text-slate-900
+                focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+                "
             >
                 {/* Icon */}
                 <span
-                    className="
-            flex
-            h-8
-            w-8
-            shrink-0
-            items-center
-            justify-center
-            rounded-lg
-            bg-slate-100
-            text-slate-500
-            transition-all
-            duration-200
-
-            group-hover:bg-indigo-50
-            group-hover:text-indigo-600
-          "
+                    className="flex items-center justify-center h-8 w-8shrink-0 rounded-lg bg-slate-100 
+                    text-slate-500
+                    transition-all duration-200
+                    group-hover:bg-indigo-50 group-hover:text-indigo-600
+                    "
                 >
                     <NavIcon
                         name={node.icon}
-                        className="
-              h-4
-              w-4
-              transition-transform
-              duration-200
-              group-hover:scale-110
-            "
+                        className="h-4 w-4
+                        transition-transform duration-200
+                        group-hover:scale-110
+                    "
                     />
                 </span>
 
@@ -101,20 +71,11 @@ function NavGroup({ node, depth }) {
 
                 {/* Arrow */}
                 <span
-                    className="
-            flex
-            h-6
-            w-6
-            shrink-0
-            items-center
-            justify-center
-            rounded-md
-            text-slate-400
-            transition-colors
-
-            group-hover:bg-slate-200
-            group-hover:text-slate-600
-          "
+                    className="flex items-center justify-center h-6 w-6 shrink-0 rounded-md
+                    text-slate-400
+                    transition-colors
+                    group-hover:bg-slate-200 group-hover:text-slate-600
+                    "
                 >
                     <FaChevronDown
                         className={`
@@ -336,8 +297,7 @@ export default function DynamicSideBar() {
         <aside
             className="
         flex
-        h-dvh
-        min-h-0
+        h-full
         w-72
         shrink-0
         flex-col
