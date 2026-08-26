@@ -1,8 +1,12 @@
+import apiClient from "../../../api/apiClient";
+import { FormilyPageSchema } from "../types/JsonSchemaFormily";
+
 export default async function ExecuteAction(
     ref: string,
     cond: string,
     pageSchema: FormilyPageSchema,
-    ctx: ActionContext
+    ctx: ActionContext,
+    visited: Set<string> = new Set()
 ) {
     const actRegistry = pageSchema?.["x-actions"];
     if (!actRegistry) {
@@ -16,6 +20,20 @@ export default async function ExecuteAction(
         console.warn(`Action ${ref} not found`);
         return;
     }
+
+    // FIX: condition was captured/stored end-to-end but never evaluated —
+    // every action fired unconditionally. Skip execution when it evaluates false.
+    if (!evaluateCondition(cond, ctx)) {
+        return;
+    }
+
+    // FIX: guard against a CHAIN action referencing itself (directly or via a
+    // cycle of chains), which would otherwise recurse forever.
+    if (visited.has(ref)) {
+        console.warn(`Circular action chain detected at "${ref}", skipping`);
+        return;
+    }
+    visited.add(ref);
 
     switch (action.type) {
 
@@ -83,6 +101,7 @@ export default async function ExecuteAction(
         case "SET_FIELD_VALUE": {
             const field = getSetFieldName(action);
             const value = resolveValue(action.setField?.value, ctx);
+            console.log("field "+field, "  ", "value "+value)
             ctx.setFieldValue?.(field, value);
             break;
         }
@@ -92,11 +111,24 @@ export default async function ExecuteAction(
             break;
         }
 
+        //typeScript issues ignore till fully understanding emit-event
         case "EMIT_EVENT": {
             const eventConfig = action.event || action.emit || {};
             const eventName = eventConfig.name || action.eventName;
             const payload = resolveValue(parseJsonValue(eventConfig.payload), ctx);
             ctx.emitEvent?.(eventName, payload);
+            break;
+        }``
+
+        // FIX: CHAIN was fully configurable from the admin UI (type selector,
+        // ChainFields, saved as { chain: [...] }) but had no runtime handler —
+        // it silently hit "Unsupported action type". Run each referenced
+        // action in order, sharing the same visited set to prevent cycles.
+        case "CHAIN": {
+            const chainRefs = Array.isArray(action.chain) ? action.chain : [];
+            for (const chainRef of chainRefs) {
+                await ExecuteAction(chainRef, "true", pageSchema, ctx, visited);
+            }
             break;
         }
 
@@ -105,8 +137,6 @@ export default async function ExecuteAction(
     }
 }
 
-import apiClient from "../../../api/apiClient";
-import { FormilyPageSchema } from "../types/JsonSchemaFormily";
 
 export interface ActionContext {
     navigate?: (path: string, options?: { replace?: boolean }) => void;
@@ -138,7 +168,7 @@ const parseJsonValue = (value: any) => {
     }
 };
 
-const resolveValue = (value: any, ctx: ActionContext, responseData?: any) => {
+const resolveValue = (value: any, ctx: ActionContext, responseData?: any): any => {
     if (Array.isArray(value)) {
         return value.map((item) => resolveValue(item, ctx, responseData));
     }
@@ -171,6 +201,30 @@ const resolveValue = (value: any, ctx: ActionContext, responseData?: any) => {
 
         return resolved == null ? "" : String(resolved);
     });
+};
+
+// FIX: previously unused — `cond` reached this file but nothing ever called
+// this. Supports the same "true" / "false" / "$form.field" style already
+// used elsewhere in this file, plus simple JS-like comparisons
+// (e.g. `$form.status == 'active' && $form.qty > 0`).
+const evaluateCondition = (cond: string | undefined, ctx: ActionContext): boolean => {
+    const expr = (cond ?? "true").trim();
+
+    if (expr === "" || expr === "true") return true;
+    if (expr === "false") return false;
+
+    const substituted = expr.replace(/\$form\.([A-Za-z0-9_.-]+)/g, (_match, path) => {
+        const value = ctx.getFormValue?.(path) ?? getByPath(ctx.formData, path);
+        return JSON.stringify(value ?? null);
+    });
+
+    try {
+        // eslint-disable-next-line no-new-func
+        return Boolean(new Function(`"use strict"; return (${substituted});`)());
+    } catch (err) {
+        console.warn(`Failed to evaluate condition "${cond}", defaulting to true`, err);
+        return true;
+    }
 };
 
 const resolveRecord = (

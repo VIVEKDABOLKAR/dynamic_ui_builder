@@ -31,7 +31,8 @@ export default function ManagePageAction() {
 
     try {
       return JSON.parse(value);
-    } catch {
+    } catch(error) {
+      console.error(error)
       return undefined;
     }
   };
@@ -50,10 +51,16 @@ export default function ManagePageAction() {
       }
       
       case "FETCH_DATA": {
+        // FIX: params was saved as a raw string instead of parsed JSON (unlike
+        // navigateParams/eventPayload, which already go through parseJson).
+        // ExecuteAction's resolveRecord() calls Object.entries() on this value
+        // expecting an object — a string silently produced broken params
+        // (iterated character-by-character).
+        const params = parseJson(formData.params);
         const api = {
           url: formData.url,
           method: formData.method,
-          params: formData.params,
+          ...(params ? { params } : {}),
           ...(formData.responsePath ? { responsePath: formData.responsePath } : {}),
         };
 
@@ -62,8 +69,20 @@ export default function ManagePageAction() {
           ...(formData.targetField ? { setField: { field: formData.targetField, value: "$response" } } : {}),
         };
       }
-      case "SUBMIT_FORM":
-        return { api: { url: formData.url, method: formData.method } };
+      case "SUBMIT_FORM": {
+        // FIX: the form shows a Params input for Submit Form (it reuses
+        // ApiFields), but this case never included it in the saved config —
+        // params were silently dropped even though ExecuteAction's
+        // SUBMIT_FORM case supports them.
+        const params = parseJson(formData.params);
+        return {
+          api: {
+            url: formData.url,
+            method: formData.method,
+            ...(params ? { params } : {}),
+          },
+        };
+      }
       case "SHOW_TOAST":
         return { toast: { message: formData.toastMessage, severity: formData.toastType } };
       case "SET_FIELD_VALUE":
@@ -139,6 +158,9 @@ export default function ManagePageAction() {
       navigateReplace: Boolean(props?.navigate?.replace),
       url: props?.api?.url || '',
       method: props?.api?.method || 'GET',
+      // FIX: params was never restored on edit, so re-saving an edited
+      // action wiped out any params it had.
+      params: props?.api?.params ? JSON.stringify(props.api.params, null, 2) : '',
       responsePath: props?.api?.responsePath || '',
       targetField: props?.setField?.field || props?.setField?.fieldName || '',
       toastMessage: props?.toast?.message || '',
