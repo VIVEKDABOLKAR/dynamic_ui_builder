@@ -1,5 +1,7 @@
 import apiClient from "../../../api/apiClient";
 import { FormilyPageSchema } from "../types/JsonSchemaFormily";
+import { buildSubmitPayload, resolveFieldName } from "../../dataMappingEngine/entityMapping";
+import { buildEntityPayload } from "../../dataMappingEngine/utils/buildEntityPayload";
 
 export default async function ExecuteAction(
     ref: string,
@@ -39,6 +41,18 @@ export default async function ExecuteAction(
 
         case "SUBMIT_FORM": {
             try {
+                // FIX (Entity Mapping proposal): payload used to be sent as the flat
+                // formData object, keyed by component name. Fields that carry an
+                // ENTITY mapping (e.g. "jobOrder.driver.name") are now nested under
+                // that path instead; unmapped fields still fall back to their
+                // component name, so pages without entity mapping are unaffected.
+                const submitPayload = buildEntityPayload(
+                    ctx.formData,
+                    pageSchema
+                );
+                console.log(submitPayload)
+
+
                 const response = await apiClient({
                     method: action.api?.method || "POST",
                     url: action.api?.url,
@@ -101,7 +115,7 @@ export default async function ExecuteAction(
         case "SET_FIELD_VALUE": {
             const field = getSetFieldName(action);
             const value = resolveValue(action.setField?.value, ctx);
-            console.log("field "+field, "  ", "value "+value)
+            console.log("field " + field, "  ", "value " + value)
             ctx.setFieldValue?.(field, value);
             break;
         }
@@ -118,7 +132,7 @@ export default async function ExecuteAction(
             const payload = resolveValue(parseJsonValue(eventConfig.payload), ctx);
             ctx.emitEvent?.(eventName, payload);
             break;
-        }``
+        } ``
 
         // FIX: CHAIN was fully configurable from the admin UI (type selector,
         // ChainFields, saved as { chain: [...] }) but had no runtime handler —
