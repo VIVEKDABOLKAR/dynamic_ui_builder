@@ -2,6 +2,8 @@ package dynamicUi.demo.service;
 
 import dynamicUi.demo.entity.WorkflowStep;
 import dynamicUi.demo.entity.WorkflowStepType;
+import dynamicUi.demo.exception.WorkflowStepAlreadyExistsException;
+import dynamicUi.demo.exception.WorkflowStepNotFoundException;
 import dynamicUi.demo.repoistory.WorkflowConfigurationRepository;
 import dynamicUi.demo.repoistory.WorkflowStepRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -169,7 +171,7 @@ public class WorkflowStepServiceTest {
 
         //action + assert
         assertThatThrownBy(() -> workflowStepService.create(workflowStep))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(WorkflowStepAlreadyExistsException.class)
                 .hasMessageContaining("A workflow step with code 'GATE_CHECK_IN' already exists.");
 
         //verify — never reaches save()
@@ -215,7 +217,7 @@ public class WorkflowStepServiceTest {
         WorkflowStep payload = WorkflowStep.builder().name("New Name").build();
 
         assertThatThrownBy(() -> workflowStepService.update(99L, payload))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(WorkflowStepNotFoundException.class)
                 .hasMessageContaining("Workflow step not found: 99");
 
         verify(workflowStepRepository, never()).save(any());
@@ -283,7 +285,7 @@ public class WorkflowStepServiceTest {
         when(workflowStepRepository.existsById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> workflowStepService.delete(99L))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(WorkflowStepNotFoundException.class)
                 .hasMessageContaining("Workflow step not found: 99");
 
         verify(workflowStepRepository, never()).deleteById(any());

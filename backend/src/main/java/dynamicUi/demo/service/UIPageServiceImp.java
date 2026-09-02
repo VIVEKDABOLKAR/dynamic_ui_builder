@@ -8,6 +8,10 @@ import dynamicUi.demo.demo.PageUpdateMessage;
 import dynamicUi.demo.dto.UIPageRequestDTO;
 import dynamicUi.demo.dto.UIPageResponseDTO;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.exception.PageAlreadyExistsException;
+import dynamicUi.demo.exception.PageNotFoundException;
+import dynamicUi.demo.exception.RouteAlreadyExistsException;
+import dynamicUi.demo.exception.RouteNotFoundException;
 import dynamicUi.demo.mapper.UIPageMapper;
 import dynamicUi.demo.mapper.UIRouteMapper;
 import dynamicUi.demo.repoistory.UIRouteRepository;
@@ -48,11 +52,11 @@ public class UIPageServiceImp implements UIPageService {
 
         ///Unique validation
         if (uiPageRepository.existsByPageCode(uiPageReq.getPageCode())) {
-            throw new RuntimeException("Page code already exists");
+            throw new PageAlreadyExistsException("Page code already exists");
         }
 
         if (uiRouteRepository.existsByPath(uiPageReq.getRoute().getPath())) {
-            throw new RuntimeException("Route Path already exists");
+            throw new RouteAlreadyExistsException("Route Path already exists");
         }
 
         UIPage uiPage = uiPageMapper.toEntity(uiPageReq);
@@ -74,7 +78,7 @@ public class UIPageServiceImp implements UIPageService {
 
         UIPage page = uiPageRepository.findByPageCode(pageCode)
                 .orElseThrow(() ->
-                        new RuntimeException("Page not found with code: " + pageCode));
+                        new PageNotFoundException("Page not found with code: " + pageCode));
 
         UIRoute route = getRouteForPageOrThrow(pageCode);
         return uiPageMapper.toResponse(page, route);
@@ -90,12 +94,12 @@ public class UIPageServiceImp implements UIPageService {
     public UIPageResponseDTO updatePage(String pageCode, UIPageRequestDTO request) {
 
         UIPage page = uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page not found"));
+                .orElseThrow(() -> new PageNotFoundException("Page not found"));
         UIRoute route = getRouteForPageOrThrow(pageCode);
 
         if (!route.getPath().equals(request.getRoute().getPath())
                 && uiRouteRepository.existsByPath(request.getRoute().getPath())) {
-            throw new RuntimeException("Route already exists");
+            throw new RouteAlreadyExistsException("Route already exists");
         }
 
         // Update page and nested route
@@ -113,7 +117,7 @@ public class UIPageServiceImp implements UIPageService {
     @Override
     public void deletePage(String pageCode) {
         UIPage page = uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page not found with code: " + pageCode));
+                .orElseThrow(() -> new PageNotFoundException("Page not found with code: " + pageCode));
         page.setStatus(PageStatus.DELETED);
         uiPageRepository.save(page);
         syncPageJson(page, getRouteForPageOrThrow(pageCode));
@@ -133,7 +137,7 @@ public class UIPageServiceImp implements UIPageService {
         UIPage page =
                 uiPageRepository.findByPageCode(pageCode)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new PageNotFoundException(
                                         "Page not found"));
 
         page.setStatus(status);
@@ -149,7 +153,7 @@ public class UIPageServiceImp implements UIPageService {
     /// Helper Functions
     private UIRoute getRouteForPageOrThrow(String pageCode) {
         return uiRouteRepository.findByPage_PageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Route not found for page: " + pageCode));
+                .orElseThrow(() -> new RouteNotFoundException("Route not found for page: " + pageCode));
     }
 
     private ObjectNode buildPageNode(UIPage page, UIRoute route) {

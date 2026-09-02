@@ -2,6 +2,8 @@ package dynamicUi.demo.service;
 
 import dynamicUi.demo.entity.WorkflowStep;
 import dynamicUi.demo.entity.WorkflowStepType;
+import dynamicUi.demo.exception.WorkflowStepAlreadyExistsException;
+import dynamicUi.demo.exception.WorkflowStepNotFoundException;
 import dynamicUi.demo.repoistory.WorkflowConfigurationRepository;
 import dynamicUi.demo.repoistory.WorkflowStepRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ public class WorkflowStepService {
         validateKnownStepType(normalizedCode);
 
         if (workflowStepRepository.existsByCode(normalizedCode)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A workflow step with code '" + normalizedCode + "' already exists.");
+            throw new WorkflowStepAlreadyExistsException("A workflow step with code '" + normalizedCode + "' already exists.");
         }
 
         step.setCode(normalizedCode);
@@ -47,7 +49,7 @@ public class WorkflowStepService {
 
     public WorkflowStep update(Long id, WorkflowStep payload) {
         WorkflowStep existing = workflowStepRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow step not found: " + id));
+                .orElseThrow(() -> new WorkflowStepNotFoundException("Workflow step not found: " + id));
 
         if (payload.getName() == null || payload.getName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Step name is required.");
@@ -63,7 +65,7 @@ public class WorkflowStepService {
 
     public void delete(Long id) {
         if (!workflowStepRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow step not found: " + id);
+            throw new WorkflowStepNotFoundException("Workflow step not found: " + id);
         }
         if (workflowConfigurationRepository.existsByWorkflowStep_Id(id)) {
             throw new ResponseStatusException(

@@ -1,6 +1,8 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.entity.Facility;
+import dynamicUi.demo.exception.FacilityAlreadyExistsException;
+import dynamicUi.demo.exception.FacilityNotFoundException;
 import dynamicUi.demo.repoistory.FacilityRepository;
 import dynamicUi.demo.security.JwtUtil;
 import dynamicUi.demo.security.Role;
@@ -62,7 +64,7 @@ public class FacilityService {
         String normalizedId = facility.getId().trim().toUpperCase();
 
         if (facilityRepository.existsById(normalizedId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "A facility with ID '" + normalizedId + "' already exists.");
+            throw new FacilityAlreadyExistsException("A facility with ID '" + normalizedId + "' already exists.");
         }
 
         facility.setId(normalizedId);
@@ -73,7 +75,7 @@ public class FacilityService {
 
     public Facility updateFacility(String id, Facility payload) {
         Facility existing = facilityRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility '" + id + "' not found."));
+                .orElseThrow(() -> new FacilityNotFoundException("Facility '" + id + "' not found."));
 
         if (payload.getName() == null || payload.getName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Facility name is required.");
@@ -86,7 +88,7 @@ public class FacilityService {
 
     public void deleteFacility(String id) {
         if (!facilityRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility '" + id + "' not found.");
+            throw new FacilityNotFoundException("Facility '" + id + "' not found.");
         }
 
         try {

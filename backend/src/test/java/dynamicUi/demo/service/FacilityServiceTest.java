@@ -1,6 +1,8 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.entity.Facility;
+import dynamicUi.demo.exception.FacilityAlreadyExistsException;
+import dynamicUi.demo.exception.FacilityNotFoundException;
 import dynamicUi.demo.repoistory.FacilityRepository;
 import dynamicUi.demo.security.JwtUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -164,7 +166,7 @@ class FacilityServiceTest {
         Facility payload = Facility.builder().id("f1").name("Duplicate").build();
 
         assertThatThrownBy(() -> facilityService.createFacility(payload))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(FacilityAlreadyExistsException.class)
                 .hasMessageContaining("F1");
         verify(facilityRepository, never()).save(any());
     }
@@ -189,7 +191,7 @@ class FacilityServiceTest {
         when(facilityRepository.findById("F9")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> facilityService.updateFacility("F9", Facility.builder().name("X").build()))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(FacilityNotFoundException.class);
     }
 
     @Test
@@ -221,7 +223,7 @@ class FacilityServiceTest {
         when(facilityRepository.existsById("F9")).thenReturn(false);
 
         assertThatThrownBy(() -> facilityService.deleteFacility("F9"))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(FacilityNotFoundException.class);
         verify(facilityRepository, never()).deleteById(any());
     }
 
