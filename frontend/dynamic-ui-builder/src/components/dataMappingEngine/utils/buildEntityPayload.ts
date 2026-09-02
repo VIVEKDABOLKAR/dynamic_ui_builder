@@ -4,13 +4,9 @@ export function buildEntityPayload(
   values: Record<string, any>,
   schema: any
 ) {
-  const payload = {};
+  const payload: Record<string, any> = {};
 
-  traverseSchema(
-    schema,
-    values, // original form data
-    payload
-  );
+  traverseSchema(schema, values, payload);
 
   return payload;
 }
@@ -18,7 +14,7 @@ export function buildEntityPayload(
 function traverseSchema(
   schema: any,
   formValues: Record<string, any>,
-  payload: any
+  payload: Record<string, any>
 ) {
   if (!schema?.properties) {
     return;
@@ -27,16 +23,17 @@ function traverseSchema(
   for (const [fieldName, fieldSchema] of Object.entries<any>(
     schema.properties
   )) {
-    const mapping = fieldSchema["x-mapping"];
-
-    // Value always comes from original form data
+    // The actual value comes from the form field name.
+    // Example: formValues["Text Field"] => "John"
     const fieldValue = formValues[fieldName];
 
+    const mapping = fieldSchema?.["x-mapping"];
+
+    // ENTITY field
     if (
       mapping?.type === "ENTITY" &&
       mapping.source &&
-      mapping.source !== "." &&
-      fieldValue !== undefined
+      mapping.source !== "." 
     ) {
       setNestedValue(
         payload,
@@ -45,8 +42,8 @@ function traverseSchema(
       );
     }
 
-    // Recursively traverse children
-    if (fieldSchema.properties) {
+    // Recursively process nested schema properties
+    if (fieldSchema?.properties) {
       traverseSchema(
         fieldSchema,
         formValues,

@@ -1,9 +1,13 @@
 package dynamicUi.demo.controller;
 
 import dynamicUi.demo.constant.Attribute;
+import dynamicUi.demo.dto.JobStepDTO;
 import dynamicUi.demo.entity.DockAssignment;
+import dynamicUi.demo.entity.JobStep;
+import dynamicUi.demo.entity.JobStepStatus;
 import dynamicUi.demo.entity.WorkflowStepType;
 import dynamicUi.demo.repoistory.DockAssignmentRepository;
+import dynamicUi.demo.repoistory.JobStepRepository;
 import dynamicUi.demo.service.WorkflowStepExecutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import java.util.List;
 public class DockAssignmentController {
 
     private final DockAssignmentRepository repository;
+    private final JobStepRepository jobStepRepository;
     private final WorkflowStepExecutorService executor;
 
     @PostMapping
@@ -39,6 +44,28 @@ public class DockAssignmentController {
     ) {
         return repository.findByJobOrderFacilityId(selectedFacilityId);
     }
+
+    @GetMapping("/inprogress")
+    public List<JobStepDTO> getAllInProgressDockAssignment(
+            @RequestAttribute(value = Attribute.SELECTED_FACILITY_ID, required = false) String selectedFacilityId
+    ) {
+
+
+        List<JobStep> jobStepList = jobStepRepository.findByJobOrder_FacilityIdAndStatusAndStep(selectedFacilityId, JobStepStatus.IN_PROGRESS, WorkflowStepType.DOCK_ASSIGNMENT);
+
+        return jobStepList.stream()
+                .map(var ->
+                        JobStepDTO.builder()
+                                .id(var.getId())
+                                .jobOrderId(var.getJobOrder().getId())
+                                .status(var.getStatus())
+                                .step(var.getStep())
+                                .sequenceNo(var.getSequenceNo())
+                                .build()
+                )
+                .toList();
+    }
+
 
     public record DockAssignmentRequest(Long jobOrderId, String dock, String assignedBy) {}
 
