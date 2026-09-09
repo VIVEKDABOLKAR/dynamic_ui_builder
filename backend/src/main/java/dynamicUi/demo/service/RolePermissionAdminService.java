@@ -3,6 +3,8 @@ package dynamicUi.demo.service;
 import dynamicUi.demo.dto.RoleAccessResponse;
 import dynamicUi.demo.entity.AppRole;
 import dynamicUi.demo.entity.RolePermission;
+import dynamicUi.demo.exception.RoleAlreadyExistsException;
+import dynamicUi.demo.exception.RoleNotFoundException;
 import dynamicUi.demo.repoistory.AppRoleRepository;
 import dynamicUi.demo.repoistory.RolePermissionRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +71,7 @@ public class RolePermissionAdminService {
         String code = normalizeCode(rawCode);
 
         if (appRoleRepository.existsByCode(code)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Role already exists: " + code);
+            throw new RoleAlreadyExistsException("Role already exists: " + code);
         }
 
         AppRole role = appRoleRepository.save(
@@ -85,8 +87,8 @@ public class RolePermissionAdminService {
 
     private AppRole findRoleOrThrow(String code) {
         return appRoleRepository.findByCode(code)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Role not found: " + code));
+                .orElseThrow(() -> new RoleNotFoundException(
+                        "Role not found: " + code));
     }
 
     /**

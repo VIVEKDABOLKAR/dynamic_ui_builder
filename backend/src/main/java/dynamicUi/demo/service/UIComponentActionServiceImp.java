@@ -1,6 +1,7 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.entity.UIComponentAction;
+import dynamicUi.demo.exception.ComponentActionNotFoundException;
 import dynamicUi.demo.repoistory.UIComponentActionRepository;
 import dynamicUi.demo.service.inter.UIComponentActionService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class UIComponentActionServiceImp implements UIComponentActionService {
     @Override
     public UIComponentAction update(Long id, UIComponentAction action) {
         UIComponentAction existing = uiComponentActionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UIComponentAction not found: " + id));
+                .orElseThrow(() -> new ComponentActionNotFoundException("UIComponentAction not found: " + id));
 
         existing.setEvent(action.getEvent());
         existing.setActionRef(action.getActionRef());
@@ -46,7 +47,7 @@ public class UIComponentActionServiceImp implements UIComponentActionService {
     @Override
     public UIComponentAction getById(Long id) {
         return uiComponentActionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("UIComponentAction not found: " + id));
+                .orElseThrow(() -> new ComponentActionNotFoundException("UIComponentAction not found: " + id));
     }
 
     @Override
@@ -62,7 +63,7 @@ public class UIComponentActionServiceImp implements UIComponentActionService {
     @Override
     public void delete(Long id) {
         if (!uiComponentActionRepository.existsById(id)) {
-            throw new RuntimeException("UIComponentAction not found: " + id);
+            throw new ComponentActionNotFoundException("UIComponentAction not found: " + id);
         }
         uiComponentActionRepository.deleteById(id);
     }

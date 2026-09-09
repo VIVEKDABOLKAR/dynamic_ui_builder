@@ -10,6 +10,7 @@ import dynamicUi.demo.entity.UIComponentAction;
 import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIPageAction;
 import dynamicUi.demo.entity.UIPageJson;
+import dynamicUi.demo.exception.PageNotFoundException;
 import dynamicUi.demo.repoistory.UIComponentActionRepository;
 import dynamicUi.demo.repoistory.UIPageActionRepository;
 import dynamicUi.demo.repoistory.UIPageJsonRepository;
@@ -64,7 +65,7 @@ public class PageAssemblerService {
 
         // 1. Validate page exists and is active
         UIPage uiPage = uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new PageNotFoundException(
                         "PAGE NOT FOUND :: pageCode = " + pageCode));
 
         if (!(uiPage.getStatus() != PageStatus.INACTIVE && uiPage.getStatus() != PageStatus.DRAFT)) {
@@ -79,7 +80,7 @@ public class PageAssemblerService {
 
         // 2. Load base JSON schema
         UIPageJson uiPageJson = uiPageJsonRepository.findByUiPage_PageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new PageNotFoundException(
                         "PAGE JSON NOT FOUND :: pageCode = " + pageCode));
 
         try {

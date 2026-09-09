@@ -2,6 +2,8 @@ package dynamicUi.demo.service;
 
 import dynamicUi.demo.dto.RouteResponseDTO;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.exception.RouteAlreadyExistsException;
+import dynamicUi.demo.exception.RouteNotFoundException;
 import dynamicUi.demo.mapper.UIRouteMapper;
 import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
@@ -29,7 +31,7 @@ public class UIRouteServiceImp implements UIRouteService {
     public RouteResponseDTO resolveByPath(String path) {
         //get route object
         UIRoute route = repository.findByPath(path)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RouteNotFoundException(
                         "ROUTE NOT FOUND :: path = " + path));
 
         if (!Boolean.TRUE.equals(route.getIsActive()))
@@ -43,7 +45,7 @@ public class UIRouteServiceImp implements UIRouteService {
 
         //get route object
         UIRoute route = repository.findByPath(path)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RouteNotFoundException(
                         "ROUTE NOT FOUND :: path = " + path));
 
         //validate selectedFacilityId and RouteId is exists
@@ -69,7 +71,7 @@ public class UIRouteServiceImp implements UIRouteService {
     @Override
     public UIRoute getPathByPage_id(Long id) {
         return repository.findByPage_id(id)
-                .orElseThrow(() -> new RuntimeException("path does not exist for page id :- " + id));
+                .orElseThrow(() -> new RouteNotFoundException("path does not exist for page id :- " + id));
     }
 
 
@@ -77,10 +79,10 @@ public class UIRouteServiceImp implements UIRouteService {
     public UIRoute createRoute(UIRoute route) {
 
         if (repository.existsByRouteCode(route.getRouteCode()))
-            throw new RuntimeException("Route code already exists.");
+            throw new RouteAlreadyExistsException("Route code already exists.");
 
         if (repository.existsByPath(route.getPath()))
-            throw new RuntimeException("Route path already exists.");
+            throw new RouteAlreadyExistsException("Route path already exists.");
 
         return repository.save(route);
     }
@@ -89,7 +91,7 @@ public class UIRouteServiceImp implements UIRouteService {
     public UIRoute updateRoute(String routeCode, UIRoute request) {
 
         UIRoute route = repository.findByRouteCode(routeCode)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
+                .orElseThrow(() -> new RouteNotFoundException("Route not found"));
 
         route.setPath(request.getPath());
         route.setShowInMenu(request.getShowInMenu());
@@ -106,7 +108,7 @@ public class UIRouteServiceImp implements UIRouteService {
     public UIRoute getRoute(String routeCode) {
 
         return repository.findByRouteCode(routeCode)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
+                .orElseThrow(() -> new RouteNotFoundException("Route not found"));
     }
 
     @Override
@@ -119,7 +121,7 @@ public class UIRouteServiceImp implements UIRouteService {
     public void deleteRoute(String routeCode) {
 
         UIRoute route = repository.findByRouteCode(routeCode)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
+                .orElseThrow(() -> new RouteNotFoundException("Route not found"));
 
         route.setIsActive(false);
 

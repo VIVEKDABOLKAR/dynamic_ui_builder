@@ -5,6 +5,8 @@ import dynamicUi.demo.entity.Facility;
 import dynamicUi.demo.entity.FacilityRouteAccess;
 import dynamicUi.demo.entity.UIPage;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.exception.FacilityNotFoundException;
+import dynamicUi.demo.exception.RouteNotFoundException;
 import dynamicUi.demo.repoistory.FacilityRepository;
 import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
@@ -58,7 +60,7 @@ class FacilityRouteAccessServiceTest {
         when(facilityRepository.existsById("F9")).thenReturn(false);
 
         assertThatThrownBy(() -> service.getAccessForFacility("F9"))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(FacilityNotFoundException.class)
                 .hasMessageContaining("F9");
     }
 
@@ -132,7 +134,7 @@ class FacilityRouteAccessServiceTest {
         when(facilityRepository.existsById("F9")).thenReturn(false);
 
         assertThatThrownBy(() -> service.updateFacilityAccess("F9", List.of(1L)))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(FacilityNotFoundException.class);
         verify(accessRepository, never()).findByFacilityId(any());
     }
 
@@ -143,7 +145,7 @@ class FacilityRouteAccessServiceTest {
         when(uiRouteRepository.existsById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> service.updateFacilityAccess("F1", List.of(99L)))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(RouteNotFoundException.class);
     }
 
     @Test

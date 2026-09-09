@@ -5,6 +5,8 @@ import dynamicUi.demo.dto.RouteAccessResponse;
 import dynamicUi.demo.entity.Facility;
 import dynamicUi.demo.entity.FacilityRouteAccess;
 import dynamicUi.demo.entity.UIRoute;
+import dynamicUi.demo.exception.FacilityNotFoundException;
+import dynamicUi.demo.exception.RouteNotFoundException;
 import dynamicUi.demo.repoistory.FacilityRepository;
 import dynamicUi.demo.repoistory.FacilityRouteAccessRepository;
 import dynamicUi.demo.repoistory.UIRouteRepository;
@@ -31,7 +33,7 @@ public class FacilityRouteAccessService {
 
     public RouteAccessResponse getAccessForFacility(String facilityId) {
         if (!facilityRepository.existsById(facilityId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility not found: " + facilityId);
+            throw new FacilityNotFoundException("Facility not found: " + facilityId);
         }
         List<FacilityRouteAccess> byFacilityIdAndActiveTrue = accessRepository.findByFacilityIdAndActiveTrue(facilityId);
         Set<Long> granted = byFacilityIdAndActiveTrue
@@ -100,7 +102,7 @@ public class FacilityRouteAccessService {
     @Transactional
     public void updateFacilityAccess(String facilityId, List<Long> selectedRouteIds) {
         if (!facilityRepository.existsById(facilityId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Facility not found: " + facilityId);
+            throw new FacilityNotFoundException("Facility not found: " + facilityId);
         }
         applyAccess(facilityId, selectedRouteIds);
     }
@@ -122,7 +124,7 @@ public class FacilityRouteAccessService {
 
         for (Long routeId : selected) {
             if (!uiRouteRepository.existsById(routeId)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown route id: " + routeId);
+                throw new RouteNotFoundException("Unknown route id: " + routeId);
             }
         }
 

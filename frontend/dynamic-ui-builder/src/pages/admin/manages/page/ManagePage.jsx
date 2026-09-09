@@ -84,14 +84,24 @@ export default function ManagePage() {
             headerName: 'Status',
             minWidth: 120,
             filter: true,
-            valueFormatter: (params) => (params.value ? 'Active' : 'Inactive'),
-            cellStyle: (params) => ({
-                cursor: 'pointer',
-                color: params.value ? '#16a34a' : '#dc2626',
-                fontWeight: 600
-            }),
-            onCellClicked: handleStatusToggle
+            suppressCellFocus: true,
+
+            cellRenderer: (params) => (
+                <div className="flex h-full items-center justify-center">
+                    <input
+                        type="checkbox"
+                        checked={!!params.value}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusToggle(params);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="h-4 w-4 cursor-pointer accent-green-600"
+                    />
+                </div>
+            ),
         },
+
         {
             field: 'createdAt',
             minWidth: 180,
@@ -111,10 +121,14 @@ export default function ManagePage() {
             lockPinned: true,
             lockPosition: true,
             suppressMovable: true,
+            suppressCellFocus: true,
             sortable: false,
             filter: false,
             cellRenderer: (params) => (
-                <div className="flex h-full items-center gap-3 py-1">
+                <div
+                    className="flex h-full items-center gap-3 py-1"
+                    onClick={(e) => e.stopPropagation()}
+                >
 
                     <Link
                         to={`/admin_panel/manage_page/${params.data.pageCode}/edit`}
@@ -193,7 +207,7 @@ export default function ManagePage() {
                 </div>
 
                 <div className="overflow-auto">
-                    <div className="h-[350px]  ">
+                    <div className="h-[350px]">
                         {isLoading ? (
                             <div className="flex h-full items-center justify-center gap-3 text-sm text-slate-500">
                                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-500" />
@@ -205,7 +219,9 @@ export default function ManagePage() {
                                 <p>Create a new page to get started.</p>
                             </div>
                         ) : (
-                            <AgGridReact rowData={rowData} columnDefs={columnDefs} />
+                            <AgGridReact rowData={rowData} columnDefs={columnDefs}
+                                suppressCellFocus={true}
+                            />
                         )}
                     </div>
                 </div>

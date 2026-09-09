@@ -1,11 +1,13 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.dto.UserRoleResponse;
+import dynamicUi.demo.exception.UserNotFoundException;
 import dynamicUi.demo.security.AppUser;
 import dynamicUi.demo.security.AppUserRepository;
 import dynamicUi.demo.security.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,7 +31,7 @@ public class UserRoleAdminService {
     @Transactional
     public UserRoleResponse updateRole(Long userId, String newRole) {
         AppUser user = appUserRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
         // Guard: don't allow demoting the last remaining admin
         if (user.getRole().equals(Role.ROLE_ADMIN.name()) &&

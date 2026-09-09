@@ -1,8 +1,5 @@
 package dynamicUi.demo.exception;
 
-import dynamicUi.demo.controller.FacilityAdminController;
-import dynamicUi.demo.controller.UIPageController;
-import dynamicUi.demo.controller.WorkflowStepAdminController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,25 +7,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Basic global exception handler.
+ * Global exception handler — applies app-wide (no assignableTypes scoping
+ * anymore, now that the specific-exception pattern covers most modules:
+ * pages, facilities, routes, workflow steps, roles, lookups, component
+ * actions, users).
  *
- * Scoped (via assignableTypes) to a first batch of 3 controllers —
- * UIPageController, FacilityAdminController, WorkflowStepAdminController —
- * so we can validate the response shape before wiring it up app-wide.
- * To extend it to more controllers later, just add them to assignableTypes.
- *
- * Covers the exception types these modules' services actually throw today:
- * specific NotFoundException / AlreadyExistsException subclasses (e.g.
- * FacilityNotFoundException, PageAlreadyExistsException), plus the
+ * Covers: specific NotFoundException / AlreadyExistsException subclasses
+ * (e.g. FacilityNotFoundException, PageAlreadyExistsException), the
  * pre-existing ResponseStatusException (still used for simple field
- * validation), IllegalArgumentException / IllegalStateException, and a
- * generic fallback for anything unexpected.
+ * validation and business-rule conflicts that don't map to one entity),
+ * IllegalArgumentException / IllegalStateException, and a generic
+ * fallback for anything unexpected.
  */
-@RestControllerAdvice(assignableTypes = {
-        UIPageController.class,
-        FacilityAdminController.class,
-        WorkflowStepAdminController.class
-})
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // Specific "not found" exceptions, e.g. FacilityNotFoundException,

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import dynamicUi.demo.constant.PageStatus;
+import dynamicUi.demo.exception.PageNotFoundException;
 import dynamicUi.demo.repoistory.UIPageRepository;
 import dynamicUi.demo.service.inter.UIPageJsonService;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
     @Override
     public UIPageJson getByPageCode(String pageCode) {
         UIPage page = uiPageRepository.findByPageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page not found: " + pageCode));
+                .orElseThrow(() -> new PageNotFoundException("Page not found: " + pageCode));
 
         // Uses getIsActive() — fixed in UIPage.java
         if (page.getStatus() != PageStatus.ACTIVE) {
@@ -56,7 +57,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
         }
 
         return uiPageJsonRepository.findByUiPage_PageCode(pageCode)
-                .orElseThrow(() -> new RuntimeException("Page schema not found: " + pageCode));
+                .orElseThrow(() -> new PageNotFoundException("Page schema not found: " + pageCode));
     }
 
     @Override
@@ -220,7 +221,7 @@ public class UIPageJsonServiceImp implements UIPageJsonService {
                 .orElseGet(() -> {
                     // Load managed UIPage — never create a detached one
                     UIPage managedPage = uiPageRepository.findByPageCode(pageCode)
-                            .orElseThrow(() -> new RuntimeException(
+                            .orElseThrow(() -> new PageNotFoundException(
                                     "Cannot sync page JSON — page not found: " + pageCode));
                     UIPageJson newJson = new UIPageJson();
                     newJson.setUiPage(managedPage);

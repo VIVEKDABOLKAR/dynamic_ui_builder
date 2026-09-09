@@ -1,9 +1,11 @@
 package dynamicUi.demo.service;
 
 import dynamicUi.demo.dto.UserRoleResponse;
+import dynamicUi.demo.exception.UserNotFoundException;
 import dynamicUi.demo.security.AppUser;
 import dynamicUi.demo.security.AppUserRepository;
 import dynamicUi.demo.security.Role;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -104,16 +106,7 @@ class UserRoleAdminServiceTest {
 
         assertThatThrownBy(() ->
                 service.updateRole(99L, Role.ROLE_ADMIN.name()))
-                .isInstanceOf(ResponseStatusException.class)
-                .satisfies(exception -> {
-                    ResponseStatusException ex =
-                            (ResponseStatusException) exception;
-
-                    assertThat(ex.getStatusCode())
-                            .isEqualTo(HttpStatus.NOT_FOUND);
-                    assertThat(ex.getReason())
-                            .contains("User not found: 99");
-                });
+                .isInstanceOf(UserNotFoundException.class);
 
         verify(appUserRepository, never()).save(any());
     }

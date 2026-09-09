@@ -3,6 +3,8 @@ package dynamicUi.demo.service;
 import dynamicUi.demo.dto.RoleAccessResponse;
 import dynamicUi.demo.entity.AppRole;
 import dynamicUi.demo.entity.RolePermission;
+import dynamicUi.demo.exception.RoleAlreadyExistsException;
+import dynamicUi.demo.exception.RoleNotFoundException;
 import dynamicUi.demo.repoistory.AppRoleRepository;
 import dynamicUi.demo.repoistory.RolePermissionRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -70,7 +72,7 @@ class RolePermissionAdminServiceTest {
         when(appRoleRepository.findByCode("ROLE_MISSING")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getRole("ROLE_MISSING"))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(RoleNotFoundException.class)
                 .hasMessageContaining("ROLE_MISSING");
     }
 
@@ -148,7 +150,7 @@ class RolePermissionAdminServiceTest {
         when(appRoleRepository.findByCode("ROLE_MISSING")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.updatePatterns("ROLE_MISSING", List.of("*")))
-                .isInstanceOf(ResponseStatusException.class);
+                .isInstanceOf(RoleNotFoundException.class);
 
         verify(rolePermissionRepository, never()).deleteByAppRole_Id(any());
     }
@@ -191,7 +193,7 @@ class RolePermissionAdminServiceTest {
         when(appRoleRepository.existsByCode("ROLE_ADMIN")).thenReturn(true);
 
         assertThatThrownBy(() -> service.createRole("Admin", "Administrator", null))
-                .isInstanceOf(ResponseStatusException.class)
+                .isInstanceOf(RoleAlreadyExistsException.class)
                 .hasMessageContaining("ROLE_ADMIN");
 
         verify(appRoleRepository, never()).save(any());

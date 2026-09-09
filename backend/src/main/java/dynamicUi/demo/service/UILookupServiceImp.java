@@ -3,6 +3,8 @@ package dynamicUi.demo.service;
 import dynamicUi.demo.dto.UILookupDTO;
 import dynamicUi.demo.entity.UILookup;
 import dynamicUi.demo.entity.UILookupMaster;
+import dynamicUi.demo.exception.LookupMasterNotFoundException;
+import dynamicUi.demo.exception.LookupNotFoundException;
 import dynamicUi.demo.repoistory.UILookupMasterRepository;
 import dynamicUi.demo.repoistory.UILookupRepository;
 import dynamicUi.demo.service.inter.UILookupService;
@@ -57,7 +59,7 @@ public class UILookupServiceImp implements UILookupService {
     public UILookupDTO getLookupById(Long id) {
 
         UILookup lookup = uiLookupRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lookup not found"));
+                .orElseThrow(() -> new LookupNotFoundException("Lookup not found"));
 
         return mapToDto(lookup);
     }
@@ -67,7 +69,7 @@ public class UILookupServiceImp implements UILookupService {
 
         UILookupMaster master = uiLookupMasterRepository
                 .findById(dto.getLookupMasterId())
-                .orElseThrow(() -> new RuntimeException("Lookup Master not found"));
+                .orElseThrow(() -> new LookupMasterNotFoundException("Lookup Master not found"));
 
         UILookup lookup = UILookup.builder()
                 .lookupType(dto.getLookupType())
@@ -85,7 +87,7 @@ public class UILookupServiceImp implements UILookupService {
     public UILookupDTO updateLookup(Long id, UILookupDTO dto) {
 
         UILookup lookup = uiLookupRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lookup not found"));
+                .orElseThrow(() -> new LookupNotFoundException("Lookup not found"));
 
         lookup.setLookupType(dto.getLookupType());
         lookup.setLookupValue(dto.getLookupValue());
@@ -97,7 +99,7 @@ public class UILookupServiceImp implements UILookupService {
 
             UILookupMaster master = uiLookupMasterRepository
                     .findById(dto.getLookupMasterId())
-                    .orElseThrow(() -> new RuntimeException("Lookup Master not found"));
+                    .orElseThrow(() -> new LookupMasterNotFoundException("Lookup Master not found"));
 
             lookup.setUiLookupMaster(master);
         }
@@ -109,7 +111,7 @@ public class UILookupServiceImp implements UILookupService {
     public void deleteLookup(Long id) {
 
         if (!uiLookupRepository.existsById(id)) {
-            throw new RuntimeException("Lookup not found");
+            throw new LookupNotFoundException("Lookup not found");
         }
 
         uiLookupRepository.deleteById(id);

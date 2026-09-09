@@ -193,7 +193,7 @@ public class WorkflowConfigurationAdminControllerTest {
          when(service.update(eq(999L),any(WorkflowConfigurationRequest.class)))
                  .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND,"workflow configuration not found ; 999"));
 
-         mockMvc.perform(put("/api/admin/workflow-congiurations")
+         mockMvc.perform(put("/api/admin/workflow-configurations/999")
                  .contentType(MediaType.APPLICATION_JSON)
                  .content(objectMapper.writeValueAsString(request))
          )
