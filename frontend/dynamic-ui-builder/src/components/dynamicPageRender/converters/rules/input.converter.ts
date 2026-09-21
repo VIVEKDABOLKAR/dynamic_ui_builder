@@ -2,7 +2,7 @@ import { ActionRegistry, ComponentSchema } from "../../types/JsonSchema";
 import { FormilyFieldSchema } from "../../types/JsonSchemaFormily";
 import { convertDefaultFieldSchema } from "./default/default.converter";
 
-export function convertInput(
+export function   convertInput(
     comp: ComponentSchema,
     actionRegistry: ActionRegistry = {}
 ): FormilyFieldSchema {
