@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import DynamicNavbar from '../admin/globalUi/DynamicNavbar';
-import { getAccessibleFacilities } from '../../api/facilityApi'
-import DynamicSideBar from '../../components/dynamicPageRender/layout/DynamicSideBar';
+import { getAccessibleFacilities } from '../../api/facilityApi';
+import DynamicSideBar from '../../components/dynamicPageRender/layout/DynamicSidebar';
 
 export default function UI_layout() {
 
