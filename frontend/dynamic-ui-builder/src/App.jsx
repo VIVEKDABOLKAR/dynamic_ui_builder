@@ -23,7 +23,7 @@ import FacilityAccessApproval from '../src/pages/admin/globalUi/FacilityAccessAp
 import LookupManagement from './pages/admin/manages/lookup/LookupManagement'
 import ManageFacilities from './pages/admin/manages/facility/ManageFacilities'
 import ManageWorkflow from './pages/admin/workflow/ManageWorkflow'
-import Test from './pages/admin/Drag&Drop/test'
+import Test from './pages/admin/Drag&Drop/Test'
 import ManageRouteAccess from './pages/admin/manages/facility/routeAccess/ManageRouteAccess'
 import DynamicPageDefault from './pages/ui/DynamicPageDefault'
 import ManageRolePermissions from './pages/admin/manages/security/ManageRolePermissions'
